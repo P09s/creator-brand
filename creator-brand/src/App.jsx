@@ -1,12 +1,18 @@
-import { useState } from 'react'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router } from 'react-router-dom';
+import Header from './component/header';
+import Body from './component/body';
+import Footer from './component/footer';
 
 function App() {
-  const [count, setCount] = useState(0)
 
   return (
     <>
-      <h1 className='text-3xl underline font-sans'>hello</h1>
+      <Router>
+        <div className='font-satoshi'><Header/></div>
+        <div><Body/></div>
+        <div><Footer/></div>
+      </Router>
     </>
   )
 }
