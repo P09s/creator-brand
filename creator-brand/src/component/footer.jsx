@@ -4,7 +4,7 @@ function Footer() {
             <div className="container">
                 <div className="row">
                     <div className="col-md-12 text-center">
-                        <p className="text-muted">© 2023 Your Company Name. All rights reserved.</p>
+                        <p className="text-gray-500 justify-center text-black">© 2026 LINKFLUENCE. All rights reserved.</p>
                     </div>
                 </div>
             </div>
