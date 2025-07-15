@@ -1,12 +1,10 @@
 function Footer() {
     return (
-        <footer className="footer">
+        <footer className="footer bg-black justify-center text-center text-white">
             <div className="container">
-                <div className="row">
-                    <div className="col-md-12 text-center">
-                        <p className="text-gray-500 justify-center text-black">© 2026 LINKFLUENCE. All rights reserved.</p>
+                    <div>
+                        <span>© 2026 LINKFLUENCE. All rights reserved.</span>
                     </div>
-                </div>
             </div>
         </footer>
     );

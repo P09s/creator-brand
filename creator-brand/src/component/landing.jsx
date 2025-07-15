@@ -1,10 +1,10 @@
 function landing() {
   return (
-    <div className="bg-black">
+    <div className="bg-black h-screen">
       <header className="">
-        <nav className="row justify-between items-center bg-black p-4">
+        <nav className="flex justify-center items-center p-4 scr"> 
         <img className="size-15" src="src/assets/img/logo.png" alt="logo"/>
-        <span className="text-white">LINKFLUENCE</span>
+        <span className="text-white font-satoshi text-bold">LINKFLUENCE</span>
         </nav>
       </header>
     </div>

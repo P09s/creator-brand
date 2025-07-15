@@ -2,7 +2,7 @@ import React from 'react';
 import Landing from './landing';
 function Body() {
     return (
-        <div className="body">
+        <div className="bg-black">
             <div><Landing/></div>
         </div>
     );
