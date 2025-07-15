@@ -10,6 +10,7 @@ function App() {
   return (
     <>
       <Router>
+        <div className='bg-black min-h-screen'>
         <div className="font-satoshi">
           <Header setHeaderHeight={setHeaderHeight} />
         </div>
@@ -18,6 +19,7 @@ function App() {
         </div>
         <div className="font-satoshi">
           <Footer />
+        </div>
         </div>
       </Router>
     </>
