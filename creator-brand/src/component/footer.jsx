@@ -1,11 +1,7 @@
 function Footer() {
     return (
-        <footer className="footer bg-black justify-center text-center text-white">
-            <div className="container">
-                    <div>
-                        <span>© 2026 LINKFLUENCE. All rights reserved.</span>
-                    </div>
-            </div>
+        <footer className="bg-black text-gray-400 justify-center items-center flex flex-col py-4">
+            <span>@ 2025 LinkFluence, All rights reserved.</span>
         </footer>
     );
 }
