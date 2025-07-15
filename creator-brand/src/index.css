@@ -18,3 +18,28 @@
     font-family: 'Satoshi-Variable', sans-serif;
   }
 }
+@keyframes glowMove {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+.border-glow {
+  border-radius: 1rem;
+  background: linear-gradient(
+    270deg,
+    red,
+    blue,
+    green,
+    yellow,
+    red
+  );
+  background-size: 600% 600%;
+  animation: glowMove 5s linear infinite;
+  filter: blur(12px) brightness(2);
+  opacity: 1;
+  z-index: 0;
+}
