@@ -185,7 +185,72 @@ function Landing() {
             </p>
           </div>
         </div>
-
+        <div className="max-w-7xl mx-auto px-4 py-16 w-full">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-bold text-white mb-4 font-satoshi">Choose Your Plan</h2>
+            <p className="text-lg text-gray-400 font-satoshi">Select the perfect plan for your influencer marketing journey</p>
+          </div>
+          
+          <div className="flex items-stretch justify-center space-x-8">
+            {plans.map((plan, index) => (
+              <div key={plan.name} className="flex items-stretch">
+                <div className="flex-1 w-80 relative">
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                      <span className="bg-white text-black px-4 py-1 rounded-full text-sm font-medium font-satoshi">
+                        Most Popular
+                      </span>
+                    </div>
+                  )}
+                  
+                  <div className={`bg-neutral-900 rounded-2xl shadow-lg p-8 h-full flex flex-col min-h-[600px] ${
+                    plan.popular ? 'border-2 border-white' : 'border border-gray-700'
+                  }`}>
+                    <div className="text-center mb-6">
+                      <h3 className="text-2xl font-bold text-white mb-2 font-satoshi">{plan.name}</h3>
+                      <p className="text-gray-400 mb-4 font-satoshi">{plan.description}</p>
+                      <div className="flex items-baseline justify-center">
+                        <span className="text-4xl font-bold text-white font-satoshi">{plan.price}</span>
+                        <span className="text-gray-400 ml-1 font-satoshi">/{plan.period}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 mb-8">
+                      <ul className="space-y-3">
+                        {plan.features.map((feature, i) => (
+                          <li key={i} className="flex items-center">
+                            <Check className="w-5 h-5 text-white mr-3 flex-shrink-0" />
+                            <span className="text-gray-300 font-satoshi">{feature}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <button className={`w-full py-3 px-6 rounded-lg font-semibold transition-all duration-200 font-satoshi ${
+                      plan.popular 
+                        ? 'bg-white text-black hover:bg-gray-200 shadow-lg' 
+                        : 'bg-gray-800 text-white hover:bg-gray-700 border border-gray-600'
+                    }`}>
+                      {plan.buttonText}
+                    </button>
+                  </div>
+                </div>
+                
+                {index < plans.length - 1 && (
+                  <div className="flex items-center mx-4">
+                    <div className="w-px h-[600px] bg-gray-700"></div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <p className="text-gray-400 font-satoshi">
+              All plans include a 30-day free trial. No credit card required.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );
