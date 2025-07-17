@@ -34,7 +34,7 @@ function Header({ setHeaderHeight }) {
       ref={headerRef}
       className={`fixed top-0 left-0 w-full z-50 transition-all duration-300
         ${scrolled ? 'bg-black/30 backdrop-blur-sm shadow-md' : 'bg-black'}
-        justify-center items-center flex flex-col py-3 pb-1`}
+        justify-center items-center flex flex-col py-3 pb-6 border-b-[0.5px] border-neutral-400`}
     >
       {/* Logo and Title */}
       <div
