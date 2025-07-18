@@ -48,7 +48,7 @@ function Header({ setHeaderHeight }) {
       {/* Navigation Buttons */}
       <div className="flex flex-row items-center gap-6 mt-3">
         <button
-          onClick={() => navigate('/explore')}
+          // onClick={() => navigate('/explore')}
           className="text-gray-200 font-satoshi flex items-center"
         >
           Explore <ChevronDown className="inline size-4 ml-1" />

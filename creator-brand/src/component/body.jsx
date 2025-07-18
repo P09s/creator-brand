@@ -12,7 +12,7 @@ function Body() {
       <Route path="/" element={<Landing />} />
       <Route path="/organization" element={<Organization />} />
       <Route path="/influencer" element={<Influencer />} />
-      <Route path="/explore" element={<Explore />} />
+      {/* <Route path="/explore" element={<Explore />} /> */}
       <Route path="/pro" element={<Pro />} />
     </Routes>
   );
