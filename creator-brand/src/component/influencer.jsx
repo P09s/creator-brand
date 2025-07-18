@@ -42,7 +42,7 @@ export default function Influencer() {
         {/* Right Side Image or Illustration */}
         <div className="flex-1">
           <img
-            src="src/assets/img/influencer-profile-preview.png"
+            src="src/assets/img/bg.webp"
             alt="Influencer Profile"
             className="rounded-xl shadow-2xl border border-white/10"
           />

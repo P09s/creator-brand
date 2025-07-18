@@ -42,7 +42,7 @@ export default function OrganizationLanding() {
         {/* Right Side Image or Illustration */}
         <div className="flex-1">
           <img
-            src="src/assets/img/org-dashboard-mock.png"
+            src="src/assets/img/bg.webp"
             alt="Organization Dashboard"
             className="rounded-xl shadow-2xl border border-white/10"
           />
