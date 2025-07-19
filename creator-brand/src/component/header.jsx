@@ -1,12 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 function Header({ setHeaderHeight }) {
   const headerRef = useRef();
   const [scrolled, setScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Scroll background effect
   useEffect(() => {
@@ -41,6 +42,9 @@ function Header({ setHeaderHeight }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Helper to check active path
+  const isActive = (path) => location.pathname === path;
+
   return (
     <header
       ref={headerRef}
@@ -60,13 +64,22 @@ function Header({ setHeaderHeight }) {
       {/* Navigation Buttons */}
       <div className="flex flex-row items-center gap-6 mt-3 relative">
         {/* Explore Dropdown */}
-        <div className="relative">
+        <div className="relative group">
           <button
             onClick={() => setShowDropdown((prev) => !prev)}
-            className="text-gray-200 font-satoshi flex items-center"
+            className="text-gray-200 font-satoshi flex items-center gap-1 transition-colors duration-300 relative"
           >
-            Explore <ChevronDown className="inline size-4 ml-1" />
+            Explore
+            <ChevronDown
+              className={`inline size-4 ml-1 transition-transform duration-300 ${
+                showDropdown ? 'rotate-180' : 'rotate-0'
+              }`}
+            />
           </button>
+          {/* Underline on hover */}
+          <span
+            className="absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left scale-x-0 group-hover:scale-x-100"
+          ></span>
 
           {showDropdown && (
             <div className="absolute top-full left-0 mt-2 bg-black border border-neutral-700 rounded shadow-lg w-48 z-50">
@@ -101,27 +114,50 @@ function Header({ setHeaderHeight }) {
           )}
         </div>
 
-        {/* Other Navigation */}
-        <button
-          onClick={() => navigate('/organization')}
-          className="text-gray-200 font-satoshi"
-        >
-          Organization
-        </button>
+        {/* Organization */}
+        <div className="relative group">
+          <button
+            onClick={() => navigate('/organization')}
+            className={`text-gray-200 font-satoshi transition duration-300 ${
+              isActive('/organization') ? 'font-bold text-white' : ''
+            }`}
+          >
+            Organization
+          </button>
+          <span
+            className={`absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left
+              ${isActive('/organization') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}
+          ></span>
+        </div>
 
-        <button
-          onClick={() => navigate('/influencer')}
-          className="text-gray-200 font-satoshi"
-        >
-          Influencer
-        </button>
+        {/* Influencer */}
+        <div className="relative group">
+          <button
+            onClick={() => navigate('/influencer')}
+            className={`text-gray-200 font-satoshi transition duration-300 ${
+              isActive('/influencer') ? 'font-bold text-white' : ''
+            }`}
+          >
+            Influencer
+          </button>
+          <span
+            className={`absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left
+              ${isActive('/influencer') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}
+          ></span>
+        </div>
 
-        <button
-          onClick={() => navigate('/pro')}
-          className="text-gray-200 font-bold font-satoshi flex items-center gap-1"
-        >
-          Pro Member
-        </button>
+        {/* Pro Member */}
+        <div className="relative group">
+          <button
+            onClick={() => navigate('/pro')}
+            className="text-gray-200 font-bold font-satoshi flex items-center gap-1 relative transition duration-300 group-hover:text-white"
+          >
+            Pro Member
+          </button>
+          <span
+            className="absolute left-0 -bottom-1 h-[2px] w-full bg-purple-500 transition-transform duration-300 origin-left scale-x-0 group-hover:scale-x-100"
+          ></span>
+        </div>
       </div>
     </header>
   );

@@ -71,7 +71,7 @@ function Landing() {
   ];
 
   return (
-    <div className=" bg-black flex justify-center mt-30">
+    <div className=" bg-black flex justify-center mt-20">
       <div className="flex flex-col items-center text-center space-y-4 max-w-screen-xl px-4 w-full">
         {/* Button */}
         <div className="relative glow-wrapper">
