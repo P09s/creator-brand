@@ -154,7 +154,7 @@ function Header({ setHeaderHeight }) {
                      hover:scale-110 hover:px-8 hover:shadow-2xl hover:shadow-white/20
                      relative z-10"
           >
-            Pro Member
+            Join Pro
           </button>
           
         </div>
