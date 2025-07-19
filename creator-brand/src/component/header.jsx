@@ -5,7 +5,8 @@ import { useNavigate } from 'react-router-dom';
 function Header({ setHeaderHeight }) {
   const headerRef = useRef();
   const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate(); // ✅ Must be at top level
+  const [showDropdown, setShowDropdown] = useState(false);
+  const navigate = useNavigate();
 
   // Scroll background effect
   useEffect(() => {
@@ -24,10 +25,21 @@ function Header({ setHeaderHeight }) {
       }
     };
 
-    updateHeaderHeight(); // Initial call
+    updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
     return () => window.removeEventListener('resize', updateHeaderHeight);
   }, [setHeaderHeight]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!headerRef.current?.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header
@@ -46,14 +58,50 @@ function Header({ setHeaderHeight }) {
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex flex-row items-center gap-6 mt-3">
-        <button
-          // onClick={() => navigate('/explore')}
-          className="text-gray-200 font-satoshi flex items-center"
-        >
-          Explore <ChevronDown className="inline size-4 ml-1" />
-        </button>
+      <div className="flex flex-row items-center gap-6 mt-3 relative">
+        {/* Explore Dropdown */}
+        <div className="relative">
+          <button
+            onClick={() => setShowDropdown((prev) => !prev)}
+            className="text-gray-200 font-satoshi flex items-center"
+          >
+            Explore <ChevronDown className="inline size-4 ml-1" />
+          </button>
 
+          {showDropdown && (
+            <div className="absolute top-full left-0 mt-2 bg-black border border-neutral-700 rounded shadow-lg w-48 z-50">
+              <button
+                onClick={() => {
+                  navigate('/explore/trending');
+                  setShowDropdown(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-neutral-800"
+              >
+                🔥 Trending
+              </button>
+              <button
+                onClick={() => {
+                  navigate('/explore/categories');
+                  setShowDropdown(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-neutral-800"
+              >
+                🗂️ Categories
+              </button>
+              <button
+                onClick={() => {
+                  navigate('/explore/top-influencers');
+                  setShowDropdown(false);
+                }}
+                className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-neutral-800"
+              >
+                🌟 Top Influencers
+              </button>
+            </div>
+          )}
+        </div>
+
+        {/* Other Navigation */}
         <button
           onClick={() => navigate('/organization')}
           className="text-gray-200 font-satoshi"
