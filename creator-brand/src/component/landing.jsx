@@ -89,6 +89,28 @@ function Landing() {
           Discover, engage, and grow your brand with the power of influencer marketing.
         </span>
 
+        <div className="mt-6 flex flex-col sm:flex-row justify-center items-center gap-8 group relative">
+          {/* Left Button - Secondary */}
+          <button
+            onClick={() => navigate('/explore')}
+            className="bg-neutral-900 text-white px-6 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600
+                     hover:scale-110 hover:px-12 hover:shadow-2xl hover:shadow-white/20
+                     relative z-10"
+          >
+            Explore the Platform
+          </button>
+
+          {/* Right Button - Primary Focus */}
+          <button
+            onClick={() => navigate('/influencer')}
+            className="bg-white text-black px-6 py-3 rounded-full font-semibold shadow-md transition-all duration-500 ease-out
+                     hover:scale-110 hover:px-12 hover:shadow-2xl hover:shadow-black/30
+                     relative z-10"
+          >
+            Become an Influencer
+          </button>
+        </div>
+
         {/* Mac-style window with image slider */}
         <div className="w-full max-w-4xl mt-20">
           <div className="bg-neutral-800 rounded-xl overflow-hidden border border-white/20 shadow-lg">

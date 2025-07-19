@@ -150,13 +150,13 @@ function Header({ setHeaderHeight }) {
         <div className="relative group">
           <button
             onClick={() => navigate('/pro')}
-            className="text-gray-200 font-bold font-satoshi flex items-center gap-1 relative transition duration-300 group-hover:text-white"
+            className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600
+                     hover:scale-110 hover:px-8 hover:shadow-2xl hover:shadow-white/20
+                     relative z-10"
           >
             Pro Member
           </button>
-          <span
-            className="absolute left-0 -bottom-1 h-[2px] w-full bg-purple-500 transition-transform duration-300 origin-left scale-x-0 group-hover:scale-x-100"
-          ></span>
+          
         </div>
       </div>
     </header>
