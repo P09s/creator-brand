@@ -1,5 +1,3 @@
-// explore/index.jsx (Final Version with Templates, Onboarding Flow, All Features)
-
 import { Outlet } from 'react-router-dom';
 import { useState } from 'react';
 import {
