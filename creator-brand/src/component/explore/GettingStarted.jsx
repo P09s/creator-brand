@@ -1,4 +1,4 @@
-function Trending() {
+function GettingStarted() {
     return (
       <div>
         <h2 className="text-2xl font-bold font-satoshi mb-4">Trending Content</h2>
@@ -7,5 +7,5 @@ function Trending() {
     );
   }
   
-  export default Trending;
+  export default GettingStarted;
   

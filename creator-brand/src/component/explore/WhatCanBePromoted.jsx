@@ -1,4 +1,4 @@
-function TopInfluencers() {
+function WhatCanBePromoted() {
     return (
       <div>
         <h2 className="text-2xl font-bold font-satoshi mb-4">Trending Content</h2>
@@ -7,5 +7,5 @@ function TopInfluencers() {
     );
   }
   
-  export default TopInfluencers;
+  export default WhatCanBePromoted;
   

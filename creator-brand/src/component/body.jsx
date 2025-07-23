@@ -6,10 +6,11 @@ import Landing from './landing';
 import Organization from './organization';
 import Influencer from './influencer';
 import Explore from './explore';
-import Trending from './explore/Trending';
-import Categories from './explore/Categories';
-import TopInfluencers from './explore/TopInfluencers';
+import HowItWorks from './explore/HowItWorks';
+import WhatCanBePromoted from './explore/WhatCanBePromoted';
 import Pro from './pro';
+import GettingStarted from './explore/GettingStarted';
+import CampaignTemplate from './explore/CampaignTemplate';
 
 function Body() {
   const location = useLocation();
@@ -22,9 +23,10 @@ function Body() {
         <Route path="/influencer" element={<PageWrapper><Influencer /></PageWrapper>} />
         
         <Route path="/explore" element={<PageWrapper><Explore /></PageWrapper>}>
-          <Route path="trending" element={<PageWrapper><Trending /></PageWrapper>} />
-          <Route path="categories" element={<PageWrapper><Categories /></PageWrapper>} />
-          <Route path="top-influencers" element={<PageWrapper><TopInfluencers /></PageWrapper>} />
+          <Route path="getting-started" element={<PageWrapper><GettingStarted /></PageWrapper>} />
+          <Route path="how-it-works" element={<PageWrapper><HowItWorks /></PageWrapper>} />
+          <Route path="what-can-be-promoted" element={<PageWrapper><WhatCanBePromoted /></PageWrapper>} />
+          <Route path="campaign-template" element={<PageWrapper><CampaignTemplate /></PageWrapper>} />
         </Route>
 
         <Route path="/pro" element={<PageWrapper><Pro /></PageWrapper>} />

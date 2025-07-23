@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 
 function Header({ setHeaderHeight }) {
   const headerRef = useRef();
@@ -81,37 +82,44 @@ function Header({ setHeaderHeight }) {
             className="absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left scale-x-0 group-hover:scale-x-100"
           ></span>
 
-          {showDropdown && (
-            <div className="absolute top-full left-0 mt-2 bg-black border border-neutral-700 rounded shadow-lg w-48 z-50">
-              <button
-                onClick={() => {
-                  navigate('/explore/trending');
-                  setShowDropdown(false);
+          <AnimatePresence>
+            {showDropdown && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 300,
+                  damping: 22
                 }}
-                className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-neutral-800"
+                className="absolute top-full left-0 mt-2 w-60 z-50 bg-black/80 backdrop-blur-md border border-neutral-700 rounded-2xl shadow-xl overflow-hidden"
               >
-                🔥 Trending
-              </button>
-              <button
-                onClick={() => {
-                  navigate('/explore/categories');
-                  setShowDropdown(false);
-                }}
-                className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-neutral-800"
-              >
-                🗂️ Categories
-              </button>
-              <button
-                onClick={() => {
-                  navigate('/explore/top-influencers');
-                  setShowDropdown(false);
-                }}
-                className="block w-full text-left px-4 py-2 text-gray-200 hover:bg-neutral-800"
-              >
-                🌟 Top Influencers
-              </button>
-            </div>
-          )}
+                {[
+                  { label: 'Getting Started', path: '/explore/getting-started' },
+                  { label: 'How It Works', path: '/explore/how-it-works' },
+                  { label: 'What Can Be Promoted', path: '/explore/what-can-be-promoted' },
+                  { label: 'Campaign Templates', path: '/explore/campaign-template' }
+                ].map((item, idx, arr) => (
+                  <div key={item.label}>
+                    <button
+                      onClick={() => {
+                        navigate(item.path);
+                        setShowDropdown(false);
+                      }}
+                      className="w-full text-left px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition duration-150"
+                    >
+                      {item.label}
+                    </button>
+
+                    {idx < arr.length - 1 && (
+                      <div className="mx-4 my-[1px] h-px bg-white/10" />
+                    )}
+                  </div>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Organization */}
