@@ -79,7 +79,7 @@ function Explore() {
         </div>
 
         {/* Onboarding Flow */}
-        <div id="getting-started" className="mb-20">
+        <div id="getting-started" className="mb-20 scroll-mt-[600px]">
           <h3 className="text-2xl font-bold mb-6 text-center">Getting Started</h3>
           <div className="grid md:grid-cols-3 gap-6 text-center">
             {[{
@@ -99,7 +99,7 @@ function Explore() {
         </div>
 
         {/* How It Works */}
-        <div id="how-it-works" className="mb-20">
+        <div id="how-it-works" className="mb-20 scroll-mt-[210px]">
           <h3 className="text-2xl font-bold mb-6 text-center">How It Works</h3>
           <div className="grid md:grid-cols-3 gap-6 text-center">
             {[{
@@ -125,7 +125,7 @@ function Explore() {
         </div>
 
         {/* Promo Categories */}
-        <div id="what-can-be-promoted" className="mb-20">
+        <div id="what-can-be-promoted" className="mb-20 scroll-mt-[210px]">
           <h3 className="text-2xl font-bold mb-6 text-center">What Can Be Promoted?</h3>
           <div className="flex justify-center mb-6">
             <div className="relative w-full max-w-md">
@@ -155,7 +155,7 @@ function Explore() {
         </div>
 
         {/* Campaign Templates */}
-        <div id="campaign-templates" className="mb-20">
+        <div id="campaign-templates" className="mb-20 scroll-mt-[210px]">
           <h3 className="text-2xl font-bold mb-6 text-center">Campaign Templates</h3>
           <p className="text-center text-gray-400 mb-6">Use ready-made campaign blueprints and customize them to launch faster.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
