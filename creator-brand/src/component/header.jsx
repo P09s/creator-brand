@@ -56,7 +56,7 @@ function Header({ setHeaderHeight }) {
       {/* Logo and Title */}
       <div
         className="flex flex-row items-center gap-2 cursor-pointer"
-        onClick={() => navigate('/')}
+        onClick={() => navigate('/', { replace: true, state: {} })}
       >
         <img className="size-12" src="src/assets/img/logo.png" alt="logo" />
         <span className="text-white font-bold font-satoshi text-xl">LinkFluence</span>
@@ -77,7 +77,6 @@ function Header({ setHeaderHeight }) {
               }`}
             />
           </button>
-          {/* Underline on hover */}
           <span
             className="absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left scale-x-0 group-hover:scale-x-100"
           ></span>
@@ -96,15 +95,15 @@ function Header({ setHeaderHeight }) {
                 className="absolute top-full left-0 mt-2 w-60 z-50 bg-black/80 backdrop-blur-md border border-neutral-700 rounded-2xl shadow-xl overflow-hidden"
               >
                 {[
-                  { label: 'Getting Started', path: '/explore/getting-started' },
-                  { label: 'How It Works', path: '/explore/how-it-works' },
-                  { label: 'What Can Be Promoted', path: '/explore/what-can-be-promoted' },
-                  { label: 'Campaign Templates', path: '/explore/campaign-template' }
+                  { label: 'Getting Started', hash: 'getting-started' },
+                  { label: 'How It Works', hash: 'how-it-works' },
+                  { label: 'What Can Be Promoted', hash: 'what-can-be-promoted' },
+                  { label: 'Campaign Templates', hash: 'campaign-templates' }
                 ].map((item, idx, arr) => (
                   <div key={item.label}>
                     <button
                       onClick={() => {
-                        navigate(item.path);
+                        navigate(`/explore#${item.hash}`);
                         setShowDropdown(false);
                       }}
                       className="w-full text-left px-4 py-2 text-gray-200 hover:bg-white/10 hover:text-white transition duration-150"
@@ -125,7 +124,7 @@ function Header({ setHeaderHeight }) {
         {/* Organization */}
         <div className="relative group">
           <button
-            onClick={() => navigate('/organization')}
+            onClick={() => navigate('/organization', { replace: true, state: {} })}
             className={`text-gray-200 font-satoshi transition duration-300 ${
               isActive('/organization') ? 'font-bold text-white' : ''
             }`}
@@ -141,7 +140,7 @@ function Header({ setHeaderHeight }) {
         {/* Influencer */}
         <div className="relative group">
           <button
-            onClick={() => navigate('/influencer')}
+            onClick={() => navigate('/influencer', { replace: true, state: {} })}
             className={`text-gray-200 font-satoshi transition duration-300 ${
               isActive('/influencer') ? 'font-bold text-white' : ''
             }`}
@@ -157,14 +156,13 @@ function Header({ setHeaderHeight }) {
         {/* Pro Member */}
         <div className="relative group">
           <button
-            onClick={() => navigate('/pro')}
+            onClick={() => navigate('/pro', { replace: true, state: {} })}
             className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600
                      hover:scale-110 hover:px-8 hover:shadow-2xl hover:shadow-white/20
                      relative z-10"
           >
             Join Pro
           </button>
-          
         </div>
       </div>
     </header>
