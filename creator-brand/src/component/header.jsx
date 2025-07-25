@@ -2,15 +2,16 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import SignInModal from '../auth/SignInModal';
 
 function Header({ setHeaderHeight }) {
   const headerRef = useRef();
   const [scrolled, setScrolled] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showSignInModal, setShowSignInModal] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Scroll background effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -19,20 +20,21 @@ function Header({ setHeaderHeight }) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Measure and set header height
+  useEffect(() => {
+    document.body.style.overflow = showSignInModal ? 'hidden' : 'auto';
+  }, [showSignInModal]);
+
   useEffect(() => {
     const updateHeaderHeight = () => {
       if (headerRef.current) {
         setHeaderHeight?.(headerRef.current.offsetHeight);
       }
     };
-
     updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
     return () => window.removeEventListener('resize', updateHeaderHeight);
   }, [setHeaderHeight]);
 
-  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!headerRef.current?.contains(event.target)) {
@@ -43,29 +45,27 @@ function Header({ setHeaderHeight }) {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Helper to check active path
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header
-      ref={headerRef}
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300
-        ${scrolled ? 'bg-black/30 backdrop-blur-sm shadow-md' : 'bg-black'}
-        justify-center items-center flex flex-col py-3 pb-6 border-b-[0.5px] border-neutral-700`}
-    >
-      {/* Logo and Title */}
-      <div
-        className="flex flex-row items-center gap-2 cursor-pointer"
-        onClick={() => navigate('/', { replace: true, state: {} })}
+    <>
+      <header
+        ref={headerRef}
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-300
+          ${scrolled ? 'bg-black/30 backdrop-blur-sm shadow-md' : 'bg-black'}
+          border-b-[0.5px] border-neutral-700 px-6 py-3`}
       >
-        <img className="size-12" src="src/assets/img/logo.png" alt="logo" />
-        <span className="text-white font-bold font-satoshi text-xl">LinkFluence</span>
-      </div>
-
-      {/* Navigation Buttons */}
-      <div className="flex flex-row items-center gap-6 mt-3 relative">
-        {/* Explore Dropdown */}
-        <div className="relative group">
+        <div className="relative flex justify-center items-center w-full">
+          <div className="flex flex-col items-center">
+            <div
+              className="flex flex-row items-center gap-2 cursor-pointer"
+              onClick={() => navigate('/', { replace: true })}
+            >
+              <img className="size-12" src="src/assets/img/logo.png" alt="logo" />
+              <span className="text-white font-bold font-satoshi text-xl">LinkFluence</span>
+            </div>
+            <div className="flex flex-row items-center gap-6 mt-3 relative">
+            <div className="relative group">
           <button
             onClick={() => setShowDropdown((prev) => !prev)}
             className="text-gray-200 font-satoshi flex items-center gap-1 transition-colors duration-300 relative"
@@ -120,52 +120,65 @@ function Header({ setHeaderHeight }) {
             )}
           </AnimatePresence>
         </div>
-
-        {/* Organization */}
-        <div className="relative group">
-          <button
-            onClick={() => navigate('/organization', { replace: true, state: {} })}
-            className={`text-gray-200 font-satoshi transition duration-300 ${
-              isActive('/organization') ? 'font-bold text-white' : ''
-            }`}
-          >
-            Organization
-          </button>
-          <span
-            className={`absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left
-              ${isActive('/organization') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}
-          ></span>
+              <div className="relative group">
+                <button
+                  onClick={() => navigate('/organization', { replace: true })}
+                  className={`text-gray-200 font-satoshi transition duration-300 ${
+                    isActive('/organization') ? 'font-bold text-white' : ''
+                  }`}
+                >
+                  Organization
+                </button>
+                <span
+                  className={`absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left ${
+                    isActive('/organization') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  }`}
+                />
+              </div>
+              <div className="relative group">
+                <button
+                  onClick={() => navigate('/influencer', { replace: true })}
+                  className={`text-gray-200 font-satoshi transition duration-300 ${
+                    isActive('/influencer') ? 'font-bold text-white' : ''
+                  }`}
+                >
+                  Influencer
+                </button>
+                <span
+                  className={`absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left ${
+                    isActive('/influencer') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                  }`}
+                />
+              </div>
+              <div className="relative group">
+                <button
+                  onClick={() => navigate('/pro', { replace: true })}
+                  className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600
+                           hover:scale-110 hover:px-8 hover:shadow-2xl hover:shadow-white/20 relative z-10"
+                >
+                  Join Pro
+                </button>
+              </div>
+            </div>
+          </div>
+          <div className="absolute right-6 top-1/2 -translate-y-1/2">
+            <button
+              onClick={() => setShowSignInModal(true)}
+              className="bg-neutral-900 text-white px-6 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-300 ease-out hover:bg-neutral-800 hover:border-neutral-600
+                hover:scale-110 hover:shadow-2xl hover:shadow-white/20 relative z-10"
+            >
+              Sign In
+            </button>
+          </div>
         </div>
+      </header>
 
-        {/* Influencer */}
-        <div className="relative group">
-          <button
-            onClick={() => navigate('/influencer', { replace: true, state: {} })}
-            className={`text-gray-200 font-satoshi transition duration-300 ${
-              isActive('/influencer') ? 'font-bold text-white' : ''
-            }`}
-          >
-            Influencer
-          </button>
-          <span
-            className={`absolute left-0 -bottom-1 h-[2px] w-full bg-white transition-transform duration-300 origin-left
-              ${isActive('/influencer') ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'}`}
-          ></span>
-        </div>
-
-        {/* Pro Member */}
-        <div className="relative group">
-          <button
-            onClick={() => navigate('/pro', { replace: true, state: {} })}
-            className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600
-                     hover:scale-110 hover:px-8 hover:shadow-2xl hover:shadow-white/20
-                     relative z-10"
-          >
-            Join Pro
-          </button>
-        </div>
-      </div>
-    </header>
+      <AnimatePresence>
+        {showSignInModal && (
+          <SignInModal isOpen={showSignInModal} onClose={() => setShowSignInModal(false)} />
+        )}
+      </AnimatePresence>
+    </>
   );
 }
 

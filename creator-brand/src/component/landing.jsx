@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Check } from 'lucide-react';
 
+
 const images = [
   "src/assets/img/image.png",
   "src/assets/img/image.png",
@@ -109,6 +110,18 @@ function Landing() {
           >
             Become an Influencer
           </button>
+        </div>
+        <div>
+          <span className="text-gray-400 font-satoshi text-lg"> 
+                  already have an account?
+                  </span>
+            <button
+              //onClick={() => navigate('/login', { replace: true, state: {} })}
+              className="text-white hover:underline ml-1"
+            >
+              Login 
+            </button>
+          
         </div>
 
         {/* Mac-style window with image slider */}
