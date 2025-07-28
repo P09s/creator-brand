@@ -20,19 +20,27 @@ export default function SignInForm() {
   };
 
   return (
-    <div className="w-full h-full flex">
-      {/* Visual/Brand Side (Inspired by Dropbox/Airbnb) */}
-      <div className="w-1/2 bg-gradient-to-br from-gray-800 to-neutral-900 p-6 flex items-center justify-center text-white">
-        <div className="text-center">
-          <h3 className="text-xl font-semibold mb-2">Welcome Back</h3>
-          <p className="text-sm text-gray-300">
+    <div className="w-full h-full relative text-center overflow-hidden flex">
+      <div className="relative w-1/2 text-white ">
+        {/* Background Image */}
+        <img
+          src="src/assets/img/login.png"
+          alt="background"
+          className="w-full h-full object-cover overflow-hidden rounded-xl"
+        />
+
+        {/* Overlaying Text */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center ">
+          <h3 className="text-3xl font-bold mb-4">Welcome Back</h3>
+          <p className="text-lg text-gray-200 max-w-md px-2">
             Sign in to explore a world of possibilities and seamless experiences.
           </p>
         </div>
       </div>
 
+
       {/* Form Side */}
-      <div className="w-1/2 bg-neutral-900 p-6 flex items-center justify-center">
+      <div className="w-1/2 bg-neutral-900 p-6 flex items-center justify-center ml-10">
         <div className="w-full max-w-md space-y-6">
           {/* Tabs */}
           <div className="flex border-b border-neutral-700">
@@ -59,7 +67,7 @@ export default function SignInForm() {
           {/* Form Content */}
           {activeTab === 'login' ? (
             <div className="space-y-4">
-              <h2 className="text-xl font-medium text-center">Sign In</h2>
+              <h2 className="text-white text-xl font-medium text-center">Sign In</h2>
               {/* Email */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="email" className="text-xs font-medium text-gray-300">
@@ -128,7 +136,7 @@ export default function SignInForm() {
             </div>
           ) : (
             <div className="space-y-4">
-              <h2 className="text-xl font-medium text-center">Create Account</h2>
+              <h2 className="text-white text-xl font-medium text-center">Create Account</h2>
               {/* Name */}
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="name" className="text-xs font-medium text-gray-300">
