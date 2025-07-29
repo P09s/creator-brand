@@ -21,7 +21,7 @@ export default function SignInForm() {
 
   return (
     <div className="w-full h-full relative text-center overflow-hidden flex">
-      <div className="relative w-1/2 text-white ">
+      <div className="relative w-1/2 text-white">
         {/* Background Image */}
         <img
           src="src/assets/img/login.png"
@@ -30,7 +30,7 @@ export default function SignInForm() {
         />
 
         {/* Overlaying Text */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center ">
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
           <h3 className="text-3xl font-bold mb-4">Welcome Back</h3>
           <p className="text-lg text-gray-200 max-w-md px-2">
             Sign in to explore a world of possibilities and seamless experiences.
@@ -38,9 +38,8 @@ export default function SignInForm() {
         </div>
       </div>
 
-
       {/* Form Side */}
-      <div className="w-1/2 bg-neutral-900 p-6 flex items-center justify-center ml-10">
+      <div className="w-1/2 p-6 flex items-center justify-center ml-10">
         <div className="w-full max-w-md space-y-6">
           {/* Tabs */}
           <div className="flex border-b border-neutral-700">
@@ -64,146 +63,165 @@ export default function SignInForm() {
             </button>
           </div>
 
-          {/* Form Content */}
-          {activeTab === 'login' ? (
-            <div className="space-y-4">
-              <h2 className="text-white text-xl font-medium text-center">Sign In</h2>
-              {/* Email */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="email" className="text-xs font-medium text-gray-300">
-                  Email address
-                </label>
-                <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
-                  <Mail className="size-4 mr-2 text-gray-400" />
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+          {/* Animated Form Content */}
+          <div
+            className="transition-all duration-300 ease-in-out transform"
+            style={{
+              opacity: activeTab === 'login' ? 1 : 0,
+              transform: activeTab === 'login' ? 'translateX(0)' : 'translateX(20px)',
+            }}
+            key="login"
+          >
+            {activeTab === 'login' && (
+              <div className="space-y-4">
+                <h2 className="text-white text-xl font-medium text-center">Sign In</h2>
+                {/* Email */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="email" className="text-xs font-medium text-gray-300 text-start">
+                    Email address
+                  </label>
+                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                    <Mail className="size-4 mr-2 text-gray-400" />
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Password */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="password" className="text-xs font-medium text-gray-300">
-                  Password
-                </label>
-                <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
-                  <Lock className="size-4 mr-2 text-gray-400" />
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                {/* Password */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="password" className="text-xs font-medium text-gray-300 text-start">
+                    Password
+                  </label>
+                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                    <Lock className="size-4 mr-2 text-gray-400" />
+                    <input
+                      id="password"
+                      type="password"
+                      required
+                      className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Remember + Forgot */}
-              <div className="flex justify-between items-center text-xs text-gray-400">
-                <label className="flex items-center gap-1.5">
-                  <input
-                    type="checkbox"
-                    checked={remember}
-                    onChange={(e) => setRemember(e.target.checked)}
-                    className="accent-white w-3.5 h-3.5"
-                  />
-                  Remember me
-                </label>
+                {/* Remember + Forgot */}
+                <div className="flex justify-between items-center text-xs text-gray-400">
+                  <label className="flex items-center gap-1.5">
+                    <input
+                      type="checkbox"
+                      checked={remember}
+                      onChange={(e) => setRemember(e.target.checked)}
+                      className="accent-white w-3.5 h-3.5"
+                    />
+                    Remember me
+                  </label>
+                  <button
+                    type="button"
+                    className="hover:underline text-white"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+
+                {/* Sign In Button */}
                 <button
                   type="button"
-                  className="hover:underline text-white"
+                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition text-sm"
+                  onClick={handleSubmit}
                 >
-                  Forgot password?
+                  Sign In
                 </button>
               </div>
-
-              {/* Sign In Button */}
-              <button
-                type="submit"
-                className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition text-sm"
-                onClick={handleSubmit}
-              >
-                Sign In
-              </button>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <h2 className="text-white text-xl font-medium text-center">Create Account</h2>
-              {/* Name */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="name" className="text-xs font-medium text-gray-300">
-                  Full Name
-                </label>
-                <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
-                  <UserPlus className="size-4 mr-2 text-gray-400" />
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
-                    placeholder="John Doe"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
+            )}
+          </div>
+          <div
+            className="transition-all duration-300 ease-in-out transform"
+            style={{
+              opacity: activeTab === 'register' ? 1 : 0,
+              transform: activeTab === 'register' ? 'translateX(0)' : 'translateX(-20px)',
+            }}
+            key="register"
+          >
+            {activeTab === 'register' && (
+              <div className="space-y-4">
+                <h2 className="text-white text-xl font-medium text-center">Create Account</h2>
+                {/* Name */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="name" className="text-xs font-medium text-gray-300 text-start">
+                    Full Name
+                  </label>
+                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                    <UserPlus className="size-4 mr-2 text-gray-400" />
+                    <input
+                      id="name"
+                      type="text"
+                      required
+                      className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
+                      placeholder="John Doe"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Email */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="email" className="text-xs font-medium text-gray-300">
-                  Email address
-                </label>
-                <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
-                  <Mail className="size-4 mr-2 text-gray-400" />
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                  />
+                {/* Email */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="email" className="text-xs font-medium text-gray-300 text-start">
+                    Email address
+                  </label>
+                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                    <Mail className="size-4 mr-2 text-gray-400" />
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
+                      placeholder="you@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Password */}
-              <div className="flex flex-col gap-1.5">
-                <label htmlFor="password" className="text-xs font-medium text-gray-300">
-                  Password
-                </label>
-                <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
-                  <Lock className="size-4 mr-2 text-gray-400" />
-                  <input
-                    id="password"
-                    type="password"
-                    required
-                    className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                {/* Password */}
+                <div className="flex flex-col gap-1.5">
+                  <label htmlFor="password" className="text-xs font-medium text-gray-300 text-start">
+                    Password
+                  </label>
+                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                    <Lock className="size-4 mr-2 text-gray-400" />
+                    <input
+                      id="password"
+                      type="password"
+                      required
+                      className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
+                      placeholder="••••••••"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Register Button */}
-              <button
-                type="submit"
-                className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition text-sm"
-                onClick={handleSubmit}
-              >
-                Register
-              </button>
-            </div>
-          )}
+                {/* Register Button */}
+                <button
+                  type="button"
+                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition text-sm"
+                  onClick={handleSubmit}
+                >
+                  Register
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
