@@ -75,7 +75,7 @@ function Landing() {
       <div className="flex flex-col items-center text-center space-y-6 sm:space-y-8 max-w-screen-xl px-4 sm:px-6 md:px-8 w-full">
         {/* Button */}
         <div className="relative glow-wrapper">
-          <button className="relative z-10 text-black bg-white px-4 sm:px-6 py-2 sm:py-3 rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 hover:scale-105">
+          <button className="relative z-10 text-black bg-white px-4 sm:px-6 py-2 sm:py-3 rounded-2xl font-semibold text-sm sm:text-base transition-all duration-300 ">
             Search Collaborate Earn
           </button>
           <div className="absolute inset-0 rounded-2xl border-glow z-0" />
@@ -93,7 +93,7 @@ function Landing() {
           {/* Left Button - Secondary */}
           <button
             onClick={() => navigate('/explore')}
-            className="bg-neutral-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600 hover:scale-105 hover:shadow-2xl hover:shadow-white/20 relative z-10 w-full sm:w-auto"
+            className="bg-neutral-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600 hover:px-12 hover:shadow-2xl hover:shadow-white/20 relative z-10 w-full sm:w-auto"
           >
             Explore the Platform
           </button>
@@ -101,7 +101,7 @@ function Landing() {
           {/* Right Button - Primary Focus */}
           <button
             onClick={() => navigate('/influencer')}
-            className="bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base shadow-md transition-all duration-500 ease-out hover:scale-105 hover:shadow-2xl hover:shadow-black/30 relative z-10 w-full sm:w-auto"
+            className="bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base shadow-md transition-all duration-500 ease-out hover:px-12 hover:shadow-2xl hover:shadow-black/30 relative z-10 w-full sm:w-auto"
           >
             Become an Influencer
           </button>

@@ -157,7 +157,7 @@ function Header({ setHeaderHeight }) {
                 <button
                   onClick={() => navigate('/pro', { replace: true })}
                   className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600
-                           hover:scale-110 hover:shadow-2xl hover:shadow-white/20 relative z-10"
+                           hover:px-8 hover:shadow-2xl hover:shadow-white/20 relative z-10"
                 >
                   Join Pro
                 </button>
@@ -311,7 +311,7 @@ function Header({ setHeaderHeight }) {
                         navigate('/pro', { replace: true });
                         setShowMobileMenu(false);
                       }}
-                      className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600 hover:scale-110 hover:shadow-2xl hover:shadow-white/20 w-full text-center relative z-10"
+                      className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600 hover:px-12 hover:shadow-2xl hover:shadow-white/20 w-full text-center relative z-10"
                     >
                       Join Pro
                     </button>
@@ -326,7 +326,7 @@ function Header({ setHeaderHeight }) {
             <button
               onClick={() => setShowSignInModal(true)}
               className="bg-neutral-900 text-white px-6 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-300 ease-out hover:bg-neutral-800 hover:border-neutral-600
-                hover:scale-110 hover:shadow-2xl hover:shadow-white/20 relative z-10"
+                hover:px-9 hover:shadow-2xl hover:shadow-white/20 relative z-10"
             >
               Sign In
             </button>
