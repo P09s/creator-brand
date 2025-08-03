@@ -7,18 +7,19 @@ export default function SignInForm() {
   const [name, setName] = useState('');
   const [remember, setRemember] = useState(true);
   const [activeTab, setActiveTab] = useState('login');
+  const [userType, setUserType] = useState('influencer');
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (activeTab === 'login') {
-      console.log({ email, password, remember, action: 'login' });
+      console.log({ email, password, remember, userType, action: 'login' });
     } else {
-      console.log({ name, email, password, action: 'register' });
+      console.log({ name, email, password, userType, action: 'register' });
     }
   };
 
   return (
-    <div className="w-full h-full relative text-center overflow-hidden flex flex-col sm:flex-row">
+    <div className="w-full h-full relative text-center overflow-hidden flex flex-col sm:flex-row overflow-y-auto">
       <div className="relative w-full sm:w-1/2 text-white">
         <img
           src="src/assets/img/login.png"
@@ -67,6 +68,20 @@ export default function SignInForm() {
             {activeTab === 'login' && (
               <div className="space-y-4">
                 <h2 className="text-white text-base sm:text-lg font-medium text-center">Sign In</h2>
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="userType" className="text-xs font-medium text-gray-300 text-start">
+                    Account Type
+                  </label>
+                  <select
+                    id="userType"
+                    className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:border-white transition"
+                    value={userType}
+                    onChange={(e) => setUserType(e.target.value)}
+                  >
+                    <option value="influencer">Influencer</option>
+                    <option value="brand">Brand</option>
+                  </select>
+                </div>
                 <div className="flex flex-col gap-2">
                   <label htmlFor="email" className="text-xs font-medium text-gray-300 text-start">
                     Email address
@@ -143,8 +158,22 @@ export default function SignInForm() {
               <div className="space-y-4">
                 <h2 className="text-white text-base sm:text-lg font-medium text-center">Create Account</h2>
                 <div className="flex flex-col gap-2">
+                  <label htmlFor="userType" className="text-xs font-medium text-gray-300 text-start">
+                    Account Type
+                  </label>
+                  <select
+                    id="userType"
+                    className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:border-white transition"
+                    value={userType}
+                    onChange={(e) => setUserType(e.target.value)}
+                  >
+                    <option value="influencer">Influencer</option>
+                    <option value="brand">Brand</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-2">
                   <label htmlFor="name" className="text-xs font-medium text-gray-300 text-start">
-                    Full Name
+                    {userType === 'influencer' ? 'Full Name' : 'Brand Name'}
                   </label>
                   <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
                     <UserPlus className="size-4 mr-2 text-gray-400" />
@@ -153,7 +182,7 @@ export default function SignInForm() {
                       type="text"
                       required
                       className="bg-transparent w-full outline-none text-white placeholder-gray-500 text-sm"
-                      placeholder="John Doe"
+                      placeholder={userType === 'influencer' ? 'John Doe' : 'Brand Name'}
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                     />

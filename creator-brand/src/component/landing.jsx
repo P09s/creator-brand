@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
+import { AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
+import SignInModal from '../auth/SignInModal';
 
 const images = [
   "src/assets/img/image.png",
@@ -7,15 +10,23 @@ const images = [
 ];
 
 function Landing() {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showSignInModal, setShowSignInModal] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
     }, 3000);
-
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = showSignInModal ? 'hidden' : 'auto';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showSignInModal]);
 
   const plans = [
     {
@@ -90,15 +101,12 @@ function Landing() {
         </span>
 
         <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8">
-          {/* Left Button - Secondary */}
           <button
             onClick={() => navigate('/explore')}
             className="bg-neutral-900 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600 hover:px-12 hover:shadow-2xl hover:shadow-white/20 relative z-10 w-full sm:w-auto"
           >
             Explore the Platform
           </button>
-
-          {/* Right Button - Primary Focus */}
           <button
             onClick={() => navigate('/influencer')}
             className="bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base shadow-md transition-all duration-500 ease-out hover:px-12 hover:shadow-2xl hover:shadow-black/30 relative z-10 w-full sm:w-auto"
@@ -111,6 +119,7 @@ function Landing() {
             Already have an account?
           </span>
           <button
+            onClick={() => setShowSignInModal(true)}
             className="text-white hover:underline ml-1 text-sm sm:text-base"
           >
             Login
@@ -205,7 +214,6 @@ function Landing() {
         {/* Tweet Section */}
         <div className="max-w-full px-4 pt-0 pb-10 sm:pb-16 w-full">
           <div className="flex flex-col md:flex-row items-stretch justify-center space-y-6 md:space-y-0 md:space-x-6 lg:space-x-8">
-            {/* Tweet 1 */}
             <div className="flex-1 w-full max-w-full md:max-w-[420px] bg-neutral-900 rounded-2xl shadow-sm p-4 sm:p-5 border border-neutral-800 transition-all duration-300 hover:shadow-lg hover:shadow-white/10">
               <div className="flex items-start">
                 <img
@@ -228,8 +236,6 @@ function Landing() {
                 </div>
               </div>
             </div>
-
-            {/* Tweet 2 */}
             <div className="flex-1 w-full max-w-full md:max-w-[420px] bg-neutral-900 rounded-2xl shadow-sm p-4 sm:p-5 border border-neutral-800 transition-all duration-300 hover:shadow-lg hover:shadow-white/10">
               <div className="flex items-start">
                 <img
@@ -254,6 +260,12 @@ function Landing() {
             </div>
           </div>
         </div>
+
+        <AnimatePresence>
+          {showSignInModal && (
+            <SignInModal isOpen={showSignInModal} onClose={() => setShowSignInModal(false)} />
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
