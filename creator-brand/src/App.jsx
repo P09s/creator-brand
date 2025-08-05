@@ -1,27 +1,42 @@
 import React, { useState } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
+import { BrowserRouter as Router, useLocation } from 'react-router-dom';
 import Header from './component/header';
 import Body from './component/body';
 import Footer from './component/footer';
 import ScrollRestoration from './component/ScrollRestoration';
 
-function App() {
+function AppContent() {
   const [headerHeight, setHeaderHeight] = useState(0);
+  const location = useLocation();
+
+  // Hide header for dashboard routes
+  const shouldRenderHeader = !(
+    location.pathname === '/org_dashboard' || location.pathname === '/influencer_dashboard'
+  );
 
   return (
-    <Router>
-      <div className="bg-black min-h-screen">
-        <div className="font-satoshi">
-          <Header setHeaderHeight={setHeaderHeight} />
-        </div>
-        <ScrollRestoration />
-        <div className="font-satoshi" style={{ paddingTop: `${headerHeight}px` }}>
-          <Body />
-        </div>
-        <div className="font-satoshi">
-          <Footer />
-        </div>
+    <div className="bg-black min-h-screen">
+      <div className="font-satoshi">
+        {shouldRenderHeader && <Header setHeaderHeight={setHeaderHeight} />}
       </div>
+      <ScrollRestoration />
+      <div
+        className="font-satoshi"
+        style={{ paddingTop: shouldRenderHeader ? `${headerHeight}px` : '0px' }}
+      >
+        <Body />
+      </div>
+      <div className="font-satoshi">
+        <Footer />
+      </div>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 }
