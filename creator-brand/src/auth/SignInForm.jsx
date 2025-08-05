@@ -9,12 +9,33 @@ export default function SignInForm() {
   const [activeTab, setActiveTab] = useState('login');
   const [userType, setUserType] = useState('influencer');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (activeTab === 'login') {
-      console.log({ email, password, remember, userType, action: 'login' });
-    } else {
-      console.log({ name, email, password, userType, action: 'register' });
+    const data = activeTab === 'login' ? { email, password, userType } : { name, email, password, userType };
+    try {
+      const response = await fetch(`http://localhost:3000/api/${activeTab}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        console.error('Response not OK:', text);
+        alert('Error: ' + (text || 'Server error'));
+        return;
+      }
+      const result = await response.json();
+      console.log('Success:', result);
+      localStorage.setItem('token', result.token);
+      if(result.user.userType === 'influencer') {
+       navigate('component/influencer_dashboard');
+      } else if(result.user.userType === 'brand') {
+       navigate('/component/Org_dashboard');
+      }
+      alert('Successfully logged in/registered!');
+    } catch (error) {
+      console.error('Error:', error);
+      alert('An error occurred. Please try again.');
     }
   };
 
