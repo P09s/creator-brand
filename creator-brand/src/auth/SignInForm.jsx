@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Mail, Lock, UserPlus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function SignInForm() {
   const [email, setEmail] = useState('');
@@ -8,6 +9,7 @@ export default function SignInForm() {
   const [remember, setRemember] = useState(true);
   const [activeTab, setActiveTab] = useState('login');
   const [userType, setUserType] = useState('influencer');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,9 +30,9 @@ export default function SignInForm() {
       console.log('Success:', result);
       localStorage.setItem('token', result.token);
       if(result.user.userType === 'influencer') {
-       navigate('component/influencer_dashboard');
+       navigate('/influencer_dashboard');
       } else if(result.user.userType === 'brand') {
-       navigate('/component/Org_dashboard');
+       navigate('/org_dashboard');
       }
       alert('Successfully logged in/registered!');
     } catch (error) {
