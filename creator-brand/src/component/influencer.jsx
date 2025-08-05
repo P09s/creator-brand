@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import SignInModal from '../auth/SignInModal';
 
 const perks = [
   "Get discovered by top brands",
@@ -11,6 +14,15 @@ const perks = [
 
 export default function Influencer() {
   const navigate = useNavigate();
+  const [showSignInModal, setShowSignInModal] = useState(false);
+
+  // Manage body overflow when modal is open
+  useEffect(() => {
+    document.body.style.overflow = showSignInModal ? 'hidden' : 'auto';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showSignInModal]);
 
   return (
     <div className="bg-black text-white min-h-screen pt-32 px-6 md:px-20">
@@ -23,19 +35,21 @@ export default function Influencer() {
           <p className="text-gray-400 text-lg font-satoshi">
             Connect with trusted brands and monetize your reach. LinkFluence helps you focus on what you love—creating.
           </p>
-          <div className="flex gap-4">
-            <button
-              onClick={() => navigate('/influencer_dashboard')}
-              className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition"
-            >
-              Join as Influencer
-            </button>
-            <button
-              onClick={() => navigate('/organization')}
-              className="border border-gray-500 text-white py-3 px-6 rounded-xl hover:bg-white hover:text-black transition"
-            >
-              I’m a Brand
-            </button>
+          <div className="flex flex-col sm:flex-row gap-4 items-center">
+            <div className="flex gap-4">
+              <button
+                onClick={() => setShowSignInModal(true)}
+                className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition"
+              >
+                Join as Influencer
+              </button>
+              <button
+                onClick={() => navigate('/organization')}
+                className="border border-gray-500 text-white py-3 px-6 rounded-xl hover:bg-white hover:text-black transition"
+              >
+                I’m a Brand
+              </button>
+            </div>
           </div>
         </div>
 
@@ -73,12 +87,19 @@ export default function Influencer() {
           Sign up and create your influencer profile in minutes.
         </p>
         <button
-          onClick={() => navigate('/signup')}
+          onClick={() => setShowSignInModal(true)}
           className="bg-white text-black font-semibold py-3 px-8 rounded-xl hover:bg-gray-100 transition"
         >
           Become an Influencer
         </button>
       </section>
+
+      {/* SignInModal */}
+      <AnimatePresence>
+        {showSignInModal && (
+          <SignInModal isOpen={showSignInModal} onClose={() => setShowSignInModal(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import SignInModal from '../auth/SignInModal';
 
 const features = [
   "Smart Influencer Discovery",
@@ -11,6 +14,16 @@ const features = [
 
 export default function OrganizationLanding() {
   const navigate = useNavigate();
+
+  const [showSignInModal, setShowSignInModal] = useState(false);
+
+  // Manage body overflow when modal is open
+  useEffect(() => {
+    document.body.style.overflow = showSignInModal ? 'hidden' : 'auto';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showSignInModal]);
 
   return (
     <div className="bg-black text-white min-h-screen pt-32 px-6 md:px-20">
@@ -25,7 +38,7 @@ export default function OrganizationLanding() {
           </p>
           <div className="flex gap-4">
             <button
-              onClick={() => navigate('/org_dashboard')}
+              onClick={() => setShowSignInModal(true)}
               className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition"
             >
               Start Collaborating
@@ -73,12 +86,17 @@ export default function OrganizationLanding() {
           Get started in minutes. No setup fees, no contracts.
         </p>
         <button
-          onClick={() => navigate('/signup')}
+          onClick={() => setShowSignInModal(true)}
           className="bg-white text-black font-semibold py-3 px-8 rounded-xl hover:bg-gray-100 transition"
         >
           Create Organization Account
         </button>
       </section>
+      <AnimatePresence>
+        {showSignInModal && (
+          <SignInModal isOpen={showSignInModal} onClose={() => setShowSignInModal(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
