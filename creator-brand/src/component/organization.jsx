@@ -25,7 +25,7 @@ export default function OrganizationLanding() {
           </p>
           <div className="flex gap-4">
             <button
-              onClick={() => navigate('/signup')}
+              onClick={() => navigate('/org_dashboard')}
               className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition"
             >
               Start Collaborating

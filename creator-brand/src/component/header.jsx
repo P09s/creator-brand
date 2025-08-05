@@ -13,6 +13,11 @@ function Header({ setHeaderHeight }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Hide header on dashboard route
+  if (location.pathname === '/org_dashboard' || location.pathname === '/influencer_dashboard') {
+    return null;
+  }
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
