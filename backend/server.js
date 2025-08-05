@@ -11,11 +11,22 @@ app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
-// Connect to MongoDB and run server
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    app.listen(5050, () => console.log("Server running on http://localhost:5050"));
+const startServer =async ()=> {
+  // Connect to MongoDB and run server
+ try {
+  await mongoose.connect(process.env.MONGO_URI, {}
+  ).then(() => {
+    console.log("Connected to MongoDB");
+  }).catch((error) => {
+    console.error("MongoDB connection error:", error);
+  });
+  app.listen(3000,()=> {
+    console.log("Server is running on port 3000");
   })
-  .catch((err) => console.error(err));
+ } catch (error) {
+  console.log("Error connecting to MongoDB:", error);
+  process.exit(1);
+ }
+}
 
-  
+startServer()
