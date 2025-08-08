@@ -8,7 +8,8 @@ import Org_dashboard from './org_dashboard';
 import Influencer from './influencer';
 import Explore from './explore';
 import Pro from './pro';
-import Influencer_dashboard from './influencer_dashboard';
+import Influencer_dashboard from './influencer/influencer_dashboard';
+import BrowseCampaign from './influencer/browseCampaign';
 
 function Body() {
   const location = useLocation();
@@ -31,8 +32,9 @@ function Body() {
         <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
         <Route path="/organization" element={<PageWrapper><Organization /></PageWrapper>} />
         <Route path="/org_dashboard" element={<PageWrapper><Org_dashboard /></PageWrapper>} />
-        <Route path="/influencer_dashboard" element={<PageWrapper><Influencer_dashboard /></PageWrapper>} />
         <Route path="/influencer" element={<PageWrapper><Influencer /></PageWrapper>} />
+        <Route path="/influencer_dashboard" element={<PageWrapper><Influencer_dashboard /></PageWrapper>} />
+        <Route path="/BrowseCampaign" element={<PageWrapper><BrowseCampaign /></PageWrapper>} />
         <Route path="/explore" element={<PageWrapper><Explore /></PageWrapper>} />
         <Route path="/pro" element={<PageWrapper><Pro /></PageWrapper>} />
       </Routes>
