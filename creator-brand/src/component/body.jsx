@@ -4,12 +4,12 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 import Landing from './landing';
 import Organization from './organization';
-import Org_dashboard from './Dashboard/org_dashboard';
+import Org_dashboard from './org/org_dashboard';
 import Influencer from './influencer';
 import Explore from './explore';
 import Pro from './pro';
 import Influencer_dashboard from './influencer/influencer_dashboard';
-import BrowseCampaign from './influencer/browseCampaign';
+import BrowseCampaign from './influencer/BrowseCampaign';
 
 function Body() {
   const location = useLocation();

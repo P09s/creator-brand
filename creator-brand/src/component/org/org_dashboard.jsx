@@ -1,42 +1,3 @@
-// import { useEffect, useRef, useState } from 'react';
-// import { ChevronDown } from 'lucide-react';
-// import { useLocation, useNavigate } from 'react-router-dom';
-// import { motion, AnimatePresence } from 'framer-motion';
-// import CampaignModal from '../campaign/campaignModal';
-
-// export default function Influencer_dashboard() {
-
-//     const [showCampaignModal, setShowCampaignModal] = useState(false);
-//     const navigate = useNavigate();
-//   const location = useLocation();
-
-//   useEffect(() => {
-//     document.body.style.overflow = showCampaignModal ? 'hidden' : 'auto';
-//   }, [showCampaignModal]);
-
-//   const isActive = (path) => location.pathname === path;
-
-
-//     return(
-//         <div className="flex flex-row items-end justify-between min-h-screen bg-gradient-to-r from-gray-800 to-gray-900 p-6">
-//             <h1 className="text-amber-50">Hello</h1>
-//             <button
-//             onClick={() => setShowCampaignModal(true)} 
-//             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-//                 Click Me
-//             </button>
-//             <AnimatePresence>
-//                     {showCampaignModal && (
-//                       <CampaignModal isOpen={showCampaignModal} onClose={() => setShowCampaignModal(false)} />
-//                     )}
-//                   </AnimatePresence>
-//         </div>
-        
-//     );
-
-// }
-// InfluencerDashboard.jsx
-// influencer_dashboard.jsx
 import React, { useState, useEffect, memo } from 'react';
 import { 
   DollarSign, 
@@ -58,7 +19,7 @@ import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
 import BrowseCampaign from './BrowseCampaign';
 
-const Influencer_dashboard = () => {
+const org_dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -394,4 +355,4 @@ const Influencer_dashboard = () => {
   );
 };
 
-export default Influencer_dashboard;
+export default org_dashboard;
