@@ -136,7 +136,7 @@ const Influencer_dashboard = () => {
   const Dashboard = memo(() => (
     <div className="space-y-8">
       <div className="bg-white rounded-xl p-8 text-black">
-        <h1 className="text-xl font-bold mb-2">Welcome back, Alex! 👋</h1>
+        <h1 className="text-xl font-bold mb-2">Welcome back, Tillu! 👋</h1>
         <p className="text-neutral-800 text-xs">You have 3 new campaign opportunities waiting for you.</p>
       </div>
 
@@ -302,14 +302,14 @@ const Influencer_dashboard = () => {
               
               <div className="flex items-center gap-3">
                 <img
-                  src="/api/placeholder/40/40"
+                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s"
                   alt="Profile picture"
                   className="w-10 h-10 rounded-full object-cover border-2 border-neutral-700"
                   onError={(e) => (e.target.src = '/fallback-image.jpg')}
                 />
                 <div>
-                  <p className="text-white font-medium text-sm">Alex Johnson</p>
-                  <p className="text-white text-xs">@alexj_creates</p>
+                  <p className="text-white font-medium text-sm">Tillu Badmosh</p>
+                  <p className="text-white text-xs">@baddi_tillu</p>
                 </div>
               </div>
             </div>
