@@ -150,7 +150,7 @@ const Sidebar = ({
                 >
                   <div>
                     <p className="text-sm font-semibold text-white truncate font-satoshi">
-                      Tillu Badmaas
+                      Tillu Badmosh
                     </p>
                     <p className="text-xs text-white truncate font-satoshi">
                       Brand Manager

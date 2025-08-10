@@ -61,7 +61,7 @@ const Sidebar = ({
   const navItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { id: 'campaigns', label: 'Campaigns', icon: Target },
-    { id: 'influencers', label: 'Influencers', icon: Users },
+    { id: 'organizations', label: 'Organizations', icon: Users },
     { id: 'analytics', label: 'Analytics', icon: BarChart3 },
     { id: 'messages', label: 'Messages', icon: MessageCircle },
     { id: 'payments', label: 'Payments', icon: CreditCard },
@@ -150,10 +150,10 @@ const Sidebar = ({
                 >
                   <div>
                     <p className="text-sm font-semibold text-white truncate font-satoshi">
-                      Tillu Badmaas
+                      Tillu Badmosh
                     </p>
                     <p className="text-xs text-white truncate font-satoshi">
-                      Brand Manager
+                      Influencer
                     </p>
                   </div>
                   <ChevronUp
