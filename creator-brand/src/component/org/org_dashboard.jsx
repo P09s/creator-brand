@@ -10,7 +10,8 @@ import {
   MessageSquare,
   Share,
   Sparkles,
-  Megaphone as Campaign
+  Megaphone as Campaign,
+  Plus
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './sideBar';
@@ -18,12 +19,13 @@ import StatsGrid from './StatsGrid';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
 import BrowseCampaign from './BrowseCampaign';
+import CampaignModal from './campaign/campaignModal'; // Import your CampaignModal component
 
 const org_dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [isSearchExpanded, setIsSearchExpanded] = useState(true);
+  const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [showBrowseCampaign, setShowBrowseCampaign] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [formData, setFormData] = useState({
@@ -33,7 +35,6 @@ const org_dashboard = () => {
     campaignDate: '',
     results: '',
   });
-  const [searchTerm, setSearchTerm] = useState('');
 
   // Handle scroll for glass effect
   useEffect(() => {
@@ -43,6 +44,14 @@ const org_dashboard = () => {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  // Handle body overflow when modal is open
+  useEffect(() => {
+    document.body.style.overflow = showCampaignModal ? 'hidden' : 'auto';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [showCampaignModal]);
 
   // Mock data
   const stats = [
@@ -70,28 +79,15 @@ const org_dashboard = () => {
     { id: 3, message: 'Campaign deadline approaching', time: '2 days ago', type: 'reminder' },
   ];
 
-  // Handle search bar click to toggle BrowseCampaign and collapse sidebar
-  const handleSearchClick = () => {
-    setIsSearchExpanded(false);
-    setShowBrowseCampaign(true);
-    setIsSidebarOpen(false);
+  // Handle campaign modal close
+  const handleCampaignModalClose = () => {
+    setShowCampaignModal(false);
   };
 
   // Handle closing BrowseCampaign
   const handleBrowseCampaignClose = () => {
     setShowBrowseCampaign(false);
-    setIsSearchExpanded(true);
     setActiveTab('dashboard');
-  };
-
-  // Handle search form submission
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      setIsSearchExpanded(false);
-      setShowBrowseCampaign(true);
-      setIsSidebarOpen(false);
-    }
   };
 
   const Dashboard = memo(() => (
@@ -203,7 +199,6 @@ const org_dashboard = () => {
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
         setShowBrowseCampaign={setShowBrowseCampaign}
-        setIsSearchExpanded={setIsSearchExpanded}
       />
 
       {/* Main Content */}
@@ -216,40 +211,21 @@ const org_dashboard = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
               <AnimatePresence mode="wait">
-                {isSearchExpanded ? (
-                  <motion.form
-                    key="search-form"
-                    onSubmit={handleSearchSubmit}
-                    className="relative"
-                    initial={{ width: '20rem', opacity: 0, scale: 0.9 }}
-                    animate={{ width: '20rem', opacity: 1, scale: 1 }}
-                    exit={{ width: 0, opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
-                  >
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-white" aria-hidden="true" />
-                    <input
-                      type="text"
-                      placeholder="Search campaigns, brands..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      onClick={handleSearchClick}
-                      className="bg-neutral-800 text-white pl-10 pr-4 py-2 rounded-lg w-80 border border-neutral-600 focus:ring-2 focus:ring-neutral-500 focus:outline-none text-sm placeholder:text-neutral-400"
-                      aria-label="Search campaigns or brands"
-                    />
-                  </motion.form>
-                ) : (
+                {!showCampaignModal && (
                   <motion.button
-                    key="mascot-button"
-                    onClick={handleBrowseCampaignClose}
-                    className="flex items-center gap-2 bg-neutral-700 hover:bg-neutral-600 text-white px-4 py-2 rounded-lg transition-colors"
-                    aria-label="Close browse campaigns"
-                    initial={{ scale: 0, opacity: 0, y: -10 }}
-                    animate={{ scale: 1, opacity: 1, y: 0 }}
-                    exit={{ scale: 0, opacity: 0, y: 10 }}
-                    transition={{ duration: 0.3, ease: 'easeOut', type: 'spring', stiffness: 200, damping: 10 }}
+                    key="create-campaign-button"
+                    onClick={() => setShowCampaignModal(true)}
+                    className="flex items-center gap-2 bg-neutral-900 border border-neutral-700 text-white px-6 py-3 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl font-medium"
+                    aria-label="Create new campaign"
+                    initial={{ opacity: 0, scale: 1, y: 0 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <Sparkles className="w-5 h-5" aria-hidden="true" />
-                    <span className="text-sm font-bold">Let's Earn!</span>
+                    <Plus className="w-4 h-4" aria-hidden="true" />
+                    <span className="text-sm font-semibold">Create Campaign</span>
                   </motion.button>
                 )}
               </AnimatePresence>
@@ -290,7 +266,6 @@ const org_dashboard = () => {
               {showBrowseCampaign ? (
                 <BrowseCampaign 
                   setActiveTab={setActiveTab} 
-                  initialSearchTerm={searchTerm} 
                   onClose={handleBrowseCampaignClose}
                 />
               ) : (
@@ -351,6 +326,16 @@ const org_dashboard = () => {
         formData={formData}
         setFormData={setFormData}
       />
+
+      {/* Campaign Modal */}
+      <AnimatePresence>
+        {showCampaignModal && (
+          <CampaignModal 
+            isOpen={showCampaignModal} 
+            onClose={handleCampaignModalClose} 
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };
