@@ -47,13 +47,19 @@ const Sidebar = ({
   activeTab,
   setActiveTab,
   isSidebarOpen,
-  setIsSidebarOpen
+  setIsSidebarOpen,
+  setShowBrowseCampaign,
+  setIsSearchExpanded,
+  navigate // Add navigate as a prop
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
   const handleSidebarToggle = () => setIsSidebarOpen(!isSidebarOpen);
   const handleNavClick = (id) => {
+    const basePath = '/influencer_dashboard'; // Match the parent route
+    const path = id === 'dashboard' ? basePath : `${basePath}/${id}`;
+    navigate(path); // Use navigate to change the route
     setActiveTab(id);
     setIsDropdownOpen(false);
   };
@@ -179,6 +185,7 @@ const Sidebar = ({
                 <button
                   className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-neutral-800 rounded-lg"
                   onClick={() => {
+                    navigate('/influencer_dashboard/portfolio'); // Use navigate for portfolio
                     setActiveTab('portfolio');
                     setIsSidebarOpen(false);
                     setIsDropdownOpen(false);

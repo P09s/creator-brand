@@ -33,7 +33,7 @@ function Body() {
         <Route path="/organization" element={<PageWrapper><Organization /></PageWrapper>} />
         <Route path="/org_dashboard" element={<PageWrapper><Org_dashboard /></PageWrapper>} />
         <Route path="/influencer" element={<PageWrapper><Influencer /></PageWrapper>} />
-        <Route path="/influencer_dashboard" element={<PageWrapper><Influencer_dashboard /></PageWrapper>} />
+        <Route path="/influencer_dashboard/*" element={<PageWrapper><Influencer_dashboard /></PageWrapper>} />
         <Route path="/BrowseCampaign" element={<PageWrapper><BrowseCampaign /></PageWrapper>} />
         <Route path="/explore" element={<PageWrapper><Explore /></PageWrapper>} />
         <Route path="/pro" element={<PageWrapper><Pro /></PageWrapper>} />

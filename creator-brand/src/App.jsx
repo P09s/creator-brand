@@ -11,7 +11,7 @@ function AppContent() {
 
   // Hide header for dashboard routes
   const shouldRenderHeader = !(
-    location.pathname === '/org_dashboard' || location.pathname === '/influencer_dashboard'
+    location.pathname.startsWith('/org_dashboard') || location.pathname.startsWith('/influencer_dashboard')
   );
 
   return (
