@@ -25,13 +25,19 @@ import {
   Upload
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from './sidebar';
-import StatsGrid from './StatsGrid';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
 import BrowseCampaign from './BrowseCampaign';
+import Campaigns from './campaigns';
+import Organizations from './organizations';
+import Analytics from './analytics';
+import Messages from './messages';
+import Payments from './payments';
+import SettingsComponent from './settings';
 
-const Influencer_dashboard = () => {
+const InfluencerDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -46,8 +52,26 @@ const Influencer_dashboard = () => {
     results: '',
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+  const location = useLocation();
 
-  // Handle scroll for glass effect
+  useEffect(() => {
+    const basePath = '/influencer_dashboard'; // Define the parent route
+    const pathToTab = {
+      '/': 'dashboard',
+      '/campaigns': 'campaigns',
+      '/organizations': 'organizations',
+      '/analytics': 'analytics',
+      '/messages': 'messages',
+      '/payments': 'payments',
+      '/settings': 'settings',
+      '/portfolio': 'portfolio',
+    };
+    const currentPath = location.pathname.replace(basePath, '') || '/';
+    const newTab = pathToTab[currentPath] || 'dashboard';
+    setActiveTab(newTab);
+  }, [location]);
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -56,7 +80,6 @@ const Influencer_dashboard = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Mock data for CreatorDashboard
   const activeCampaigns = [
     { id: 1, brand: 'TechFlow', title: 'Product Launch Campaign', deadline: '2025-08-20', status: 'Live', color: 'bg-green-500/20 text-green-400' },
     { id: 2, brand: 'StyleCorp', title: 'Summer Collection', deadline: '2025-08-25', status: 'Awaiting Approval', color: 'bg-yellow-500/20 text-yellow-400' },
@@ -78,29 +101,27 @@ const Influencer_dashboard = () => {
   ];
 
   const quickActions = [
-    { icon: Search, label: 'Browse Campaigns', color: 'text-blue-400' },
-    { icon: Upload, label: 'Upload Content', color: 'text-green-400' },
-    { icon: BarChart3, label: 'View Analytics', color: 'text-purple-400' },
-    { icon: MessageSquare, label: 'Messages', color: 'text-pink-400' },
-    { icon: Users, label: 'Connect Accounts', color: 'text-orange-400' },
-    { icon: Settings, label: 'Account Settings', color: 'text-gray-400' },
+    { icon: Search, label: 'Browse Campaigns', color: 'text-blue-400', path: '/campaigns' },
+    { icon: Upload, label: 'Upload Content', color: 'text-green-400', path: '/campaigns' },
+    { icon: BarChart3, label: 'View Analytics', color: 'text-purple-400', path: '/analytics' },
+    { icon: MessageSquare, label: 'Messages', color: 'text-pink-400', path: '/messages' },
+    { icon: Users, label: 'Connect Accounts', color: 'text-orange-400', path: '/organizations' },
+    { icon: Settings, label: 'Account Settings', color: 'text-gray-400', path: '/settings' },
   ];
 
-  // Handle search bar click to toggle BrowseCampaign and collapse sidebar
   const handleSearchClick = () => {
     setIsSearchExpanded(false);
     setShowBrowseCampaign(true);
     setIsSidebarOpen(false);
   };
 
-  // Handle closing BrowseCampaign
   const handleBrowseCampaignClose = () => {
     setShowBrowseCampaign(false);
     setIsSearchExpanded(true);
     setActiveTab('dashboard');
+    navigate('/influencer_dashboard');
   };
 
-  // Handle search form submission
   const handleSearchSubmit = (e) => {
     e.preventDefault();
     if (searchTerm.trim()) {
@@ -152,7 +173,7 @@ const Influencer_dashboard = () => {
                 <Target className="w-5 h-5 text-blue-400" aria-hidden="true" />
                 <h2 className="text-lg font-medium text-white">Active Campaigns</h2>
               </div>
-              <button className="text-xs text-neutral-400 hover:text-white flex items-center" aria-label="View all campaigns">
+              <button className="text-xs text-neutral-400 hover:text-white flex items-center" onClick={() => navigate('/influencer_dashboard/campaigns')} aria-label="View all campaigns">
                 View All <ChevronRight className="w-3 h-3 ml-1" aria-hidden="true" />
               </button>
             </div>
@@ -241,6 +262,7 @@ const Influencer_dashboard = () => {
               {quickActions.map((action, index) => (
                 <button 
                   key={index}
+                  onClick={() => navigate(`/influencer_dashboard${action.path}`)}
                   className="flex flex-col items-center p-3 rounded-lg transition-colors group"
                   aria-label={action.label}
                 >
@@ -320,7 +342,6 @@ const Influencer_dashboard = () => {
 
   return (
     <div className="flex h-screen bg-black">
-      {/* Sidebar */}
       <Sidebar 
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -328,11 +349,10 @@ const Influencer_dashboard = () => {
         setIsSidebarOpen={setIsSidebarOpen}
         setShowBrowseCampaign={setShowBrowseCampaign}
         setIsSearchExpanded={setIsSearchExpanded}
+        navigate={navigate}
       />
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
         <header 
           className={`fixed top-0 ${isSidebarOpen ? 'left-64' : 'left-16'} right-0 z-10 transition-all duration-300 border-b border-neutral-700 p-6
             ${isScrolled ? 'bg-black/30 backdrop-blur-sm shadow-md' : 'bg-black'}`}
@@ -401,11 +421,10 @@ const Influencer_dashboard = () => {
           </div>
         </header>
 
-        {/* Page Content */}
         <main className="flex-1 overflow-auto p-8 bg-black text-white mt-20">
           <AnimatePresence mode="wait">
             <motion.div
-              key={showBrowseCampaign ? 'browse-campaign' : activeTab}
+              key={showBrowseCampaign ? 'browse-campaign' : location.pathname}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -418,57 +437,22 @@ const Influencer_dashboard = () => {
                   onClose={handleBrowseCampaignClose}
                 />
               ) : (
-                <>
-                  {activeTab === 'dashboard' && <Dashboard />}
-                  {activeTab === 'campaigns' && (
-                    <div className="space-y-8">
-                      <div className="bg-white rounded-xl p-8">
-                        <h2 className="text-xl font-bold text-black">My Campaigns</h2>
-                      </div>
-                      <p className="text-neutral-300 text-xs">Campaign management interface coming soon...</p>
-                    </div>
-                  )}
-                  {activeTab === 'portfolio' && <PortfolioOverview setIsProfileModalOpen={setIsProfileModalOpen} />}
-                  {activeTab === 'analytics' && (
-                    <div className="space-y-8">
-                      <div className="bg-white rounded-xl p-8">
-                        <h2 className="text-xl font-bold text-black">Analytics Dashboard</h2>
-                      </div>
-                      <p className="text-neutral-300 text-xs">Analytics dashboard coming soon...</p>
-                    </div>
-                  )}
-                  {activeTab === 'earnings' && (
-                    <div className="space-y-8">
-                      <div className="bg-white rounded-xl p-8">
-                        <h2 className="text-xl font-bold text-black">Earnings & Payments</h2>
-                      </div>
-                      <p className="text-neutral-300 text-xs">Earnings dashboard coming soon...</p>
-                    </div>
-                  )}
-                  {activeTab === 'calendar' && (
-                    <div className="space-y-8">
-                      <div className="bg-white rounded-xl p-8">
-                        <h2 className="text-xl font-bold text-black">Content Calendar</h2>
-                      </div>
-                      <p className="text-neutral-300 text-xs">Calendar interface coming soon...</p>
-                    </div>
-                  )}
-                  {activeTab === 'settings' && (
-                    <div className="space-y-8">
-                      <div className="bg-white rounded-xl p-8">
-                        <h2 className="text-xl font-bold text-black">Account Settings</h2>
-                      </div>
-                      <p className="text-neutral-300 text-xs">Settings page coming soon...</p>
-                    </div>
-                  )}
-                </>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/campaigns" element={<Campaigns />} />
+                  <Route path="/organizations" element={<Organizations />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/messages" element={<Messages />} />
+                  <Route path="/payments" element={<Payments />} />
+                  <Route path="/settings" element={<SettingsComponent />} />
+                  <Route path="/portfolio" element={<PortfolioOverview setIsProfileModalOpen={setIsProfileModalOpen} />} />
+                </Routes>
               )}
             </motion.div>
           </AnimatePresence>
         </main>
       </div>
 
-      {/* Portfolio Modal */}
       <PortfolioModal 
         isOpen={isProfileModalOpen}
         onClose={() => setIsProfileModalOpen(false)}
@@ -479,4 +463,4 @@ const Influencer_dashboard = () => {
   );
 };
 
-export default Influencer_dashboard;
+export default InfluencerDashboard;
