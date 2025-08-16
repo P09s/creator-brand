@@ -23,8 +23,8 @@ const NavItem = ({ item, activeTab, isSidebarOpen, handleNavClick, index }) => (
     onClick={() => handleNavClick(item.id)}
     className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
       activeTab === item.id
-        ? 'bg-neutral-800 text-white shadow-sm'
-        : 'text-slate-300 hover:bg-neutral-900'
+        ? 'bg-gray-900 text-white border border-gray-600'
+        : 'text-white hover:bg-gray-900 hover:border-gray-600 border border-transparent'
     } ${isSidebarOpen ? '' : 'justify-center'}`}
   >
     <item.icon className={`w-5 h-5 ${isSidebarOpen ? 'mr-3' : ''}`} />
@@ -78,16 +78,16 @@ const Sidebar = ({
     <>
       {/* Sidebar */}
       <motion.div
-        className="bg-black border-r border-slate-200/50 dark:border-slate-700/50 flex flex-col h-full relative z-10 shadow-xl overflow-hidden"
+        className="bg-black border-r border-gray-800 flex flex-col h-full relative z-10 shadow-xl overflow-hidden"
         variants={sidebarVariants}
         animate={isSidebarOpen ? 'open' : 'closed'}
         initial={false}
       >
         {/* Logo Section */}
-        <div className={`px-4 py-5 border-b border-slate-200/50 dark:border-slate-700/50 ${isSidebarOpen ? '' : 'justify-center'} flex`}>
+        <div className={`px-4 py-5 border-b border-gray-800 ${isSidebarOpen ? '' : 'justify-center'} flex`}>
           <button onClick={handleSidebarToggle} className="flex items-center space-x-3">
-            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg bg-black">
-              <img className="w-8 h-8" src="src/assets/img/logo.png" alt="logo" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg bg-gray-950 border border-gray-800">
+              <img className="w-8 h-8" src="/logo.png" alt="logo" />
             </div>
             <AnimatePresence>
               {isSidebarOpen && (
@@ -98,7 +98,7 @@ const Sidebar = ({
                   transition={{ duration: 0.2 }}
                 >
                   <h1 className="text-xl text-white font-bold font-satoshi tracking-tight">LinkFluence</h1>
-                  <p className="text-xs text-white font-medium">Inluencer</p>
+                  <p className="text-xs text-gray-400 font-medium">Influencer</p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -120,10 +120,10 @@ const Sidebar = ({
         </nav>
 
         {/* User Profile */}
-        <div className="p-4 border-t border-slate-200/50 dark:border-slate-700/50 relative">
+        <div className="p-4 border-t border-gray-800 relative">
           <div
             className={`flex items-center ${
-              isSidebarOpen ? 'space-x-3 p-3 rounded-xl bg-neutral-800 hover:bg-neutral-900' : ''
+              isSidebarOpen ? 'space-x-3 p-3 rounded-xl bg-gray-950 hover:bg-gray-900 border border-gray-800 hover:border-gray-700' : ''
             } transition-all duration-200 cursor-pointer group`}
             onClick={() => {
               if (!isSidebarOpen) {
@@ -139,9 +139,9 @@ const Sidebar = ({
               <img
                 src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s"
                 alt="user_logo"
-                className="w-10 h-10 rounded-full ring-2 ring-blue-500 object-cover"
+                className="w-10 h-10 rounded-full ring-2 ring-gray-600 object-cover"
               />
-              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-white dark:border-slate-800 rounded-full"></div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></div>
             </div>
 
             {/* Name + Role */}
@@ -158,12 +158,12 @@ const Sidebar = ({
                     <p className="text-sm font-semibold text-white truncate font-satoshi">
                       Tillu Badmosh
                     </p>
-                    <p className="text-xs text-white truncate font-satoshi">
+                    <p className="text-xs text-gray-400 truncate font-satoshi">
                       Influencer
                     </p>
                   </div>
                   <ChevronUp
-                    className={`w-4 h-4 text-white transition-transform duration-200 ${
+                    className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${
                       isDropdownOpen ? 'rotate-180' : ''
                     }`}
                   />
@@ -180,10 +180,10 @@ const Sidebar = ({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 15 }}
                 transition={{ type: 'spring', stiffness: 250, damping: 20 }}
-                className="absolute bottom-full mb-2 left-4 right-4 space-y-1 bg-neutral-900 rounded-lg p-2 shadow-lg"
+                className="absolute bottom-full mb-2 left-4 right-4 space-y-1 bg-gray-950 border border-gray-800 rounded-lg p-2 shadow-lg"
               >
                 <button
-                  className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-neutral-800 rounded-lg"
+                  className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-gray-900 hover:border-gray-600 rounded-lg border border-transparent transition-colors"
                   onClick={() => {
                     navigate('/influencer_dashboard/portfolio'); // Use navigate for portfolio
                     setActiveTab('portfolio');
@@ -194,7 +194,7 @@ const Sidebar = ({
                   <Briefcase className="w-4 h-4 mr-2" /> My Portfolio
                 </button>
                 <button
-                  className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-neutral-800 rounded-lg"
+                  className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-gray-900 hover:border-gray-600 rounded-lg border border-transparent transition-colors"
                   onClick={() => {
                     setShowLogoutModal(true);
                     setIsDropdownOpen(false);
@@ -221,18 +221,18 @@ const Sidebar = ({
               initial={{ scale: 0.8 }}
               animate={{ scale: 1 }}
               exit={{ scale: 0.8 }}
-              className="bg-white dark:bg-neutral-900 rounded-xl p-6 shadow-2xl border border-gray-300 dark:border-gray-700 w-[300px] text-center"
+              className="bg-gray-950 rounded-xl p-6 shadow-2xl border border-gray-800 w-[300px] text-center"
             >
-              <h2 className="text-lg font-bold mb-2 text-black dark:text-white">
+              <h2 className="text-lg font-bold mb-2 text-white">
                 Really want to leave? 🥺
               </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
-                We’ll miss you! Stay a bit longer?
+              <p className="text-sm text-gray-400 mb-4">
+                We'll miss you! Stay a bit longer?
               </p>
               <div className="flex justify-between gap-3 mt-4">
                 <button
                   onClick={() => setShowLogoutModal(false)}
-                  className="flex-1 px-4 py-2 bg-white text-gray-800 dark:bg-neutral-800 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-700 transition"
+                  className="flex-1 px-4 py-2 bg-gray-900 text-white border border-gray-800 rounded-lg hover:bg-gray-800 hover:border-gray-700 transition-colors"
                 >
                   Stay
                 </button>
@@ -241,7 +241,7 @@ const Sidebar = ({
                     console.log("Logging out professionally...");
                     setShowLogoutModal(false);
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-200 text-gray-800 dark:bg-neutral-700 dark:text-white border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-300 dark:hover:bg-neutral-600 transition"
+                  className="flex-1 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-colors"
                 >
                   Logout
                 </button>

@@ -13,6 +13,9 @@ function AppContent() {
   const shouldRenderHeader = !(
     location.pathname.startsWith('/org_dashboard') || location.pathname.startsWith('/influencer_dashboard')
   );
+  const shouldRenderFooter = !(
+    location.pathname.startsWith('/org_dashboard') || location.pathname.startsWith('/influencer_dashboard')
+  );
 
   return (
     <div className="bg-black min-h-screen">
@@ -27,7 +30,7 @@ function AppContent() {
         <Body />
       </div>
       <div className="font-satoshi">
-        <Footer />
+        {shouldRenderFooter && <Footer />}
       </div>
     </div>
   );
