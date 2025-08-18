@@ -55,7 +55,7 @@ function Header({ setHeaderHeight }) {
         ref={headerRef}
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300
           ${scrolled ? 'bg-black/30 backdrop-blur-sm shadow-md' : 'bg-black'}
-          border-b-[0.5px] border-neutral-700 px-6 py-3`}
+          border-b-[0.5px] border-gray-800 px-6 py-3`}
       >
         <div className="relative flex justify-center items-center w-full">
           <div className="flex flex-col items-center z-10">
@@ -96,7 +96,7 @@ function Header({ setHeaderHeight }) {
                         stiffness: 300,
                         damping: 22,
                       }}
-                      className="absolute top-full left-0 mt-2 w-60 z-50 bg-black/80 backdrop-blur-md border border-neutral-700 rounded-2xl shadow-xl overflow-hidden"
+                      className="absolute top-full left-0 mt-2 w-60 z-50 bg-black/80 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl overflow-hidden"
                     >
                       {[
                         { label: 'Getting Started', hash: 'getting-started' },
@@ -156,7 +156,7 @@ function Header({ setHeaderHeight }) {
               <div className="relative group">
                 <button
                   onClick={() => navigate('/pro', { replace: true })}
-                  className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600
+                  className="bg-gray-950 text-white px-4 py-3 rounded-full font-semibold border border-gray-800 transition-all duration-500 ease-out hover:border-gray-700
                            hover:px-8 hover:shadow-2xl hover:shadow-white/20 relative z-10"
                 >
                   Join Pro
@@ -200,7 +200,7 @@ function Header({ setHeaderHeight }) {
             </button>
             <button
               onClick={() => setShowSignInModal(true)}
-              className="bg-neutral-900 text-white px-4 py-2 rounded-full font-semibold border border-neutral-700 transition-all duration-300 ease-out hover:bg-neutral-800 hover:border-neutral-600
+              className="bg-gray-950 text-white px-4 py-2 rounded-full font-semibold border border-gray-800 transition-all duration-300 ease-out hover:bg-gray-800 hover:border-gray-700
                 hover:scale-110 hover:shadow-2xl hover:shadow-white/20 relative z-20 right-1"
             >
               Join
@@ -215,7 +215,7 @@ function Header({ setHeaderHeight }) {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                className="sm:hidden absolute top-full left-0 w-full bg-black/80 backdrop-blur-md border border-neutral-700 flex flex-col items-center z-50 py-4 rounded-2xl"
+                className="sm:hidden absolute top-full left-0 w-full bg-black/80 backdrop-blur-md border border-gray-800 flex flex-col items-center z-50 py-4 rounded-2xl"
               >
                 <div className="flex flex-col items-center gap-4 w-full px-6">
                   <div className="relative group w-full">
@@ -241,7 +241,7 @@ function Header({ setHeaderHeight }) {
                             stiffness: 300,
                             damping: 22,
                           }}
-                          className="mt-2 w-full bg-black/80 backdrop-blur-md border border-neutral-700 rounded-2xl shadow-xl overflow-hidden"
+                          className="mt-2 w-full bg-black/80 backdrop-blur-md border border-gray-800 rounded-2xl shadow-xl overflow-hidden"
                         >
                           {[
                             { label: 'Getting Started', hash: 'getting-started' },
@@ -311,7 +311,7 @@ function Header({ setHeaderHeight }) {
                         navigate('/pro', { replace: true });
                         setShowMobileMenu(false);
                       }}
-                      className="bg-neutral-900 text-white px-4 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-500 ease-out hover:bg-neutral-800 hover:border-neutral-600 hover:px-12 hover:shadow-2xl hover:shadow-white/20 w-full text-center relative z-10"
+                      className="bg-gray-950 text-white px-4 py-3 rounded-full font-semibold border border-gray-800 transition-all duration-500 ease-out hover:bg-gray-800 hover:border-gray-700 hover:px-12 hover:shadow-2xl hover:shadow-white/20 w-full text-center relative z-10"
                     >
                       Join Pro
                     </button>
@@ -325,7 +325,7 @@ function Header({ setHeaderHeight }) {
           <div className="hidden sm:block absolute right-6 top-1/2 -translate-y-1/2">
             <button
               onClick={() => setShowSignInModal(true)}
-              className="bg-neutral-900 text-white px-6 py-3 rounded-full font-semibold border border-neutral-700 transition-all duration-300 ease-out hover:bg-neutral-800 hover:border-neutral-600
+              className="bg-gray-950 text-white px-6 py-3 rounded-full font-semibold border border-gray-800 transition-all duration-300 ease-out hover:border-gray-700
                 hover:px-9 hover:shadow-2xl hover:shadow-white/20 relative z-10"
             >
               Sign In

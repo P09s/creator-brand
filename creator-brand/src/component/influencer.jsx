@@ -39,15 +39,15 @@ export default function Influencer() {
             <div className="flex gap-4">
               <button
                 onClick={() => setShowSignInModal(true)}
-                className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-100 transition"
+                className="bg-white text-black font-semibold py-3 px-6 rounded-xl hover:bg-gray-200 transition-colors"
               >
                 Join as Influencer
               </button>
               <button
                 onClick={() => navigate('/organization')}
-                className="border border-gray-500 text-white py-3 px-6 rounded-xl hover:bg-white hover:text-black transition"
+                className="border border-gray-800 bg-gray-950 text-white py-3 px-6 rounded-xl hover:bg-gray-800 hover:border-gray-700 transition-colors"
               >
-                I’m a Brand
+                I'm a Brand
               </button>
             </div>
           </div>
@@ -58,7 +58,7 @@ export default function Influencer() {
           <img
             src="src/assets/img/bg.webp"
             alt="Influencer Profile"
-            className="rounded-xl shadow-2xl border border-white/10"
+            className="rounded-xl shadow-2xl border border-gray-800"
           />
         </div>
       </section>
@@ -70,8 +70,8 @@ export default function Influencer() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left px-4 md:px-0">
           {perks.map((perk, i) => (
-            <div key={i} className="flex items-start gap-4">
-              <Sparkles className="text-yellow-400 mt-1" />
+            <div key={i} className="flex items-start gap-4 bg-gray-950 border border-gray-800 rounded-xl p-6 hover:border-gray-700 transition-colors">
+              <Sparkles className="text-yellow-400 mt-1 flex-shrink-0" />
               <p className="text-gray-300 font-satoshi">{perk}</p>
             </div>
           ))}
@@ -79,7 +79,7 @@ export default function Influencer() {
       </section>
 
       {/* CTA Banner */}
-      <section className="mt-28 bg-neutral-900 border border-neutral-800 rounded-2xl p-10 max-w-6xl mx-auto text-center shadow-xl">
+      <section className="mt-28 bg-gray-950 border border-gray-800 rounded-2xl p-10 max-w-6xl mx-auto text-center shadow-xl hover:border-gray-700 transition-colors">
         <h3 className="text-3xl md:text-4xl font-bold mb-4 font-satoshi">
           Ready to Get Sponsored?
         </h3>
@@ -88,7 +88,7 @@ export default function Influencer() {
         </p>
         <button
           onClick={() => setShowSignInModal(true)}
-          className="bg-white text-black font-semibold py-3 px-8 rounded-xl hover:bg-gray-100 transition"
+          className="bg-white text-black font-semibold py-3 px-8 rounded-xl hover:bg-gray-200 transition-colors"
         >
           Become an Influencer
         </button>

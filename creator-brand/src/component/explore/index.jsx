@@ -63,7 +63,11 @@ function Explore() {
     <div className={`${isDarkMode ? 'bg-black text-white' : 'bg-white text-black'} min-h-screen transition-all duration-300 px-6 py-12`}>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-end mb-4">
-          <button onClick={toggleTheme} className="flex items-center gap-2 border px-4 py-2 rounded-full text-sm font-medium">
+          <button onClick={toggleTheme} className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            isDarkMode 
+              ? 'border border-gray-800 bg-gray-950 text-white hover:bg-gray-800' 
+              : 'border border-gray-300 bg-white text-black hover:bg-gray-100'
+          }`}>
             {isDarkMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             {isDarkMode ? 'Light Mode' : 'Dark Mode'}
           </button>
@@ -89,9 +93,9 @@ function Explore() {
             }, {
               icon: <Handshake className="text-purple-400" />, title: 'Start Collaborating', text: 'Connect, communicate, and launch your first campaign.'
             }].map(({ icon, title, text }, i) => (
-              <div key={i} className="bg-neutral-900 p-6 rounded-xl border border-neutral-800 hover:border-purple-500 transition-all">
+              <div key={i} className="bg-gray-950 p-6 rounded-xl border border-gray-800 hover:border-gray-700 transition-all">
                 <div className="w-6 h-6 mx-auto mb-3">{icon}</div>
-                <h4 className="font-semibold text-lg mb-1">{title}</h4>
+                <h4 className="font-semibold text-lg mb-1 text-white">{title}</h4>
                 <p className="text-sm text-gray-400">{text}</p>
               </div>
             ))}
@@ -115,9 +119,9 @@ function Explore() {
             }, {
               icon: <Users className="text-cyan-400" />, title: 'Repeat & Grow', text: 'Establish long-term partnerships and grow mutual reach.'
             }].map(({ icon, title, text }, i) => (
-              <div key={i} className="bg-neutral-900 p-6 rounded-xl border border-neutral-800 hover:border-purple-500 transition-all">
+              <div key={i} className="bg-gray-950 p-6 rounded-xl border border-gray-800 hover:border-gray-700 transition-all">
                 <div className="w-6 h-6 mx-auto mb-3">{icon}</div>
-                <h4 className="font-semibold text-lg mb-1">{title}</h4>
+                <h4 className="font-semibold text-lg mb-1 text-white">{title}</h4>
                 <p className="text-sm text-gray-400">{text}</p>
               </div>
             ))}
@@ -133,7 +137,7 @@ function Explore() {
               <input
                 type="text"
                 placeholder="Search promotions..."
-                className="w-full bg-neutral-900 text-white border border-neutral-800 rounded-full py-2 pl-10 pr-4 focus:outline-none"
+                className="w-full bg-gray-950 text-white border border-gray-800 rounded-full py-2 pl-10 pr-4 focus:outline-none focus:ring-2 focus:ring-gray-600"
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
@@ -141,7 +145,7 @@ function Explore() {
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredCategories.map((cat, idx) => (
-              <div key={idx} className="bg-neutral-900 border border-neutral-800 rounded-2xl overflow-hidden shadow-md hover:shadow-lg transition">
+              <div key={idx} className="bg-gray-950 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:border-gray-700 hover:shadow-lg transition-all">
                 <div className="flex items-center gap-4 p-4">
                   <img src={cat.icon} alt={cat.label} className="w-10 h-10 rounded-full" />
                   <div>
@@ -160,8 +164,8 @@ function Explore() {
           <p className="text-center text-gray-400 mb-6">Use ready-made campaign blueprints and customize them to launch faster.</p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {["Fashion Drop Teaser", "Tech Giveaway", "Music Launch Hype", "Product Review Blitz", "Podcast Collab", "Reel Challenge"].map((name, idx) => (
-              <div key={idx} className="bg-neutral-900 p-5 rounded-xl border border-neutral-800 text-center">
-                <h4 className="font-semibold text-lg mb-1">{name}</h4>
+              <div key={idx} className="bg-gray-950 p-5 rounded-xl border border-gray-800 hover:border-gray-700 transition-all text-center">
+                <h4 className="font-semibold text-lg mb-1 text-white">{name}</h4>
                 <p className="text-sm text-gray-400">A quick-start template to duplicate and tweak as needed.</p>
               </div>
             ))}
@@ -169,9 +173,9 @@ function Explore() {
         </div>
 
         {/* Call to Action */}
-        <div className="bg-gradient-to-r from-purple-700 via-pink-500 to-red-500 border border-neutral-800 rounded-2xl py-10 px-6 text-center">
+        <div className="bg-gradient-to-r from-purple-700 via-pink-500 to-red-500 border border-gray-800 rounded-2xl py-10 px-6 text-center shadow-lg">
           <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-white">More exciting features launching soon. Stay tuned.</h2>
-          <p className="text-white/80 mb-4">We’re building something exciting. Get ready for a new way to collaborate and create impact.</p>
+          <p className="text-white/80 mb-4">We're building something exciting. Get ready for a new way to collaborate and create impact.</p>
         </div>
 
         <div className="mt-10">
