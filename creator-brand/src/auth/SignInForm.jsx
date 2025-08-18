@@ -59,7 +59,7 @@ export default function SignInForm() {
 
       <div className="w-full sm:w-1/2 p-4 sm:p-6 flex items-center justify-center sm:ml-0 pb-20 sm:pb-24">
         <div className="w-full max-w-sm sm:max-w-md space-y-5">
-          <div className="flex border-b border-neutral-700">
+          <div className="flex border-b border-gray-800">
             <button
               type="button"
               onClick={() => setActiveTab('login')}
@@ -97,7 +97,7 @@ export default function SignInForm() {
                   </label>
                   <select
                     id="userType"
-                    className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:border-white transition"
+                    className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 pr-8 text-white text-sm focus:border-white focus:ring-2 focus:ring-gray-600 transition"
                     value={userType}
                     onChange={(e) => setUserType(e.target.value)}
                   >
@@ -109,7 +109,7 @@ export default function SignInForm() {
                   <label htmlFor="email" className="text-xs font-medium text-gray-300 text-start">
                     Email address
                   </label>
-                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                  <div className="flex items-center bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 focus-within:border-white focus-within:ring-2 focus-within:ring-gray-600 transition">
                     <Mail className="size-4 mr-2 text-gray-400" />
                     <input
                       id="email"
@@ -127,7 +127,7 @@ export default function SignInForm() {
                   <label htmlFor="password" className="text-xs font-medium text-gray-300 text-start">
                     Password
                   </label>
-                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                  <div className="flex items-center bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 focus-within:border-white focus-within:ring-2 focus-within:ring-gray-600 transition">
                     <Lock className="size-4 mr-2 text-gray-400" />
                     <input
                       id="password"
@@ -161,7 +161,7 @@ export default function SignInForm() {
 
                 <button
                   type="button"
-                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition text-sm"
+                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                   onClick={handleSubmit}
                 >
                   Sign In
@@ -186,7 +186,7 @@ export default function SignInForm() {
                   </label>
                   <select
                     id="userType"
-                    className="bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 text-white text-sm focus:border-white transition"
+                    className="bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 pr-8 text-white text-sm focus:border-white focus:ring-2 focus:ring-gray-600 transition"
                     value={userType}
                     onChange={(e) => setUserType(e.target.value)}
                   >
@@ -198,7 +198,7 @@ export default function SignInForm() {
                   <label htmlFor="name" className="text-xs font-medium text-gray-300 text-start">
                     {userType === 'influencer' ? 'Full Name' : 'Brand Name'}
                   </label>
-                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                  <div className="flex items-center bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 focus-within:border-white focus-within:ring-2 focus-within:ring-gray-600 transition">
                     <UserPlus className="size-4 mr-2 text-gray-400" />
                     <input
                       id="name"
@@ -216,7 +216,7 @@ export default function SignInForm() {
                   <label htmlFor="email" className="text-xs font-medium text-gray-300 text-start">
                     Email address
                   </label>
-                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                  <div className="flex items-center bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 focus-within:border-white focus-within:ring-2 focus-within:ring-gray-600 transition">
                     <Mail className="size-4 mr-2 text-gray-400" />
                     <input
                       id="email"
@@ -234,7 +234,7 @@ export default function SignInForm() {
                   <label htmlFor="password" className="text-xs font-medium text-gray-300 text-start">
                     Password
                   </label>
-                  <div className="flex items-center bg-neutral-800 border border-neutral-700 rounded-lg px-3 py-2 focus-within:border-white transition">
+                  <div className="flex items-center bg-gray-950 border border-gray-800 rounded-lg px-3 py-2 focus-within:border-white focus-within:ring-2 focus-within:ring-gray-600 transition">
                     <Lock className="size-4 mr-2 text-gray-400" />
                     <input
                       id="password"
@@ -250,7 +250,7 @@ export default function SignInForm() {
 
                 <button
                   type="button"
-                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition text-sm"
+                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
                   onClick={handleSubmit}
                 >
                   Register

@@ -22,7 +22,7 @@ export default function SignInModal({ isOpen, onClose }) {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 50, transition: { duration: 0.4 } }}
             transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-            className="bg-neutral-900 p-4 sm:p-6 rounded-xl shadow-2xl w-full max-w-2xl mx-4 relative flex h-[80vh]"
+            className="bg-black border border-gray-800 p-4 sm:p-6 rounded-xl shadow-2xl w-full max-w-2xl mx-4 relative flex h-[80vh]"
             onClick={(e) => e.stopPropagation()}
           >
             <button
