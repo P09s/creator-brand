@@ -5,8 +5,10 @@ import { Check } from 'lucide-react';
 import SignInModal from '../auth/SignInModal';
 
 const images = [
-  "src/assets/img/image.png",
-  "src/assets/img/image.png",
+  "src/assets/img/influencer_dash.png",
+  "src/assets/img/analytics.png",
+  "src/assets/img/browse.png",
+  "src/assets/img/pay.png",
 ];
 
 function Landing() {
@@ -130,13 +132,13 @@ function Landing() {
         <div className="w-full max-w-full sm:max-w-3xl md:max-w-4xl mt-10 sm:mt-16 md:mt-20">
           <div className="bg-gray-950 rounded-xl overflow-hidden border border-gray-800 shadow-lg">
             <div className="flex items-center px-4 py-2 bg-gray-950 space-x-2">
-              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full" />
+              {/* <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full" />
               <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-yellow-500 rounded-full" />
-              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full" />
+              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full" /> */}
             </div>
-            <div className="relative w-full h-48 sm:h-64 md:h-80 overflow-hidden">
+            <div className="relative w-full h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[31rem] overflow-hidden">
               <div
-                className="flex transition-transform duration-700 ease-in-out"
+                className="flex h-full transition-transform duration-700 ease-in-out"
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
                 {images.map((img, index) => (

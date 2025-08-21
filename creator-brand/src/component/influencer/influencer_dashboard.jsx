@@ -22,7 +22,8 @@ import {
   Settings,
   Filter,
   ArrowUpRight,
-  Upload
+  Upload,
+  FileOutput
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
@@ -368,7 +369,7 @@ const InfluencerDashboard = () => {
                     initial={{ width: '20rem', opacity: 0, scale: 0.9 }}
                     animate={{ width: '20rem', opacity: 1, scale: 1 }}
                     exit={{ width: 0, opacity: 0, scale: 0.9 }}
-                    transition={{ duration: 0.3, ease: 'easeInOut' }}
+                    transition={{ duration: 0.5, ease: 'easeInOut' }}
                   >
                     <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-white" aria-hidden="true" />
                     <input
@@ -390,10 +391,10 @@ const InfluencerDashboard = () => {
                     initial={{ scale: 0, opacity: 0, y: -10 }}
                     animate={{ scale: 1, opacity: 1, y: 0 }}
                     exit={{ scale: 0, opacity: 0, y: 10 }}
-                    transition={{ duration: 0.3, ease: 'easeOut', type: 'spring', stiffness: 200, damping: 10 }}
+                    transition={{ duration: 0.5, ease: 'easeOut', type: 'spring', damping: 15, stiffness: 100 }}
                   >
-                    <Sparkles className="w-5 h-5" aria-hidden="true" />
-                    <span className="text-sm font-bold">Let's Earn!</span>
+                    <FileOutput className="w-5 h-5" aria-hidden="true" />
+                    <span className="text-sm font-bold">Return to dashboard</span>
                   </motion.button>
                 )}
               </AnimatePresence>
