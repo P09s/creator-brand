@@ -330,7 +330,6 @@ const Campaigns = () => {
       <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Target className="w-5 h-5 text-blue-400" aria-hidden="true" />
             <h1 className="text-xl font-bold text-white">Campaigns</h1>
           </div>
           <div className="flex items-center space-x-4">
