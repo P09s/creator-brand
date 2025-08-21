@@ -34,7 +34,7 @@ return (
     <Routes location={location} key={baseKey}>  {/* Changed from key={location.pathname} */}
       <Route path="/" element={<PageWrapper><Landing /></PageWrapper>} />
       <Route path="/organization" element={<PageWrapper><Organization /></PageWrapper>} />
-      <Route path="/org_dashboard" element={<PageWrapper><Org_dashboard /></PageWrapper>} />
+      <Route path="/org_dashboard/*" element={<PageWrapper><Org_dashboard /></PageWrapper>} />
       <Route path="/influencer" element={<PageWrapper><Influencer /></PageWrapper>} />
       <Route path="/influencer_dashboard/*" element={<PageWrapper><Influencer_dashboard /></PageWrapper>} />
       <Route path="/BrowseCampaign" element={<PageWrapper><BrowseCampaign /></PageWrapper>} />

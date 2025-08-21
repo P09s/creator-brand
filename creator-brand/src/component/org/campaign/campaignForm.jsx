@@ -113,7 +113,7 @@ function CampaignForm() {
               value={formData.campaignName}
               onChange={(e) => updateFormData('campaignName', e.target.value)}
               placeholder="Enter campaign name"
-              className={`w-full px-3 py-1.5 bg-neutral-800 border ${errors.campaignName ? 'border-red-500' : 'border-neutral-700'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200`}
+              className={`w-full px-3 py-1.5 bg-black border ${errors.campaignName ? 'border-red-500' : 'border-gray-800'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200`}
               aria-invalid={!!errors.campaignName}
               aria-describedby="campaignName-error"
             />
@@ -127,7 +127,7 @@ function CampaignForm() {
               value={formData.brandName}
               onChange={(e) => updateFormData('brandName', e.target.value)}
               placeholder="Enter brand name"
-              className={`w-full px-3 py-1.5 bg-neutral-800 border ${errors.brandName ? 'border-red-500' : 'border-neutral-700'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200`}
+              className={`w-full px-3 py-1.5 bg-black border ${errors.brandName ? 'border-red-500' : 'border-gray-800'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200`}
               aria-invalid={!!errors.brandName}
               aria-describedby="brandName-error"
             />
@@ -139,7 +139,7 @@ function CampaignForm() {
             <select
               value={formData.campaignType}
               onChange={(e) => updateFormData('campaignType', e.target.value)}
-              className={`w-full px-3 py-1.5 bg-neutral-800 border ${errors.campaignType ? 'border-red-500' : 'border-neutral-700'} rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200`}
+              className={`w-full px-3 py-1.5 bg-black border ${errors.campaignType ? 'border-red-500' : 'border-gray-800'} rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200`}
               aria-invalid={!!errors.campaignType}
               aria-describedby="campaignType-error"
             >
@@ -160,7 +160,7 @@ function CampaignForm() {
               onChange={(e) => updateFormData('description', e.target.value)}
               placeholder="Describe your campaign goals"
               rows={3}
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200 resize-none"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200 resize-none"
             />
           </div>
         </div>
@@ -179,7 +179,7 @@ function CampaignForm() {
               value={formData.targetAudience}
               onChange={(e) => updateFormData('targetAudience', e.target.value)}
               placeholder="e.g., Young professionals"
-              className={`w-full px-3 py-1.5 bg-neutral-800 border ${errors.targetAudience ? 'border-red-500' : 'border-neutral-700'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200`}
+              className={`w-full px-3 py-1.5 bg-black border ${errors.targetAudience ? 'border-red-500' : 'border-gray-800'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200`}
               aria-invalid={!!errors.targetAudience}
               aria-describedby="targetAudience-error"
             />
@@ -195,7 +195,7 @@ function CampaignForm() {
                   value={formData.demographics.ageRange.min}
                   onChange={(e) => updateFormData('demographics.ageRange', {...formData.demographics.ageRange, min: parseInt(e.target.value)})}
                   placeholder="18"
-                  className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                  className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
                 />
                 <span className="text-gray-400 text-xs">to</span>
                 <input
@@ -203,7 +203,7 @@ function CampaignForm() {
                   value={formData.demographics.ageRange.max}
                   onChange={(e) => updateFormData('demographics.ageRange', {...formData.demographics.ageRange, max: parseInt(e.target.value)})}
                   placeholder="65"
-                  className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                  className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
                 />
               </div>
             </div>
@@ -213,7 +213,7 @@ function CampaignForm() {
               <select
                 value={formData.demographics.gender}
                 onChange={(e) => updateFormData('demographics.gender', e.target.value)}
-                className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
               >
                 <option value="">Any</option>
                 <option value="male">Male</option>
@@ -230,7 +230,7 @@ function CampaignForm() {
               value={formData.demographics.location}
               onChange={(e) => updateFormData('demographics.location', e.target.value)}
               placeholder="e.g., United States, Global"
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
             />
           </div>
 
@@ -241,7 +241,7 @@ function CampaignForm() {
               value={formData.demographics.interests.join(', ')}
               onChange={(e) => updateFormData('demographics.interests', e.target.value.split(', ').filter(i => i.trim()))}
               placeholder="e.g., Fashion, Tech, Travel"
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
             />
           </div>
         </div>
@@ -263,7 +263,7 @@ function CampaignForm() {
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
                     formData.budget.type === type 
                       ? 'bg-white text-black shadow-sm' 
-                      : 'bg-neutral-800 text-gray-300 hover:bg-neutral-700'
+                      : 'bg-black border border-gray-800 text-gray-300 hover:border-gray-700'
                   }`}
                 >
                   {type === 'per_post' ? 'Per Post' : type.charAt(0).toUpperCase() + type.slice(1)}
@@ -280,7 +280,7 @@ function CampaignForm() {
                 value={formData.budget.min}
                 onChange={(e) => updateFormData('budget.min', e.target.value)}
                 placeholder="1000"
-                className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
               />
             </div>
             <div>
@@ -290,7 +290,7 @@ function CampaignForm() {
                 value={formData.budget.max}
                 onChange={(e) => updateFormData('budget.max', e.target.value)}
                 placeholder="5000"
-                className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
               />
             </div>
           </div>
@@ -302,7 +302,7 @@ function CampaignForm() {
                 type="date"
                 value={formData.timeline.startDate}
                 onChange={(e) => updateFormData('timeline.startDate', e.target.value)}
-                className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
               />
             </div>
             <div>
@@ -311,7 +311,7 @@ function CampaignForm() {
                 type="date"
                 value={formData.timeline.endDate}
                 onChange={(e) => updateFormData('timeline.endDate', e.target.value)}
-                className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
               />
             </div>
           </div>
@@ -323,7 +323,7 @@ function CampaignForm() {
               value={formData.timeline.deliverables}
               onChange={(e) => updateFormData('timeline.deliverables', e.target.value)}
               placeholder="e.g., 3 posts, 1 Story"
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
             />
           </div>
         </div>
@@ -351,7 +351,7 @@ function CampaignForm() {
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
                     (formData.contentType || []).includes(type)
                       ? 'bg-white text-black shadow-sm' 
-                      : 'bg-neutral-800 text-gray-300 hover:bg-neutral-700'
+                      : 'bg-black border border-gray-800 text-gray-300 hover:border-gray-700'
                   }`}
                 >
                   {type}
@@ -377,7 +377,7 @@ function CampaignForm() {
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
                     (formData.platforms || []).includes(platform)
                       ? 'bg-white text-black shadow-sm' 
-                      : 'bg-neutral-800 text-gray-300 hover:bg-neutral-700'
+                      : 'bg-black border border-gray-800 text-gray-300 hover:border-gray-700'
                   }`}
                 >
                   {platform}
@@ -394,7 +394,7 @@ function CampaignForm() {
               onChange={(e) => updateFormData('contentGuidelines', e.target.value)}
               placeholder="Brand tone, style preferences..."
               rows={3}
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200 resize-none"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200 resize-none"
             />
           </div>
 
@@ -405,7 +405,7 @@ function CampaignForm() {
               value={formData.hashtags}
               onChange={(e) => updateFormData('hashtags', e.target.value)}
               placeholder="#brand #campaign"
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
             />
           </div>
         </div>
@@ -427,7 +427,7 @@ function CampaignForm() {
                   className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
                     formData.influencerTier === tier 
                       ? 'bg-white text-black shadow-sm' 
-                      : 'bg-neutral-800 text-gray-300 hover:bg-neutral-700'
+                      : 'bg-black border border-gray-800 text-gray-300 hover:border-gray-700'
                   }`}
                 >
                   {tier}
@@ -445,7 +445,7 @@ function CampaignForm() {
                 value={formData.followerRange.min}
                 onChange={(e) => updateFormData('followerRange.min', e.target.value)}
                 placeholder="1000"
-                className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
               />
             </div>
             <div>
@@ -455,7 +455,7 @@ function CampaignForm() {
                 value={formData.followerRange.max}
                 onChange={(e) => updateFormData('followerRange.max', e.target.value)}
                 placeholder="100000"
-                className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
               />
             </div>
           </div>
@@ -468,7 +468,7 @@ function CampaignForm() {
               value={formData.engagementRate}
               onChange={(e) => updateFormData('engagementRate', e.target.value)}
               placeholder="2.5"
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
             />
           </div>
 
@@ -477,7 +477,7 @@ function CampaignForm() {
             <select
               value={formData.previousBrands}
               onChange={(e) => updateFormData('previousBrands', e.target.value)}
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
             >
               <option value="">Any</option>
               <option value="similar">Similar brands</option>
@@ -503,7 +503,7 @@ function CampaignForm() {
                 type="checkbox"
                 checked={formData.exclusiveRights}
                 onChange={(e) => updateFormData('exclusiveRights', e.target.checked)}
-                className="w-3.5 h-3.5 bg-neutral-800 border-neutral-700 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
+                className="w-3.5 h-3.5 bg-black border-gray-800 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
               />
               <span className="text-xs text-gray-300">Exclusive usage rights</span>
             </label>
@@ -513,7 +513,7 @@ function CampaignForm() {
                 type="checkbox"
                 checked={formData.contentApproval}
                 onChange={(e) => updateFormData('contentApproval', e.target.checked)}
-                className="w-3.5 h-3.5 bg-neutral-800 border-neutral-700 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
+                className="w-3.5 h-3.5 bg-black border-gray-800 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
               />
               <span className="text-xs text-gray-300">Content approval</span>
             </label>
@@ -523,7 +523,7 @@ function CampaignForm() {
                 type="checkbox"
                 checked={formData.analytics}
                 onChange={(e) => updateFormData('analytics', e.target.checked)}
-                className="w-3.5 h-3.5 bg-neutral-800 border-neutral-700 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
+                className="w-3.5 h-3.5 bg-black border-gray-800 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
               />
               <span className="text-xs text-gray-300">Analytics reporting</span>
             </label>
@@ -536,11 +536,11 @@ function CampaignForm() {
               onChange={(e) => updateFormData('additionalNotes', e.target.value)}
               placeholder="Special requirements..."
               rows={3}
-              className="w-full px-3 py-1.5 bg-neutral-800 border border-neutral-700 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-white transition-all duration-200 resize-none"
+              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200 resize-none"
             />
           </div>
 
-          <div className="bg-neutral-800 p-3 rounded-md shadow-sm border border-neutral-700">
+          <div className="bg-black border border-gray-800 p-3 rounded-md shadow-sm">
             <h3 className="text-sm font-medium text-white mb-2">Campaign Summary</h3>
             <div className="text-xs text-gray-400 space-y-1">
               <p><span className="text-white font-medium">Campaign:</span> {formData.campaignName || 'Not set'}</p>
@@ -558,7 +558,7 @@ function CampaignForm() {
   ];
 
   return (
-    <div className="w-full max-w-2xl mx-auto bg-neutral-900 text-white p-4 rounded-lg shadow-md">
+    <div className="w-full max-w-2xl mx-auto bg-gray-950 text-white p-4 rounded-lg shadow-md">
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
@@ -566,7 +566,7 @@ function CampaignForm() {
           <span className="text-xs text-gray-400">{currentStep + 1} of {totalSteps}</span>
         </div>
         
-        <div className="relative w-full bg-neutral-800 rounded-full h-1.5 overflow-hidden">
+        <div className="relative w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
           <div 
             className="bg-gradient-to-r from-white to-gray-300 h-1.5 rounded-full transition-all duration-500 ease-out"
             style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
@@ -576,7 +576,7 @@ function CampaignForm() {
         <div className="flex justify-between mt-2">
           {steps.map((step, index) => (
             <div key={index} className="relative flex flex-col items-center group">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-200 ${index <= currentStep ? 'bg-white text-black' : 'bg-neutral-800 text-gray-400'}`}>
+              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-200 ${index <= currentStep ? 'bg-white text-black' : 'bg-black border border-gray-800 text-gray-400'}`}>
                 {step.icon}
               </div>
               <span className="absolute top-9 text-xs text-gray-400 hidden group-hover:flex gap-1 whitespace-nowrap transition-opacity duration-300">{step.title}</span>
@@ -586,7 +586,7 @@ function CampaignForm() {
       </div>
 
       {/* Step Content */}
-      <div className="flex-1 overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-neutral-700 scrollbar-track-neutral-800 pr-1">
+      <div className="flex-1 overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800 pr-1">
         <div className="mb-4 mt-4">
           <h3 className="text-lg font-medium text-white">{steps[currentStep].title}</h3>
           <p className="text-xs text-gray-400 mt-1">{steps[currentStep].description}</p>
@@ -596,14 +596,14 @@ function CampaignForm() {
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between items-center pt-4 border-t border-neutral-800">
+      <div className="flex justify-between items-center pt-4 border-t border-gray-800">
         <button
           onClick={prevStep}
           disabled={currentStep === 0}
           className={`flex items-center space-x-1 px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
             currentStep === 0 
-              ? 'bg-neutral-800 text-gray-500 cursor-not-allowed' 
-              : 'bg-neutral-800 text-gray-200 hover:bg-neutral-700 hover:shadow-sm'
+              ? 'bg-black border border-gray-800 text-gray-500 cursor-not-allowed' 
+              : 'bg-black border border-gray-800 text-gray-200 hover:border-gray-700 hover:shadow-sm'
           }`}
         >
           <ChevronLeft className="w-3.5 h-3.5" />
