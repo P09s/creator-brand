@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
-import { AnimatePresence } from 'framer-motion';
-import { Check } from 'lucide-react';
-import SignInModal from '../auth/SignInModal';
+import { useNavigate } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import { motion, stagger, useAnimate } from "motion/react";
+import { Check } from "lucide-react";
+import { cn } from "../lib/utils"; // helper for Tailwind classes
+import SignInModal from "../auth/SignInModal";
 
 const images = [
   "src/assets/img/influencer_dash.png",
@@ -10,6 +12,36 @@ const images = [
   "src/assets/img/browse.png",
   "src/assets/img/pay.png",
 ];
+
+// ✨ Animated text effect
+const TextGenerateEffect = ({ words, className, filter = true, duration = 0.5 }) => {
+  const [scope, animate] = useAnimate();
+  let wordsArray = words.split(" ");
+
+  useEffect(() => {
+    animate(
+      "span",
+      { opacity: 1, filter: filter ? "blur(0px)" : "none" },
+      { duration: duration || 1, delay: stagger(0.2) }
+    );
+  }, [scope.current]);
+
+  return (
+    <div className={cn("font-bold", className)}>
+      <motion.div ref={scope}>
+        {wordsArray.map((word, idx) => (
+          <motion.span
+            key={word + idx}
+            className="dark:text-white text-white opacity-0"
+            style={{ filter: filter ? "blur(10px)" : "none" }}
+          >
+            {word}{" "}
+          </motion.span>
+        ))}
+      </motion.div>
+    </div>
+  );
+};
 
 function Landing() {
   const navigate = useNavigate();
@@ -24,9 +56,9 @@ function Landing() {
   }, []);
 
   useEffect(() => {
-    document.body.style.overflow = showSignInModal ? 'hidden' : 'auto';
+    document.body.style.overflow = showSignInModal ? "hidden" : "auto";
     return () => {
-      document.body.style.overflow = 'auto';
+      document.body.style.overflow = "auto";
     };
   }, [showSignInModal]);
 
@@ -41,10 +73,10 @@ function Landing() {
         "10GB Storage",
         "Email Support",
         "Basic Templates",
-        "Mobile App Access"
+        "Mobile App Access",
       ],
       buttonText: "Get Started",
-      popular: false
+      popular: false,
     },
     {
       name: "Pro",
@@ -58,10 +90,10 @@ function Landing() {
         "Premium Templates",
         "Advanced Analytics",
         "Team Collaboration",
-        "Custom Branding"
+        "Custom Branding",
       ],
       buttonText: "Choose Pro",
-      popular: true
+      popular: true,
     },
     {
       name: "Enterprise",
@@ -76,11 +108,11 @@ function Landing() {
         "Advanced Security",
         "API Access",
         "Dedicated Manager",
-        "Custom Integrations"
+        "Custom Integrations",
       ],
       buttonText: "Contact Sales",
-      popular: false
-    }
+      popular: false,
+    },
   ];
 
   return (
@@ -94,23 +126,26 @@ function Landing() {
           <div className="absolute inset-0 rounded-2xl border-glow z-0" />
         </div>
 
-        {/* Headings */}
-        <span className="text-white font-bold font-satoshi text-3xl sm:text-4xl md:text-5xl leading-tight max-w-4xl w-full">
-          Welcome to LinkFluence, the platform that connects brands with influencers for seamless collaborations.
-        </span>
+        {/* Hero Heading with Animation */}
+        <TextGenerateEffect
+          words="Welcome to LinkFluence, the platform that connects brands with influencers for seamless collaborations."
+          className="text-3xl sm:text-4xl md:text-5xl leading-tight max-w-4xl w-full"
+        />
+
+        {/* Subheading */}
         <span className="text-gray-400 font-satoshi text-base sm:text-lg md:text-xl max-w-2xl">
           Discover, engage, and grow your brand with the power of influencer marketing.
         </span>
 
         <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-center items-center gap-4 sm:gap-6 md:gap-8">
           <button
-            onClick={() => navigate('/explore')}
-            className="bg-gray-950 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base border border-gray-800 transition-all duration-500 ease-out  hover:border-gray-700 hover:px-12 hover:shadow-2xl hover:shadow-white/20 relative z-10 w-full sm:w-auto"
+            onClick={() => navigate("/explore")}
+            className="bg-gray-950 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base border border-gray-800 transition-all duration-500 ease-out hover:border-gray-700 hover:px-12 hover:shadow-2xl hover:shadow-white/20 relative z-10 w-full sm:w-auto"
           >
             Explore the Platform
           </button>
           <button
-            onClick={() => navigate('/influencer')}
+            onClick={() => navigate("/influencer")}
             className="bg-white text-black px-4 sm:px-6 py-2 sm:py-3 rounded-full font-semibold text-sm sm:text-base shadow-md transition-all duration-500 ease-out hover:px-12 hover:shadow-2xl hover:shadow-black/30 relative z-10 w-full sm:w-auto"
           >
             Become an Influencer
@@ -131,11 +166,7 @@ function Landing() {
         {/* Mac-style window with image slider */}
         <div className="w-full max-w-full sm:max-w-3xl md:max-w-4xl mt-10 sm:mt-16 md:mt-20">
           <div className="bg-gray-950 rounded-xl overflow-hidden border border-gray-800 shadow-lg">
-            <div className="flex items-center px-4 py-2 bg-gray-950 space-x-2">
-              {/* <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-red-500 rounded-full" />
-              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-yellow-500 rounded-full" />
-              <span className="w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-500 rounded-full" /> */}
-            </div>
+            <div className="flex items-center px-4 py-2 bg-gray-950 space-x-2"></div>
             <div className="relative w-full h-48 sm:h-64 md:h-80 lg:h-96 xl:h-[31rem] overflow-hidden">
               <div
                 className="flex h-full transition-transform duration-700 ease-in-out"
@@ -157,16 +188,17 @@ function Landing() {
         {/* Membership Plans Section */}
         <div className="max-w-full px-4 py-10 sm:py-12 md:py-16 w-full">
           <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 font-satoshi">Choose Your Plan</h2>
-            <p className="text-sm sm:text-base md:text-lg text-gray-400 font-satoshi">Select the perfect plan for your influencer marketing journey</p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 font-satoshi">
+              Choose Your Plan
+            </h2>
+            <p className="text-sm sm:text-base md:text-lg text-gray-400 font-satoshi">
+              Select the perfect plan for your influencer marketing journey
+            </p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row items-stretch justify-center space-y-8 sm:space-y-0 sm:space-x-4 md:space-x-8 flex-wrap gap-y-8">
             {plans.map((plan) => (
-              <div
-                key={plan.name}
-                className="w-full sm:w-80 relative"
-              >
+              <div key={plan.name} className="w-full sm:w-80 relative">
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
                     <span className="bg-white text-black px-3 sm:px-4 py-1 rounded-full text-xs sm:text-sm font-medium font-satoshi">
@@ -174,15 +206,27 @@ function Landing() {
                     </span>
                   </div>
                 )}
-                <div className={`bg-gray-950 rounded-2xl shadow-lg p-6 sm:p-8 h-full flex flex-col min-h-[500px] sm:min-h-[600px] ${
-                  plan.popular ? 'border-2 border-white' : 'border border-gray-800'
-                } transition-all duration-300 hover:shadow-xl hover:shadow-white/10`}>
+                <div
+                  className={`bg-gray-950 rounded-2xl shadow-lg p-6 sm:p-8 h-full flex flex-col min-h-[500px] sm:min-h-[600px] ${
+                    plan.popular
+                      ? "border-2 border-white"
+                      : "border border-gray-800"
+                  } transition-all duration-300 hover:shadow-xl hover:shadow-white/10`}
+                >
                   <div className="text-center mb-4 sm:mb-6">
-                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 font-satoshi">{plan.name}</h3>
-                    <p className="text-gray-400 text-sm sm:text-base font-satoshi">{plan.description}</p>
+                    <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 font-satoshi">
+                      {plan.name}
+                    </h3>
+                    <p className="text-gray-400 text-sm sm:text-base font-satoshi">
+                      {plan.description}
+                    </p>
                     <div className="flex items-baseline justify-center mt-2 sm:mt-4">
-                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white font-satoshi">{plan.price}</span>
-                      <span className="text-gray-400 ml-1 text-sm sm:text-base font-satoshi">/{plan.period}</span>
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white font-satoshi">
+                        {plan.price}
+                      </span>
+                      <span className="text-gray-400 ml-1 text-sm sm:text-base font-satoshi">
+                        /{plan.period}
+                      </span>
                     </div>
                   </div>
                   <div className="flex-1 mb-6 sm:mb-8">
@@ -190,16 +234,20 @@ function Landing() {
                       {plan.features.map((feature, i) => (
                         <li key={i} className="flex items-center">
                           <Check className="w-4 h-4 sm:w-5 sm:h-5 text-white mr-2 sm:mr-3 flex-shrink-0" />
-                          <span className="text-gray-300 text-sm sm:text-base font-satoshi">{feature}</span>
+                          <span className="text-gray-300 text-sm sm:text-base font-satoshi">
+                            {feature}
+                          </span>
                         </li>
                       ))}
                     </ul>
                   </div>
-                  <button className={`w-full py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-semibold text-sm sm:text-base font-satoshi ${
-                    plan.popular 
-                      ? 'bg-white text-black hover:bg-gray-200 shadow-lg' 
-                      : 'bg-gray-800 text-white hover:bg-gray-700 border border-gray-800'
-                  } transition-all duration-300 hover:scale-105`}>
+                  <button
+                    className={`w-full py-2 sm:py-3 px-4 sm:px-6 rounded-lg font-semibold text-sm sm:text-base font-satoshi ${
+                      plan.popular
+                        ? "bg-white text-black hover:bg-gray-200 shadow-lg"
+                        : "bg-gray-800 text-white hover:bg-gray-700 border border-gray-800"
+                    } transition-all duration-300 hover:scale-105`}
+                  >
                     {plan.buttonText}
                   </button>
                 </div>
@@ -225,11 +273,20 @@ function Landing() {
                 />
                 <div className="flex-1">
                   <div className="flex items-center flex-wrap space-x-1">
-                    <span className="text-white font-semibold font-satoshi text-sm sm:text-base">Parag Sharma</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <span className="text-white font-semibold font-satoshi text-sm sm:text-base">
+                      Parag Sharma
+                    </span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path d="M22 12a10 10 0 11-20 0 10 10 0 0120 0zm-5.53-2.53a.75.75 0 00-1.06 0l-4.22 4.22-1.47-1.47a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l4.75-4.75a.75.75 0 000-1.06z" />
                     </svg>
-                    <span className="text-gray-500 font-satoshi text-xs sm:text-sm">@parag_bored</span>
+                    <span className="text-gray-500 font-satoshi text-xs sm:text-sm">
+                      @parag_bored
+                    </span>
                   </div>
                   <p className="text-white mt-1 sm:mt-2 font-satoshi text-start text-sm sm:text-base">
                     We got nothing to do! <br />
@@ -247,15 +304,25 @@ function Landing() {
                 />
                 <div className="flex-1">
                   <div className="flex items-center flex-wrap space-x-1">
-                    <span className="text-white font-semibold font-satoshi text-sm sm:text-base">Paramveer Singh</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <span className="text-white font-semibold font-satoshi text-sm sm:text-base">
+                      Paramveer Singh
+                    </span>
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 24 24"
+                    >
                       <path d="M22 12a10 10 0 11-20 0 10 10 0 0120 0zm-5.53-2.53a.75.75 0 00-1.06 0l-4.22 4.22-1.47-1.47a.75.75 0 00-1.06 1.06l2 2a.75.75 0 001.06 0l4.75-4.75a.75.75 0 000-1.06z" />
                     </svg>
-                    <span className="text-gray-500 font-satoshi text-xs sm:text-sm">@param_bored</span>
+                    <span className="text-gray-500 font-satoshi text-xs sm:text-sm">
+                      @param_bored
+                    </span>
                   </div>
                   <p className="text-white mt-1 sm:mt-2 font-satoshi text-start text-sm sm:text-base">
                     I am unemployed and bored! <br />
-                    Thinking about building something cool but lacking the energy.
+                    Thinking about building something cool but lacking the
+                    energy.
                   </p>
                 </div>
               </div>
@@ -265,7 +332,10 @@ function Landing() {
 
         <AnimatePresence>
           {showSignInModal && (
-            <SignInModal isOpen={showSignInModal} onClose={() => setShowSignInModal(false)} />
+            <SignInModal
+              isOpen={showSignInModal}
+              onClose={() => setShowSignInModal(false)}
+            />
           )}
         </AnimatePresence>
       </div>
