@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { motion, stagger, useAnimate } from "motion/react";
 import { Check } from "lucide-react";
-import { cn } from "../lib/utils"; // helper for Tailwind classes
+import { cn } from "../libs/util"; // helper for Tailwind classes
 import SignInModal from "../auth/SignInModal";
 
 const images = [
@@ -13,7 +13,7 @@ const images = [
   "src/assets/img/pay.png",
 ];
 
-// ✨ Animated text effect
+// Animated text effect
 const TextGenerateEffect = ({ words, className, filter = true, duration = 0.5 }) => {
   const [scope, animate] = useAnimate();
   let wordsArray = words.split(" ");
