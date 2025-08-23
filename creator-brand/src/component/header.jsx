@@ -51,8 +51,12 @@ function Header({ setHeaderHeight }) {
 
   return (
     <>
-      <header
+      <motion.header
         ref={headerRef}
+        initial={{ opacity: 0, y: -70 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -30 }}
+        transition={{ duration: 0, ease: "easeOut" }}
         className={`fixed top-0 left-0 w-full z-50 transition-all duration-300
           ${scrolled ? 'bg-black/30 backdrop-blur-sm shadow-md' : 'bg-black'}
           border-b-[0.5px] border-gray-800 px-6 py-3`}
@@ -359,7 +363,7 @@ function Header({ setHeaderHeight }) {
             }
           `}
         </style>
-      </header>
+      </motion.header>
 
       <AnimatePresence>
         {showSignInModal && (

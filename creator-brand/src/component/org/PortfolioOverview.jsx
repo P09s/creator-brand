@@ -11,6 +11,8 @@ import {
   Youtube
 } from 'lucide-react';
 
+const profile = JSON.parse(localStorage.getItem('profile'));
+
 const PortfolioOverview = memo(({ setIsProfileModalOpen }) => (
   <div className="space-y-8">
     {/* Header */}
@@ -19,7 +21,7 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => (
         <h2 className="text-xl font-bold text-white">My Portfolio</h2>
         <button 
           onClick={() => setIsProfileModalOpen(true)}
-          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium"
+          className="bg-gray-950 hover:bg-gray-900 border border-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium"
           aria-label="Add new portfolio work"
         >
           <Plus className="w-4 h-4" aria-hidden="true" />
@@ -48,7 +50,7 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => (
         
         <div className="flex-1">
           <div className="flex items-center gap-3 mb-2">
-            <h3 className="text-lg font-semibold text-white">Alex Johnson</h3>
+            <h3 className="text-lg font-semibold text-white">{profile?.name || "User"}</h3>
             <button className="text-gray-400 hover:text-white" aria-label="Edit profile">
               <Edit3 className="w-4 h-4" aria-hidden="true" />
             </button>

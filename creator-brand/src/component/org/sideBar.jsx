@@ -13,6 +13,8 @@ import {
   ChevronUp
 } from 'lucide-react';
 
+const profile = JSON.parse(localStorage.getItem('profile'));
+
 const sidebarVariants = {
   open: { width: '16rem', transition: { type: 'spring', stiffness: 300, damping: 30 } },
   closed: { width: '5rem', transition: { type: 'spring', stiffness: 300, damping: 30 } },
@@ -156,10 +158,10 @@ const Sidebar = ({
                 >
                   <div>
                     <p className="text-sm font-semibold text-white truncate font-satoshi">
-                      Tillu Badmosh
+                      {profile?.name || 'User'}
                     </p>
                     <p className="text-xs text-gray-400 truncate font-satoshi">
-                      Influencer
+                    {profile?.userName || 'User Name'}
                     </p>
                   </div>
                   <ChevronUp
@@ -238,7 +240,9 @@ const Sidebar = ({
                 </button>
                 <button
                   onClick={() => {
-                    console.log("Logging out professionally...");
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("profile");
+                    navigate("/");
                     setShowLogoutModal(false);
                   }}
                   className="flex-1 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-colors"

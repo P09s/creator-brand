@@ -38,6 +38,8 @@ import Messages from './messages';
 import Payments from './payments';
 import SettingsComponent from './settings';
 
+const profile = JSON.parse(localStorage.getItem('profile'));
+
 const InfluencerDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -135,7 +137,7 @@ const InfluencerDashboard = () => {
   const Dashboard = memo(() => (
     <div className="space-y-8">
       <div className="bg-gray-950 border border-gray-800 rounded-xl p-8 text-white">
-        <h1 className="text-xl font-bold mb-2">Welcome back, Parag! 👋</h1>
+        <h1 className="text-xl font-bold mb-2">Welcome back, {profile?.name.split(' ')[0]}! 👋</h1>
         <p className="text-gray-400 text-xs">Manage your creator journey from here</p>
       </div>
 
@@ -414,8 +416,8 @@ const InfluencerDashboard = () => {
                   onError={(e) => (e.target.src = '/fallback-image.jpg')}
                 />
                 <div>
-                  <p className="text-white font-medium text-sm">Tillu Badmosh</p>
-                  <p className="text-gray-400 text-xs">@baddi_tillu</p>
+                  <p className="text-white font-medium text-sm">{profile?.name || "user"}</p>
+                  <p className="text-gray-400 text-xs">{profile?.userName || "username"}</p>
                 </div>
               </div>
             </div>

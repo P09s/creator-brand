@@ -161,10 +161,10 @@ const Sidebar = ({
                 >
                   <div>
                     <p className="text-sm font-semibold text-white truncate font-satoshi">
-                      {profile?.name || "Guest"}
+                      {profile?.name || "user"}
                     </p>
                     <p className="text-xs text-gray-400 truncate font-satoshi">
-                      {profile?.userType || "User"}
+                    {profile?.userName || "user name"}
                     </p>
                   </div>
                   <ChevronUp

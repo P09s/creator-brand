@@ -40,6 +40,8 @@ import Payments from './payments';
 import SettingsComponent from './settings';
 import CampaignModal from './campaign/campaignModal';
 
+const profile = JSON.parse(localStorage.getItem('profile'));
+
 const Org_dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -148,7 +150,7 @@ const Org_dashboard = () => {
   const Dashboard = memo(() => (
     <div className="space-y-8">
       <div className="bg-gray-950 border border-gray-800 rounded-xl p-8 text-white">
-        <h1 className="text-xl font-bold mb-2">Welcome back, Parag! 👋</h1>
+        <h1 className="text-xl font-bold mb-2">Welcome back, {profile?.name || "User"}! 👋</h1>
         <p className="text-gray-400 text-xs">Manage your creator journey from here</p>
       </div>
 
@@ -408,8 +410,8 @@ const Org_dashboard = () => {
                   onError={(e) => (e.target.src = '/fallback-image.jpg')}
                 />
                 <div>
-                  <p className="text-white font-medium text-sm">Tillu Badmosh</p>
-                  <p className="text-gray-400 text-xs">@baddi_tillu</p>
+                  <p className="text-white font-medium text-sm">{profile?.name || "User"}</p>
+                  <p className="text-gray-400 text-xs">{profile?.userName || "User Name"}</p>
                 </div>
               </div>
             </div>
