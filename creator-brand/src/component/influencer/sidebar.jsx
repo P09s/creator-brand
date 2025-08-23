@@ -50,16 +50,19 @@ const Sidebar = ({
   setIsSidebarOpen,
   setShowBrowseCampaign,
   setIsSearchExpanded,
-  navigate // Add navigate as a prop
+  navigate
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
+  // 👇 Load profile from localStorage
+  const profile = JSON.parse(localStorage.getItem("profile"));
+
   const handleSidebarToggle = () => setIsSidebarOpen(!isSidebarOpen);
   const handleNavClick = (id) => {
-    const basePath = '/influencer_dashboard'; // Match the parent route
+    const basePath = '/influencer_dashboard';
     const path = id === 'dashboard' ? basePath : `${basePath}/${id}`;
-    navigate(path); // Use navigate to change the route
+    navigate(path);
     setActiveTab(id);
     setIsDropdownOpen(false);
   };
@@ -98,7 +101,9 @@ const Sidebar = ({
                   transition={{ duration: 0.2 }}
                 >
                   <h1 className="text-xl text-white font-bold font-satoshi tracking-tight">LinkFluence</h1>
-                  <p className="text-xs text-gray-400 font-medium">Influencer</p>
+                  <p className="text-xs text-gray-400 font-medium">
+                    {profile?.userType || "User"}
+                  </p>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -156,10 +161,10 @@ const Sidebar = ({
                 >
                   <div>
                     <p className="text-sm font-semibold text-white truncate font-satoshi">
-                      Tillu Badmosh
+                      {profile?.name || "Guest"}
                     </p>
                     <p className="text-xs text-gray-400 truncate font-satoshi">
-                      Influencer
+                      {profile?.userType || "User"}
                     </p>
                   </div>
                   <ChevronUp
@@ -185,7 +190,7 @@ const Sidebar = ({
                 <button
                   className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-gray-900 hover:border-gray-600 rounded-lg border border-transparent transition-colors"
                   onClick={() => {
-                    navigate('/influencer_dashboard/portfolio'); // Use navigate for portfolio
+                    navigate('/influencer_dashboard/portfolio');
                     setActiveTab('portfolio');
                     setIsSidebarOpen(false);
                     setIsDropdownOpen(false);
@@ -196,7 +201,7 @@ const Sidebar = ({
                 <button
                   className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-gray-900 hover:border-gray-600 rounded-lg border border-transparent transition-colors"
                   onClick={() => {
-                    setShowLogoutModal(true);
+                    setShowLogoutModal(true); 
                     setIsDropdownOpen(false);
                   }}
                 >
@@ -238,7 +243,9 @@ const Sidebar = ({
                 </button>
                 <button
                   onClick={() => {
-                    console.log("Logging out professionally...");
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("profile");
+                    navigate("/");
                     setShowLogoutModal(false);
                   }}
                   className="flex-1 px-4 py-2 bg-gray-800 text-white border border-gray-700 rounded-lg hover:bg-gray-700 hover:border-gray-600 transition-colors"

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Mail, Lock, UserPlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { login, register, getProfile } from '../services/authService'; // Adjust the import path as necessary
 
 export default function SignInForm() {
   const [email, setEmail] = useState('');
@@ -13,33 +14,35 @@ export default function SignInForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const data = activeTab === 'login' ? { email, password, userType } : { name, email, password, userType };
     try {
-      const response = await fetch(`http://localhost:3000/api/${activeTab}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) {
-        const text = await response.text();
-        console.error('Response not OK:', text);
-        alert('Error: ' + (text || 'Server error'));
-        return;
+      let result;
+      if (activeTab === "login") {
+        result = await login(email, password);
+      } else {
+        result = await register(name, email, password, userType);
       }
-      const result = await response.json();
-      console.log('Success:', result);
-      localStorage.setItem('token', result.token);
-      if(result.user.userType === 'influencer') {
-       navigate('/influencer_dashboard');
-      } else if(result.user.userType === 'brand') {
-       navigate('/org_dashboard');
+
+      localStorage.setItem("token", result.token);
+
+      const profile = await getProfile(result.token);
+      localStorage.setItem("profile", JSON.stringify(profile));
+      console.log("Profile from backend:", profile);
+
+      console.log("User Profile:", profile);
+
+      if (profile.userType === "influencer") {
+        navigate("/influencer_dashboard");
+      } else if (profile.userType === "brand") {
+        navigate("/org_dashboard");
       }
-      alert('Successfully logged in/registered!');
+
+      alert(`Welcome, ${profile.name}!`);
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
+      console.error("Auth Error:", error);
+      alert(error.message);
     }
   };
+  
 
   return (
     <div className="w-full h-full relative text-center overflow-hidden flex flex-col sm:flex-row overflow-y-auto">
