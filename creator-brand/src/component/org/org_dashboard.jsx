@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
+import userAuthStore from '../../store/authStore';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -40,8 +41,6 @@ import Payments from './payments';
 import SettingsComponent from './settings';
 import CampaignModal from './campaign/campaignModal';
 
-const profile = JSON.parse(localStorage.getItem('profile'));
-
 const Org_dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
@@ -57,6 +56,7 @@ const Org_dashboard = () => {
     campaignDate: '',
     results: '',
   });
+  const {user:profile} = userAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
