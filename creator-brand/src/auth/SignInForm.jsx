@@ -1,7 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Mail, Lock, UserPlus } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { login, register, getProfile } from '../services/authService'; // Adjust the import path as necessary
+import { useNavigate, useLocation } from 'react-router-dom';
+import useAuthStore from '../store/authStore';
+import { 
+  showWelcomeToast, 
+  showLoadingToast, 
+  showErrorToast, 
+  dismissAllToasts 
+} from '../utils/toastMessages';
 
 export default function SignInForm() {
   const [email, setEmail] = useState('');
@@ -10,10 +16,25 @@ export default function SignInForm() {
   const [remember, setRemember] = useState(true);
   const [activeTab, setActiveTab] = useState('login');
   const [userType, setUserType] = useState('influencer');
+  
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login, register, isLoading, clearError } = useAuthStore();
+
+  // Dismiss toasts when component unmounts or navigates away
+  useEffect(() => {
+    return () => {
+      dismissAllToasts();
+    };
+  }, [location.pathname]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    clearError();
+    
+    // Show loading toast
+    const loadingToast = showLoadingToast(activeTab === 'login');
+    
     try {
       let result;
       if (activeTab === "login") {
@@ -22,27 +43,73 @@ export default function SignInForm() {
         result = await register(name, email, password, userType);
       }
 
-      localStorage.setItem("token", result.token);
+      if (result.success) {
+        const { user, isNewUser } = result;
+        console.log("User Profile:", user);
+        
+        // Wait a bit to let user see the loading toast, then transition smoothly
+        setTimeout(() => {
+          // Dismiss loading toast first
+          dismissAllToasts();
+          
+          // Wait a moment for the dismissal animation, then show welcome toast
+          setTimeout(() => {
+            const welcomeToast = showWelcomeToast(user, isNewUser);
+            
+            // Navigate after showing welcome message for adequate time
+            setTimeout(() => {
+              // Dismiss the welcome toast before navigation for smooth transition
+              dismissAllToasts();
+              
+              // Wait for dismissal animation before navigating
+              setTimeout(() => {
+                if (user.userType === "influencer") {
+                  navigate("/influencer_dashboard");
+                } else if (user.userType === "brand") {
+                  navigate("/org_dashboard");
+                }
+              }, 300); // Wait for toast dismissal animation
+              
+            }, 2000); // Show welcome message for 3 seconds
+            
+          }, 300); // Wait for loading toast to fully dismiss
+          
+        }, 1000); // Show loading toast for at least 1 second
 
-      const profile = await getProfile(result.token);
-      localStorage.setItem("profile", JSON.stringify(profile));
-      console.log("Profile from backend:", profile);
-
-      console.log("User Profile:", profile);
-
-      if (profile.userType === "influencer") {
-        navigate("/influencer_dashboard");
-      } else if (profile.userType === "brand") {
-        navigate("/org_dashboard");
+      } else {
+        // For errors, wait a bit then dismiss loading and show error
+        setTimeout(() => {
+          dismissAllToasts();
+          setTimeout(() => {
+            showErrorToast(result.error);
+          }, 300);
+        }, 500);
       }
-
-      alert(`Welcome, ${profile.name}!`);
     } catch (error) {
-      console.error("Auth Error:", error);
-      alert(error.message);
+      // For catch errors, same pattern
+      setTimeout(() => {
+        dismissAllToasts();
+        setTimeout(() => {
+          console.error("Auth Error:", error);
+          showErrorToast(error.message || 'An unexpected error occurred');
+        }, 300);
+      }, 500);
     }
   };
-  
+
+  // Clear form when switching tabs
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    clearError();
+    dismissAllToasts(); // Clear any existing toasts
+    
+    // Reset form fields when switching tabs
+    if (tab === 'login') {
+      setName('');
+    } else {
+      // Keep email if switching from login to register
+    }
+  };
 
   return (
     <div className="w-full h-full relative text-center overflow-hidden flex flex-col sm:flex-row overflow-y-auto">
@@ -65,7 +132,7 @@ export default function SignInForm() {
           <div className="flex border-b border-gray-800">
             <button
               type="button"
-              onClick={() => setActiveTab('login')}
+              onClick={() => handleTabChange('login')}
               className={`flex-1 py-1.5 text-center font-medium text-sm transition-colors duration-300 ${
                 activeTab === 'login' ? 'text-white border-b-2 border-white' : 'text-gray-400 hover:text-gray-200'
               }`}
@@ -74,7 +141,7 @@ export default function SignInForm() {
             </button>
             <button
               type="button"
-              onClick={() => setActiveTab('register')}
+              onClick={() => handleTabChange('register')}
               className={`flex-1 py-1.5 text-center font-medium text-sm transition-colors duration-300 ${
                 activeTab === 'register' ? 'text-white border-b-2 border-white' : 'text-gray-400 hover:text-gray-200'
               }`}
@@ -164,14 +231,16 @@ export default function SignInForm() {
 
                 <button
                   type="button"
-                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                  disabled={isLoading}
+                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleSubmit}
                 >
-                  Sign In
+                  {isLoading ? 'Signing In...' : 'Sign In'}
                 </button>
               </div>
             )}
           </div>
+          
           <div
             className="transition-all duration-300 ease-in-out transform"
             style={{
@@ -253,10 +322,11 @@ export default function SignInForm() {
 
                 <button
                   type="button"
-                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm"
+                  disabled={isLoading}
+                  className="w-full bg-white text-black font-medium py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   onClick={handleSubmit}
                 >
-                  Register
+                  {isLoading ? 'Creating Account...' : 'Register'}
                 </button>
               </div>
             )}
