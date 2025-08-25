@@ -1,5 +1,11 @@
 const API_URL = "http://localhost:3000/api";
 
+// Get token from Zustand store
+const getToken = () => {
+  const authStorage = JSON.parse(localStorage.getItem('auth-storage') || '{}');
+  return authStorage.state?.token;
+};
+
 // Helper to handle API responses
 const handleResponse = async (response) => {
   if (!response.ok) {
@@ -28,8 +34,23 @@ export const register = async (name, email, password, userType) => {
 };
 
 export const getProfile = async (token) => {
+  const authToken = token || getToken();
   const response = await fetch(`${API_URL}/profile`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${authToken}` },
+  });
+  return handleResponse(response);
+};
+
+// Add more API calls as needed
+export const updateProfile = async (profileData) => {
+  const token = getToken();
+  const response = await fetch(`${API_URL}/profile`, {
+    method: 'PUT',
+    headers: { 
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}` 
+    },
+    body: JSON.stringify(profileData),
   });
   return handleResponse(response);
 };

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import useAuthStore from '../../store/authStore';
 import { 
   LayoutDashboard, 
   Target, 
@@ -55,8 +56,7 @@ const Sidebar = ({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
-  // 👇 Load profile from localStorage
-  const profile = JSON.parse(localStorage.getItem("profile"));
+  const { user: profile, logout } = useAuthStore();
 
   const handleSidebarToggle = () => setIsSidebarOpen(!isSidebarOpen);
   const handleNavClick = (id) => {
@@ -243,8 +243,7 @@ const Sidebar = ({
                 </button>
                 <button
                   onClick={() => {
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("profile");
+                    logout();
                     navigate("/");
                     setShowLogoutModal(false);
                   }}
