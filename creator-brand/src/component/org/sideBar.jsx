@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import useAuthStore from '../../store/authStore';
 import { 
   LayoutDashboard, 
   Target, 
@@ -12,8 +13,6 @@ import {
   Briefcase,
   ChevronUp
 } from 'lucide-react';
-
-const profile = JSON.parse(localStorage.getItem('profile'));
 
 const sidebarVariants = {
   open: { width: '16rem', transition: { type: 'spring', stiffness: 300, damping: 30 } },
@@ -56,6 +55,7 @@ const Sidebar = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const {user: profile} = useAuthStore();
 
   const handleSidebarToggle = () => setIsSidebarOpen(!isSidebarOpen);
   const handleNavClick = (id) => {

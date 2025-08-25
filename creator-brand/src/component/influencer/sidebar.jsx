@@ -102,7 +102,7 @@ const Sidebar = ({
                 >
                   <h1 className="text-xl text-white font-bold font-satoshi tracking-tight">LinkFluence</h1>
                   <p className="text-xs text-gray-400 font-medium">
-                    {profile?.userType || "User"}
+                    Influencer
                   </p>
                 </motion.div>
               )}
