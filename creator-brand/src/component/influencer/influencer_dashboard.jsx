@@ -1,4 +1,5 @@
 import React, { useState, useEffect, memo } from 'react';
+import useAuthStore from '../../store/authStore';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -38,7 +39,6 @@ import Messages from './messages';
 import Payments from './payments';
 import SettingsComponent from './settings';
 
-const profile = JSON.parse(localStorage.getItem('profile'));
 
 const InfluencerDashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -54,6 +54,7 @@ const InfluencerDashboard = () => {
     campaignDate: '',
     results: '',
   });
+  const { user: profile } = useAuthStore();
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const location = useLocation();
