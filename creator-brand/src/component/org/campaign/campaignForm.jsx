@@ -1,630 +1,235 @@
-import { useState } from 'react';
-import { ChevronRight, ChevronLeft, Users, Target, DollarSign, Calendar, MapPin, Hash, Image, FileText, Check } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ChevronRight, ChevronLeft, Users, Target, DollarSign, Calendar, Image, FileText, Check, Loader2 } from 'lucide-react';
+import { useCampaigns } from '../../../hooks/useCampaigns';
+import toast from 'react-hot-toast';
+import { notifyCampaignCreated } from '../../../store/notificationStore';
+import useAuthStore from '../../../store/authStore';
 
-function CampaignForm() {
+const PLATFORMS = ['Instagram', 'YouTube', 'TikTok', 'Twitter', 'LinkedIn', 'Multiple'];
+const CATEGORIES = ['Technology', 'Fashion', 'Fitness', 'Food', 'Travel', 'Beauty', 'Gaming', 'Education', 'Lifestyle', 'Business'];
+
+function CampaignForm({ prefillData, onSuccess }) {
+  const { create } = useCampaigns();
+  const { user } = useAuthStore();
   const [currentStep, setCurrentStep] = useState(0);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
-    campaignName: '',
-    brandName: '',
-    campaignType: '',
+    title: '',
     description: '',
+    platform: 'Instagram',
+    category: 'Technology',
+    budget: '',
+    deadline: '',
+    requirements: '',
     targetAudience: '',
-    demographics: {
-      ageRange: { min: 18, max: 65 },
-      gender: '',
-      location: '',
-      interests: []
-    },
-    budget: {
-      min: '',
-      max: '',
-      type: 'fixed'
-    },
-    timeline: {
-      startDate: '',
-      endDate: '',
-      deliverables: ''
-    },
-    contentType: [],
-    platforms: [],
-    contentGuidelines: '',
-    hashtags: '',
-    influencerTier: '',
-    followerRange: { min: '', max: '' },
-    engagementRate: '',
-    previousBrands: '',
-    exclusiveRights: false,
-    contentApproval: false,
-    analytics: false,
-    additionalNotes: ''
+    brandName: '',
   });
   const [errors, setErrors] = useState({});
 
-  const totalSteps = 6;
+  // Auto-fill from AI brief if provided
+  useEffect(() => {
+    if (prefillData) {
+      setFormData(prev => ({
+        ...prev,
+        title: prefillData.title || '',
+        description: prefillData.description || '',
+        requirements: prefillData.requirements || '',
+        targetAudience: prefillData.targetAudience || '',
+      }));
+    }
+  }, [prefillData]);
+
+  const update = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    setErrors(prev => ({ ...prev, [field]: '' }));
+  };
 
   const validateStep = () => {
-    const newErrors = {};
+    const e = {};
     if (currentStep === 0) {
-      if (!formData.campaignName) newErrors.campaignName = 'Campaign name is required';
-      if (!formData.brandName) newErrors.brandName = 'Brand name is required';
-      if (!formData.campaignType) newErrors.campaignType = 'Campaign type is required';
-    } else if (currentStep === 1) {
-      if (!formData.targetAudience) newErrors.targetAudience = 'Target audience is required';
-    } else if (currentStep === 3) {
-      if (!formData.contentType.length) newErrors.contentType = 'At least one content type is required';
-      if (!formData.platforms.length) newErrors.platforms = 'At least one platform is required';
-    } else if (currentStep === 4) {
-      if (!formData.influencerTier) newErrors.influencerTier = 'Influencer tier is required';
+      if (!formData.title.trim()) e.title = 'Title is required';
+      if (!formData.description.trim()) e.description = 'Description is required';
+      if (!formData.brandName.trim()) e.brandName = 'Brand name is required';
     }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    if (currentStep === 1) {
+      if (!formData.budget || isNaN(formData.budget) || Number(formData.budget) <= 0) e.budget = 'Valid budget required';
+      if (!formData.deadline) e.deadline = 'Deadline is required';
+    }
+    setErrors(e);
+    return Object.keys(e).length === 0;
   };
 
-  const updateFormData = (field, value) => {
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
-        }
-      }));
+  const next = () => { if (validateStep()) setCurrentStep(s => s + 1); };
+  const prev = () => { setCurrentStep(s => s - 1); setErrors({}); };
+
+  const handleSubmit = async () => {
+    if (!validateStep()) return;
+    setSubmitting(true);
+    const result = await create({
+      ...formData,
+      budget: Number(formData.budget),
+      brandName: formData.brandName || user?.name,
+    });
+    setSubmitting(false);
+    if (result.success) {
+      notifyCampaignCreated(formData.title);
+      toast.success('Campaign created!');
+      onSuccess?.();
     } else {
-      setFormData(prev => ({
-        ...prev,
-        [field]: value
-      }));
-    }
-    setErrors(prev => ({ ...prev, [field.split('.')[0]]: '' }));
-  };
-
-  const nextStep = () => {
-    if (validateStep() && currentStep < totalSteps - 1) {
-      setCurrentStep(currentStep + 1);
+      toast.error(result.error || 'Failed to create campaign');
     }
   };
 
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-      setErrors({});
-    }
-  };
-
-  const handleSubmit = () => {
-    if (validateStep()) {
-      console.log('Campaign Data:', formData);
-      alert('Campaign created successfully!');
-    }
-  };
+  const inputClass = (field) =>
+    `w-full px-4 py-3 bg-black border ${errors[field] ? 'border-red-500' : 'border-gray-800'} rounded-xl text-sm text-white placeholder-gray-600 focus:outline-none focus:border-gray-600 transition-colors`;
 
   const steps = [
     {
-      title: "Basic Information",
+      title: 'Campaign basics',
       icon: <FileText className="w-4 h-4" />,
-      description: "Define your campaign's core details",
-      component: (
+      content: (
         <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Campaign Name *</label>
-            <input
-              type="text"
-              value={formData.campaignName}
-              onChange={(e) => updateFormData('campaignName', e.target.value)}
-              placeholder="Enter campaign name"
-              className={`w-full px-3 py-1.5 bg-black border ${errors.campaignName ? 'border-red-500' : 'border-gray-800'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200`}
-              aria-invalid={!!errors.campaignName}
-              aria-describedby="campaignName-error"
-            />
-            {errors.campaignName && <p id="campaignName-error" className="text-red-500 text-xs mt-1">{errors.campaignName}</p>}
-          </div>
-          
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Brand Name *</label>
-            <input
-              type="text"
-              value={formData.brandName}
-              onChange={(e) => updateFormData('brandName', e.target.value)}
-              placeholder="Enter brand name"
-              className={`w-full px-3 py-1.5 bg-black border ${errors.brandName ? 'border-red-500' : 'border-gray-800'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200`}
-              aria-invalid={!!errors.brandName}
-              aria-describedby="brandName-error"
-            />
-            {errors.brandName && <p id="brandName-error" className="text-red-500 text-xs mt-1">{errors.brandName}</p>}
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Campaign Type *</label>
-            <select
-              value={formData.campaignType}
-              onChange={(e) => updateFormData('campaignType', e.target.value)}
-              className={`w-full px-3 py-1.5 bg-black border ${errors.campaignType ? 'border-red-500' : 'border-gray-800'} rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200`}
-              aria-invalid={!!errors.campaignType}
-              aria-describedby="campaignType-error"
-            >
-              <option value="">Select campaign type</option>
-              <option value="product-launch">Product Launch</option>
-              <option value="brand-awareness">Brand Awareness</option>
-              <option value="seasonal">Seasonal Campaign</option>
-              <option value="event">Event Promotion</option>
-              <option value="user-generated">User Generated Content</option>
-            </select>
-            {errors.campaignType && <p id="campaignType-error" className="text-red-500 text-xs mt-1">{errors.campaignType}</p>}
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Description</label>
-            <textarea
-              value={formData.description}
-              onChange={(e) => updateFormData('description', e.target.value)}
-              placeholder="Describe your campaign goals"
-              rows={3}
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200 resize-none"
-            />
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Target Audience",
-      icon: <Users className="w-4 h-4" />,
-      description: "Specify your ideal audience",
-      component: (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Target Audience *</label>
-            <input
-              type="text"
-              value={formData.targetAudience}
-              onChange={(e) => updateFormData('targetAudience', e.target.value)}
-              placeholder="e.g., Young professionals"
-              className={`w-full px-3 py-1.5 bg-black border ${errors.targetAudience ? 'border-red-500' : 'border-gray-800'} rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200`}
-              aria-invalid={!!errors.targetAudience}
-              aria-describedby="targetAudience-error"
-            />
-            {errors.targetAudience && <p id="targetAudience-error" className="text-red-500 text-xs mt-1">{errors.targetAudience}</p>}
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Age Range</label>
-              <div className="flex gap-1 items-center">
-                <input
-                  type="number"
-                  value={formData.demographics.ageRange.min}
-                  onChange={(e) => updateFormData('demographics.ageRange', {...formData.demographics.ageRange, min: parseInt(e.target.value)})}
-                  placeholder="18"
-                  className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-                />
-                <span className="text-gray-400 text-xs">to</span>
-                <input
-                  type="number"
-                  value={formData.demographics.ageRange.max}
-                  onChange={(e) => updateFormData('demographics.ageRange', {...formData.demographics.ageRange, max: parseInt(e.target.value)})}
-                  placeholder="65"
-                  className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-                />
-              </div>
+          {prefillData && (
+            <div className="bg-purple-500/10 border border-purple-500/20 rounded-xl p-3 text-xs text-purple-300 flex items-center gap-2">
+              ✦ Pre-filled from your AI-generated brief — edit as needed
             </div>
-
+          )}
+          <div>
+            <label className="text-gray-400 text-xs mb-1 block">Campaign Title *</label>
+            <input value={formData.title} onChange={e => update('title', e.target.value)} placeholder="e.g. Summer Launch 2025" className={inputClass('title')} />
+            {errors.title && <p className="text-red-400 text-xs mt-1">{errors.title}</p>}
+          </div>
+          <div>
+            <label className="text-gray-400 text-xs mb-1 block">Brand Name *</label>
+            <input value={formData.brandName} onChange={e => update('brandName', e.target.value)} placeholder="Your brand name" className={inputClass('brandName')} />
+            {errors.brandName && <p className="text-red-400 text-xs mt-1">{errors.brandName}</p>}
+          </div>
+          <div>
+            <label className="text-gray-400 text-xs mb-1 block">Description *</label>
+            <textarea value={formData.description} onChange={e => update('description', e.target.value)} placeholder="What's this campaign about?" rows={4} className={`${inputClass('description')} resize-none`} />
+            {errors.description && <p className="text-red-400 text-xs mt-1">{errors.description}</p>}
+          </div>
+          <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Gender</label>
-              <select
-                value={formData.demographics.gender}
-                onChange={(e) => updateFormData('demographics.gender', e.target.value)}
-                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-              >
-                <option value="">Any</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="non-binary">Non-binary</option>
+              <label className="text-gray-400 text-xs mb-1 block">Platform</label>
+              <select value={formData.platform} onChange={e => update('platform', e.target.value)} className={inputClass('platform')}>
+                {PLATFORMS.map(p => <option key={p}>{p}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-gray-400 text-xs mb-1 block">Category</label>
+              <select value={formData.category} onChange={e => update('category', e.target.value)} className={inputClass('category')}>
+                {CATEGORIES.map(c => <option key={c}>{c}</option>)}
               </select>
             </div>
           </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Location</label>
-            <input
-              type="text"
-              value={formData.demographics.location}
-              onChange={(e) => updateFormData('demographics.location', e.target.value)}
-              placeholder="e.g., United States, Global"
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Interests/Niches</label>
-            <input
-              type="text"
-              value={formData.demographics.interests.join(', ')}
-              onChange={(e) => updateFormData('demographics.interests', e.target.value.split(', ').filter(i => i.trim()))}
-              placeholder="e.g., Fashion, Tech, Travel"
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-            />
-          </div>
         </div>
-      )
+      ),
     },
     {
-      title: "Budget & Timeline",
+      title: 'Budget & timeline',
       icon: <DollarSign className="w-4 h-4" />,
-      description: "Set your financial and time constraints",
-      component: (
+      content: (
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Budget Type</label>
-            <div className="grid grid-cols-3 gap-2">
-              {['fixed', 'negotiable', 'per_post'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => updateFormData('budget.type', type)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
-                    formData.budget.type === type 
-                      ? 'bg-white text-black shadow-sm' 
-                      : 'bg-black border border-gray-800 text-gray-300 hover:border-gray-700'
-                  }`}
-                >
-                  {type === 'per_post' ? 'Per Post' : type.charAt(0).toUpperCase() + type.slice(1)}
-                </button>
-              ))}
-            </div>
+            <label className="text-gray-400 text-xs mb-1 block">Budget (USD) *</label>
+            <input type="number" value={formData.budget} onChange={e => update('budget', e.target.value)} placeholder="2500" className={inputClass('budget')} />
+            {errors.budget && <p className="text-red-400 text-xs mt-1">{errors.budget}</p>}
           </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Min Budget ($)</label>
-              <input
-                type="number"
-                value={formData.budget.min}
-                onChange={(e) => updateFormData('budget.min', e.target.value)}
-                placeholder="1000"
-                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Max Budget ($)</label>
-              <input
-                type="number"
-                value={formData.budget.max}
-                onChange={(e) => updateFormData('budget.max', e.target.value)}
-                placeholder="5000"
-                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Start Date</label>
-              <input
-                type="date"
-                value={formData.timeline.startDate}
-                onChange={(e) => updateFormData('timeline.startDate', e.target.value)}
-                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">End Date</label>
-              <input
-                type="date"
-                value={formData.timeline.endDate}
-                onChange={(e) => updateFormData('timeline.endDate', e.target.value)}
-                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-              />
-            </div>
-          </div>
-
           <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Deliverables</label>
-            <input
-              type="text"
-              value={formData.timeline.deliverables}
-              onChange={(e) => updateFormData('timeline.deliverables', e.target.value)}
-              placeholder="e.g., 3 posts, 1 Story"
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-            />
+            <label className="text-gray-400 text-xs mb-1 block">Deadline *</label>
+            <input type="date" value={formData.deadline} onChange={e => update('deadline', e.target.value)} min={new Date().toISOString().split('T')[0]} className={inputClass('deadline')} />
+            {errors.deadline && <p className="text-red-400 text-xs mt-1">{errors.deadline}</p>}
+          </div>
+          <div>
+            <label className="text-gray-400 text-xs mb-1 block">Target Audience</label>
+            <input value={formData.targetAudience} onChange={e => update('targetAudience', e.target.value)} placeholder="e.g. Fitness enthusiasts 18-35" className={inputClass('targetAudience')} />
+          </div>
+          <div>
+            <label className="text-gray-400 text-xs mb-1 block">Requirements / Deliverables</label>
+            <textarea value={formData.requirements} onChange={e => update('requirements', e.target.value)} placeholder="What do you expect from creators? (posts, stories, videos...)" rows={4} className={`${inputClass('requirements')} resize-none`} />
           </div>
         </div>
-      )
+      ),
     },
     {
-      title: "Content Requirements",
-      icon: <Image className="w-4 h-4" />,
-      description: "Define content specifications",
-      component: (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Content Types *</label>
-            <div className="grid grid-cols-2 gap-2">
-              {['Post', 'Story', 'Reel', 'Video', 'Blog', 'Review'].map((type) => (
-                <button
-                  key={type}
-                  onClick={() => {
-                    const current = formData.contentType || [];
-                    const updated = current.includes(type) 
-                      ? current.filter(t => t !== type)
-                      : [...current, type];
-                    updateFormData('contentType', updated);
-                  }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
-                    (formData.contentType || []).includes(type)
-                      ? 'bg-white text-black shadow-sm' 
-                      : 'bg-black border border-gray-800 text-gray-300 hover:border-gray-700'
-                  }`}
-                >
-                  {type}
-                </button>
-              ))}
-            </div>
-            {errors.contentType && <p className="text-red-500 text-xs mt-1">{errors.contentType}</p>}
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Platforms *</label>
-            <div className="grid grid-cols-3 gap-2">
-              {['Instagram', 'TikTok', 'YouTube', 'Twitter', 'LinkedIn', 'Facebook'].map((platform) => (
-                <button
-                  key={platform}
-                  onClick={() => {
-                    const current = formData.platforms || [];
-                    const updated = current.includes(platform) 
-                      ? current.filter(p => p !== platform)
-                      : [...current, platform];
-                    updateFormData('platforms', updated);
-                  }}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
-                    (formData.platforms || []).includes(platform)
-                      ? 'bg-white text-black shadow-sm' 
-                      : 'bg-black border border-gray-800 text-gray-300 hover:border-gray-700'
-                  }`}
-                >
-                  {platform}
-                </button>
-              ))}
-            </div>
-            {errors.platforms && <p className="text-red-500 text-xs mt-1">{errors.platforms}</p>}
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Content Guidelines</label>
-            <textarea
-              value={formData.contentGuidelines}
-              onChange={(e) => updateFormData('contentGuidelines', e.target.value)}
-              placeholder="Brand tone, style preferences..."
-              rows={3}
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200 resize-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Required Hashtags</label>
-            <input
-              type="text"
-              value={formData.hashtags}
-              onChange={(e) => updateFormData('hashtags', e.target.value)}
-              placeholder="#brand #campaign"
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-            />
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Influencer Preferences",
-      icon: <Target className="w-4 h-4" />,
-      description: "Select your ideal influencers",
-      component: (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Influencer Tier *</label>
-            <div className="grid grid-cols-2 gap-2">
-              {['Nano (1K-10K)', 'Micro (10K-100K)', 'Mid (100K-500K)', 'Macro (500K-1M)', 'Mega (1M+)', 'Celebrity'].map((tier) => (
-                <button
-                  key={tier}
-                  onClick={() => updateFormData('influencerTier', tier)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all duration-200 ${
-                    formData.influencerTier === tier 
-                      ? 'bg-white text-black shadow-sm' 
-                      : 'bg-black border border-gray-800 text-gray-300 hover:border-gray-700'
-                  }`}
-                >
-                  {tier}
-                </button>
-              ))}
-            </div>
-            {errors.influencerTier && <p className="text-red-500 text-xs mt-1">{errors.influencerTier}</p>}
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Min Followers</label>
-              <input
-                type="number"
-                value={formData.followerRange.min}
-                onChange={(e) => updateFormData('followerRange.min', e.target.value)}
-                placeholder="1000"
-                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-300 mb-1">Max Followers</label>
-              <input
-                type="number"
-                value={formData.followerRange.max}
-                onChange={(e) => updateFormData('followerRange.max', e.target.value)}
-                placeholder="100000"
-                className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Min Engagement Rate (%)</label>
-            <input
-              type="number"
-              step="0.1"
-              value={formData.engagementRate}
-              onChange={(e) => updateFormData('engagementRate', e.target.value)}
-              placeholder="2.5"
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-            />
-          </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Previous Brand Collaborations</label>
-            <select
-              value={formData.previousBrands}
-              onChange={(e) => updateFormData('previousBrands', e.target.value)}
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200"
-            >
-              <option value="">Any</option>
-              <option value="similar">Similar brands</option>
-              <option value="no-competitors">No competitors</option>
-              <option value="luxury">Luxury brands</option>
-              <option value="new-influencers">Fresh faces</option>
-            </select>
-          </div>
-        </div>
-      )
-    },
-    {
-      title: "Final Details",
+      title: 'Review & launch',
       icon: <Check className="w-4 h-4" />,
-      description: "Review and finalize your campaign",
-      component: (
+      content: (
         <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="block text-xs font-medium text-gray-300 mb-1">Additional Requirements</label>
-            
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.exclusiveRights}
-                onChange={(e) => updateFormData('exclusiveRights', e.target.checked)}
-                className="w-3.5 h-3.5 bg-black border-gray-800 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
-              />
-              <span className="text-xs text-gray-300">Exclusive usage rights</span>
-            </label>
-
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.contentApproval}
-                onChange={(e) => updateFormData('contentApproval', e.target.checked)}
-                className="w-3.5 h-3.5 bg-black border-gray-800 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
-              />
-              <span className="text-xs text-gray-300">Content approval</span>
-            </label>
-
-            <label className="flex items-center space-x-2 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={formData.analytics}
-                onChange={(e) => updateFormData('analytics', e.target.checked)}
-                className="w-3.5 h-3.5 bg-black border-gray-800 rounded focus:ring-1 focus:ring-white/20 text-white transition-all duration-200"
-              />
-              <span className="text-xs text-gray-300">Analytics reporting</span>
-            </label>
+          <div className="bg-black border border-gray-800 rounded-xl p-5 space-y-3">
+            {[
+              ['Title', formData.title],
+              ['Brand', formData.brandName],
+              ['Platform', formData.platform],
+              ['Category', formData.category],
+              ['Budget', formData.budget ? `$${Number(formData.budget).toLocaleString()}` : '—'],
+              ['Deadline', formData.deadline ? new Date(formData.deadline).toLocaleDateString() : '—'],
+              ['Target Audience', formData.targetAudience || '—'],
+            ].map(([label, val]) => (
+              <div key={label} className="flex justify-between items-start text-sm">
+                <span className="text-gray-500">{label}</span>
+                <span className="text-white text-right max-w-xs">{val || '—'}</span>
+              </div>
+            ))}
           </div>
-
-          <div>
-            <label className="block text-xs font-medium text-gray-300 mb-1">Additional Notes</label>
-            <textarea
-              value={formData.additionalNotes}
-              onChange={(e) => updateFormData('additionalNotes', e.target.value)}
-              placeholder="Special requirements..."
-              rows={3}
-              className="w-full px-3 py-1.5 bg-black border border-gray-800 rounded-md text-sm text-white placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-white/20 focus:border-gray-700 transition-all duration-200 resize-none"
-            />
-          </div>
-
-          <div className="bg-black border border-gray-800 p-3 rounded-md shadow-sm">
-            <h3 className="text-sm font-medium text-white mb-2">Campaign Summary</h3>
-            <div className="text-xs text-gray-400 space-y-1">
-              <p><span className="text-white font-medium">Campaign:</span> {formData.campaignName || 'Not set'}</p>
-              <p><span className="text-white font-medium">Type:</span> {formData.campaignType || 'Not set'}</p>
-              <p><span className="text-white font-medium">Budget:</span> ${formData.budget.min || 'Not set'} - ${formData.budget.max || 'Not set'}</p>
-              <p><span className="text-white font-medium">Platforms:</span> {(formData.platforms || []).join(', ') || 'Not set'}</p>
-              <p><span className="text-white font-medium">Content Types:</span> {(formData.contentType || []).join(', ') || 'Not set'}</p>
-              <p><span className="text-white font-medium">Target Audience:</span> {formData.targetAudience || 'Not set'}</p>
-              <p><span className="text-white font-medium">Influencer Tier:</span> {formData.influencerTier || 'Not set'}</p>
+          {formData.description && (
+            <div className="bg-black border border-gray-800 rounded-xl p-4">
+              <p className="text-gray-500 text-xs mb-1">Description</p>
+              <p className="text-gray-300 text-sm">{formData.description}</p>
             </div>
-          </div>
+          )}
         </div>
-      )
-    }
+      ),
+    },
   ];
 
+  const totalSteps = steps.length;
+
   return (
-    <div className="w-full max-w-2xl mx-auto bg-gray-950 text-white p-4 rounded-lg shadow-md">
-      {/* Progress Bar */}
+    <div className="w-full max-w-2xl mx-auto h-full flex flex-col">
+      {/* Progress */}
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
           <h2 className="text-xl font-semibold text-white">Create Campaign</h2>
-          <span className="text-xs text-gray-400">{currentStep + 1} of {totalSteps}</span>
+          <span className="text-xs text-gray-500">{currentStep + 1} / {totalSteps}</span>
         </div>
-        
-        <div className="relative w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
-          <div 
-            className="bg-gradient-to-r from-white to-gray-300 h-1.5 rounded-full transition-all duration-500 ease-out"
-            style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }}
-          />
+        <div className="w-full bg-gray-800 rounded-full h-1">
+          <div className="bg-white h-1 rounded-full transition-all duration-500" style={{ width: `${((currentStep + 1) / totalSteps) * 100}%` }} />
         </div>
-
-        <div className="flex justify-between mt-2">
-          {steps.map((step, index) => (
-            <div key={index} className="relative flex flex-col items-center group">
-              <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium transition-all duration-200 ${index <= currentStep ? 'bg-white text-black' : 'bg-black border border-gray-800 text-gray-400'}`}>
-                {step.icon}
-              </div>
-              <span className="absolute top-9 text-xs text-gray-400 hidden group-hover:flex gap-1 whitespace-nowrap transition-opacity duration-300">{step.title}</span>
+        <div className="flex justify-between mt-3">
+          {steps.map((s, i) => (
+            <div key={i} className={`flex items-center justify-center w-8 h-8 rounded-full text-xs transition-all ${i <= currentStep ? 'bg-white text-black' : 'bg-gray-900 border border-gray-700 text-gray-500'}`}>
+              {s.icon}
             </div>
           ))}
         </div>
       </div>
 
-      {/* Step Content */}
-      <div className="flex-1 overflow-y-auto max-h-[500px] scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-800 pr-1">
-        <div className="mb-4 mt-4">
-          <h3 className="text-lg font-medium text-white">{steps[currentStep].title}</h3>
-          <p className="text-xs text-gray-400 mt-1">{steps[currentStep].description}</p>
+      {/* Step content */}
+      <div className="flex-1 overflow-y-auto pr-1">
+        <div className="mb-4">
+          <h3 className="text-white font-medium">{steps[currentStep].title}</h3>
         </div>
-        
-        {steps[currentStep].component}
+        {steps[currentStep].content}
       </div>
 
       {/* Navigation */}
-      <div className="flex justify-between items-center pt-4 border-t border-gray-800">
-        <button
-          onClick={prevStep}
-          disabled={currentStep === 0}
-          className={`flex items-center space-x-1 px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${
-            currentStep === 0 
-              ? 'bg-black border border-gray-800 text-gray-500 cursor-not-allowed' 
-              : 'bg-black border border-gray-800 text-gray-200 hover:border-gray-700 hover:shadow-sm'
-          }`}
-        >
-          <ChevronLeft className="w-3.5 h-3.5" />
-          <span>Previous</span>
+      <div className="flex justify-between items-center pt-5 border-t border-gray-800 mt-5">
+        <button onClick={prev} disabled={currentStep === 0}
+          className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium border border-gray-800 text-gray-300 hover:border-gray-600 disabled:opacity-30 disabled:cursor-not-allowed transition-colors">
+          <ChevronLeft className="w-4 h-4" /> Back
         </button>
-
-        {currentStep === totalSteps - 1 ? (
-          <button
-            onClick={handleSubmit}
-            className="flex items-center space-x-1 px-4 py-1.5 bg-gradient-to-r from-white to-gray-200 text-black rounded-md text-sm font-medium hover:from-gray-100 hover:to-gray-300 transition-all duration-200 shadow-sm"
-          >
-            <span>Create Campaign</span>
-            <Check className="w-3.5 h-3.5" />
+        {currentStep < totalSteps - 1 ? (
+          <button onClick={next}
+            className="flex items-center gap-1.5 px-5 py-2 rounded-xl text-sm font-semibold bg-white text-black hover:bg-gray-100 transition-colors">
+            Next <ChevronRight className="w-4 h-4" />
           </button>
         ) : (
-          <button
-            onClick={nextStep}
-            className="flex items-center space-x-1 px-4 py-1.5 bg-gradient-to-r from-white to-gray-200 text-black rounded-md text-sm font-medium hover:from-gray-100 hover:to-gray-300 transition-all duration-200 shadow-sm"
-          >
-            <span>Next</span>
-            <ChevronRight className="w-3.5 h-3.5" />
+          <button onClick={handleSubmit} disabled={submitting}
+            className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-semibold bg-white text-black hover:bg-gray-100 disabled:opacity-50 transition-colors">
+            {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+            {submitting ? 'Launching...' : 'Launch Campaign'}
           </button>
         )}
       </div>

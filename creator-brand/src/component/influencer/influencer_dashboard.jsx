@@ -28,6 +28,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import NotificationPanel from '../shared/NotificationPanel';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
@@ -47,6 +48,7 @@ const InfluencerDashboard = () => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(true);
   const [showBrowseCampaign, setShowBrowseCampaign] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [formData, setFormData] = useState({
     brandName: '',
     campaignTitle: '',
@@ -253,94 +255,6 @@ const InfluencerDashboard = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center space-x-2">
-              <Zap className="w-5 h-5 text-purple-400" aria-hidden="true" />
-              <h2 className="text-lg font-medium text-white">Quick Actions</h2>
-            </div>
-          </div>
-          <div className="p-5">
-            <div className="grid grid-cols-2 gap-3">
-              {quickActions.map((action, index) => (
-                <button 
-                  key={index}
-                  onClick={() => navigate(`/influencer_dashboard${action.path}`)}
-                  className="flex flex-col items-center p-3 bg-black border border-gray-800 rounded-lg hover:border-gray-700 transition-colors group"
-                  aria-label={action.label}
-                >
-                  <action.icon className={`w-5 h-5 mb-2 ${action.color} group-hover:scale-110 transition-transform`} aria-hidden="true" />
-                  <span className="text-xs text-gray-400 text-center">{action.label}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center space-x-2">
-              <DollarSign className="w-5 h-5 text-green-400" aria-hidden="true" />
-              <h2 className="text-lg font-medium text-white">Earnings Overview</h2>
-            </div>
-          </div>
-          <div className="p-5">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400">This Month</span>
-                <span className="text-lg font-semibold text-green-400">$1,850</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400">Last Month</span>
-                <span className="text-sm text-gray-500">$1,620</span>
-              </div>
-              <div className="flex justify-between items-center pb-4 border-b border-gray-800">
-                <span className="text-sm text-gray-400">Pending</span>
-                <span className="text-sm text-yellow-400">$600</span>
-              </div>
-              
-              <button 
-                className="w-full bg-white text-black py-2.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
-                aria-label="Withdraw funds"
-              >
-                <Wallet className="w-4 h-4 mr-2" aria-hidden="true" />
-                Withdraw Funds
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center space-x-2">
-              <Bell className="w-5 h-5 text-blue-400" aria-hidden="true" />
-              <h2 className="text-lg font-medium text-white">Recent Activity</h2>
-            </div>
-          </div>
-          <div className="p-5 space-y-4">
-            {notifications.map(notification => (
-              <div key={notification.id} className="flex items-start space-x-3">
-                <div className={`p-1.5 rounded-full ${
-                  notification.type === 'success' ? 'bg-green-500/10' :
-                  notification.type === 'warning' ? 'bg-yellow-500/10' :
-                  notification.type === 'info' ? 'bg-blue-500/10' : 'bg-gray-500/10'
-                }`}>
-                  <notification.icon className={`w-3 h-3 ${
-                    notification.type === 'success' ? 'text-green-400' :
-                    notification.type === 'warning' ? 'text-yellow-400' :
-                    notification.type === 'info' ? 'text-blue-400' : 'text-gray-400'
-                  }`} aria-hidden="true" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs text-gray-300 mb-1">{notification.text}</p>
-                  <p className="text-xs text-gray-500">{notification.date}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   ));
 
@@ -404,10 +318,7 @@ const InfluencerDashboard = () => {
             </div>
             
             <div className="flex items-center gap-6">
-              <button className="relative p-2 text-white hover:text-gray-300 hover:bg-gray-800 rounded-lg" aria-label="View notifications">
-                <Bell className="w-4 h-4" aria-hidden="true" />
-                <span className="absolute top-0 right-0 w-2 h-2 bg-white rounded-full"></span>
-              </button>
+              <NotificationPanel isOpen={notifOpen} onToggle={() => setNotifOpen(o => !o)} />
               
               <div className="flex items-center gap-3">
                 <img

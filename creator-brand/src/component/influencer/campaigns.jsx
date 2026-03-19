@@ -1,482 +1,285 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Calendar, 
-  Target, 
-  Clock, 
-  Upload, 
-  ChevronRight, 
-  Filter, 
-  Search,
-  FileText,
-  CheckCircle,
-  XCircle,
-  DollarSign,
-  BarChart3,
-  MessageSquare,
-  X,
-  Image,
-  Type
-} from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Calendar, Target, ChevronDown, ChevronUp, Search, Loader2, CheckCircle, XCircle, AlertCircle, Clock, Send, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { getAcceptedCampaigns, getMilestones, submitMilestone, submitReview, getTrustScore } from '../../services/apiService';
+import useAuthStore from '../../store/authStore';
+import TrustBadge from '../shared/TrustBadge';
+import toast from 'react-hot-toast';
 
-const Campaigns = () => {
-  const navigate = useNavigate();
-  const [activeFilter, setActiveFilter] = useState('active');
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortBy, setSortBy] = useState('deadline');
-  const [platformFilter, setPlatformFilter] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [budgetRange, setBudgetRange] = useState('');
-  const [showCompletedTasks, setShowCompletedTasks] = useState(false);
-  const [isContentModalOpen, setIsContentModalOpen] = useState(false);
-  const [contentForm, setContentForm] = useState({
-    campaignId: '',
-    media: null,
-    caption: '',
-    platform: 'Instagram'
-  });
+const statusColors = {
+  active: 'bg-green-500/10 text-green-400 border border-green-500/20',
+  completed: 'bg-blue-500/10 text-blue-400 border border-blue-500/20',
+  paused: 'bg-yellow-500/10 text-yellow-400 border border-yellow-500/20',
+  draft: 'bg-gray-500/10 text-gray-400 border border-gray-500/20',
+};
+const msIcon = { pending: Clock, submitted: AlertCircle, approved: CheckCircle, rejected: XCircle };
+const msColor = { pending: 'text-gray-400', submitted: 'text-blue-400', approved: 'text-green-400', rejected: 'text-red-400' };
 
-  // Sample campaign data
-  const campaigns = [
-    {
-      id: 1,
-      brand: 'TechFlow',
-      title: 'Product Launch Campaign',
-      platform: 'Instagram',
-      status: 'Live',
-      deadline: '2025-08-20',
-      budget: '$2,500',
-      progress: 75,
-      category: 'Technology',
-      color: 'bg-green-500/10 text-green-400',
-      type: 'active',
-      metrics: { reach: '125K', engagement: '4.2%', clicks: '1.5K' },
-      lastUpdate: '2 hours ago',
-      tasks: [
-        { id: 1, description: 'Submit draft post', completed: true },
-        { id: 2, description: 'Post content', completed: false }
-      ]
-    },
-    {
-      id: 2,
-      brand: 'StyleCorp',
-      title: 'Summer Collection',
-      platform: 'TikTok',
-      status: 'Awaiting Approval',
-      deadline: '2025-08-25',
-      budget: '$1,800',
-      progress: 20,
-      category: 'Fashion',
-      color: 'bg-yellow-500/10 text-yellow-400',
-      type: 'active',
-      metrics: { reach: '50K', engagement: '3.8%', clicks: '800' },
-      lastUpdate: '1 day ago',
-      tasks: [
-        { id: 1, description: 'Review campaign brief', completed: true },
-        { id: 2, description: 'Upload video', completed: false }
-      ]
-    },
-    {
-      id: 3,
-      brand: 'FitnessPro',
-      title: 'Workout Series',
-      platform: 'YouTube',
-      status: 'Completed',
-      deadline: '2025-07-30',
-      budget: '$2,000',
-      progress: 100,
-      category: 'Fitness',
-      color: 'bg-blue-500/10 text-blue-400',
-      type: 'past',
-      metrics: { reach: '200K', engagement: '5.1%', clicks: '2.3K' },
-      lastUpdate: '1 week ago',
-      tasks: [
-        { id: 1, description: 'Upload video series', completed: true },
-        { id: 2, description: 'Share analytics', completed: true }
-      ]
-    },
-    {
-      id: 4,
-      brand: 'FoodieApp',
-      title: 'Recipe Contest',
-      platform: 'Instagram',
-      status: 'Draft Pending',
-      deadline: '2025-09-10',
-      budget: '$3,000',
-      progress: 10,
-      category: 'Food',
-      color: 'bg-gray-500/10 text-gray-400',
-      type: 'recent',
-      metrics: { reach: '10K', engagement: '2.5%', clicks: '200' },
-      lastUpdate: '3 hours ago',
-      tasks: [
-        { id: 1, description: 'Submit recipe idea', completed: false },
-        { id: 2, description: 'Create content', completed: false }
-      ]
-    },
-  ];
+function MilestoneRow({ milestone, onSubmit }) {
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ submissionNote: '', submissionUrl: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const Icon = msIcon[milestone.status];
 
-  const filteredCampaigns = campaigns
-    .filter(campaign => campaign.type === activeFilter)
-    .filter(campaign => 
-      (campaign.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-       campaign.title.toLowerCase().includes(searchTerm.toLowerCase())) &&
-      (platformFilter ? campaign.platform === platformFilter : true) &&
-      (categoryFilter ? campaign.category === categoryFilter : true) &&
-      (budgetRange ? 
-        parseFloat(campaign.budget.replace('$', '').replace(',', '')) >= parseFloat(budgetRange.split('-')[0]) &&
-        parseFloat(campaign.budget.replace('$', '').replace(',', '')) <= parseFloat(budgetRange.split('-')[1] || Infinity) 
-        : true)
-    )
-    .sort((a, b) => {
-      if (sortBy === 'deadline') {
-        return new Date(a.deadline) - new Date(b.deadline);
-      }
-      if (sortBy === 'budget') {
-        return parseFloat(b.budget.replace('$', '').replace(',', '')) - parseFloat(a.budget.replace('$', '').replace(',', ''));
-      }
-      return a.title.localeCompare(b.title);
-    });
-
-  const handleContentSubmit = (e) => {
-    e.preventDefault();
-    // Simulate content submission
-    console.log('Submitting content:', contentForm);
-    setIsContentModalOpen(false);
-    setContentForm({ campaignId: '', media: null, caption: '', platform: 'Instagram' });
+  const handle = async () => {
+    if (!form.submissionNote.trim()) { toast.error('Add a note about your submission'); return; }
+    setSubmitting(true);
+    try { await onSubmit(milestone._id, form); toast.success('Submitted!'); setOpen(false); }
+    catch { toast.error('Failed'); }
+    finally { setSubmitting(false); }
   };
 
-  const ContentSubmissionModal = () => (
-    <motion.div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-    >
-      <motion.div
-        className="bg-gray-950 border border-gray-800 rounded-xl p-6 w-full max-w-md"
-        initial={{ scale: 0.9, y: 20 }}
-        animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9, y: 20 }}
-      >
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium text-white">Submit Campaign Content</h2>
-          <button
-            onClick={() => setIsContentModalOpen(false)}
-            className="text-gray-400 hover:text-white"
-            aria-label="Close modal"
-          >
-            <X className="w-5 h-5" aria-hidden="true" />
-          </button>
-        </div>
-        <form onSubmit={handleContentSubmit} className="space-y-4">
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Campaign</label>
-            <select
-              value={contentForm.campaignId}
-              onChange={(e) => setContentForm({ ...contentForm, campaignId: e.target.value })}
-              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm"
-              aria-label="Select campaign"
-            >
-              <option value="">Select a campaign</option>
-              {campaigns.map(campaign => (
-                <option key={campaign.id} value={campaign.id}>{campaign.title} - {campaign.brand}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Media</label>
-            <input
-              type="file"
-              accept="image/*,video/*"
-              onChange={(e) => setContentForm({ ...contentForm, media: e.target.files[0] })}
-              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm"
-              aria-label="Upload media"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Caption</label>
-            <textarea
-              value={contentForm.caption}
-              onChange={(e) => setContentForm({ ...contentForm, caption: e.target.value })}
-              placeholder="Enter your caption..."
-              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm"
-              rows="4"
-              aria-label="Content caption"
-            />
-          </div>
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Platform</label>
-            <select
-              value={contentForm.platform}
-              onChange={(e) => setContentForm({ ...contentForm, platform: e.target.value })}
-              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm"
-              aria-label="Select platform"
-            >
-              <option value="Instagram">Instagram</option>
-              <option value="TikTok">TikTok</option>
-              <option value="YouTube">YouTube</option>
-              <option value="Twitter">Twitter</option>
-            </select>
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-white text-black py-2 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
-            aria-label="Submit content"
-          >
-            Submit Content
-          </button>
-        </form>
-      </motion.div>
-    </motion.div>
-  );
-
-  const CampaignCard = ({ campaign }) => (
-    <motion.div
-      className="bg-gray-950 border border-gray-800 rounded-xl p-6 hover:border-gray-700 transition-colors"
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
-    >
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <div className="flex items-center space-x-2 mb-2">
-            <h3 className="text-sm font-medium text-white">{campaign.brand}</h3>
-            <span className={`px-2 py-1 text-xs rounded-full ${campaign.color}`}>
-              {campaign.status}
-            </span>
-          </div>
-          <p className="text-sm text-gray-300 mb-2">{campaign.title}</p>
-          <div className="flex items-center text-xs text-gray-500 mb-3">
-            <Calendar className="w-3 h-3 mr-1" aria-hidden="true" />
-            <span>Due {campaign.deadline}</span>
-            <span className="mx-2">•</span>
-            <span>{campaign.platform}</span>
-            <span className="mx-2">•</span>
-            <span>{campaign.budget}</span>
-          </div>
-          <div className="flex items-center text-xs text-gray-400">
-            <BarChart3 className="w-3 h-3 mr-1" aria-hidden="true" />
-            <span>Reach: {campaign.metrics.reach}</span>
-            <span className="mx-2">•</span>
-            <span>Engagement: {campaign.metrics.engagement}</span>
-            <span className="mx-2">•</span>
-            <span>Clicks: {campaign.metrics.clicks}</span>
-          </div>
-          <div className="mt-3">
-            <h4 className="text-xs text-gray-400 mb-1">Tasks</h4>
-            {campaign.tasks
-              .filter(task => showCompletedTasks || !task.completed)
-              .map(task => (
-                <div key={task.id} className="flex items-center text-xs text-gray-400 mb-1">
-                  {task.completed ? (
-                    <CheckCircle className="w-3 h-3 mr-1 text-green-400" aria-hidden="true" />
-                  ) : (
-                    <XCircle className="w-3 h-3 mr-1 text-red-400" aria-hidden="true" />
-                  )}
-                  <span>{task.description}</span>
-                </div>
-              ))}
-          </div>
-        </div>
-        <button 
-          className="ml-3 text-gray-400 hover:text-white" 
-          onClick={() => navigate(`/influencer_dashboard/campaigns/${campaign.id}`)}
-          aria-label={`View details for ${campaign.brand} campaign`}
-        >
-          <ChevronRight className="w-4 h-4" aria-hidden="true" />
-        </button>
-      </div>
-      
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <button 
-            className="flex items-center text-xs text-gray-400 hover:text-white"
-            onClick={() => {
-              setContentForm({ ...contentForm, campaignId: campaign.id });
-              setIsContentModalOpen(true);
-            }}
-            aria-label={`Upload content for ${campaign.brand}`}
-          >
-            <Upload className="w-3 h-3 mr-1" aria-hidden="true" />
-            Upload Content
-          </button>
-          <button 
-            className="flex items-center text-xs text-gray-400 hover:text-white"
-            onClick={() => navigate(`/influencer_dashboard/messages?campaign=${campaign.id}`)}
-            aria-label={`View messages for ${campaign.brand}`}
-          >
-            <MessageSquare className="w-3 h-3 mr-1" aria-hidden="true" />
-            Messages
-          </button>
-          <button 
-            className="flex items-center text-xs text-gray-400 hover:text-white"
-            onClick={() => navigate(`/influencer_dashboard/analytics?campaign=${campaign.id}`)}
-            aria-label={`View analytics for ${campaign.brand}`}
-          >
-            <BarChart3 className="w-3 h-3 mr-1" aria-hidden="true" />
-            Analytics
-          </button>
-        </div>
-        <p className="text-xs text-gray-500">Last updated: {campaign.lastUpdate}</p>
-      </div>
-    </motion.div>
-  );
-
   return (
-    <div className="space-y-8">
-      {/* Header Section */}
-      <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-bold text-white">Campaigns</h1>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" aria-hidden="true" />
-              <input
-                type="text"
-                placeholder="Search campaigns..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-gray-900 text-white pl-10 pr-4 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm placeholder:text-gray-400"
-                aria-label="Search campaigns"
-              />
-            </div>
-            <select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm"
-              aria-label="Sort campaigns"
-            >
-              <option value="deadline">Sort by Deadline</option>
-              <option value="budget">Sort by Budget</option>
-              <option value="title">Sort by Title</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Campaign Management Toolbar */}
-      <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center space-x-2">
-            <Filter className="w-5 h-5 text-purple-400" aria-hidden="true" />
-            <h2 className="text-lg font-medium text-white">Manage Campaigns</h2>
-          </div>
-          <button
-            onClick={() => setIsContentModalOpen(true)}
-            className="flex items-center text-sm text-white bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg transition-colors"
-            aria-label="Submit new content"
-          >
-            <Upload className="w-4 h-4 mr-2" aria-hidden="true" />
-            Submit Content
-          </button>
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="bg-gray-950 border border-gray-800 rounded-xl overflow-hidden">
+      <button onClick={() => setOpen(o => !o)} className="w-full flex items-center justify-between p-4 hover:bg-gray-900/50 transition-colors text-left">
+        <div className="flex items-center gap-3">
+          <Icon className={`w-4 h-4 flex-shrink-0 ${msColor[milestone.status]}`} />
           <div>
-            <label className="text-sm text-gray-400 mb-1 block">Platform</label>
-            <select
-              value={platformFilter}
-              onChange={(e) => setPlatformFilter(e.target.value)}
-              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm"
-              aria-label="Filter by platform"
-            >
-              <option value="">All Platforms</option>
-              <option value="Instagram">Instagram</option>
-              <option value="TikTok">TikTok</option>
-              <option value="YouTube">YouTube</option>
-              <option value="Twitter">Twitter</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Category</label>
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm"
-              aria-label="Filter by category"
-            >
-              <option value="">All Categories</option>
-              <option value="Technology">Technology</option>
-              <option value="Fashion">Fashion</option>
-              <option value="Fitness">Fitness</option>
-              <option value="Food">Food</option>
-            </select>
-          </div>
-          <div>
-            <label className="text-sm text-gray-400 mb-1 block">Budget Range</label>
-            <select
-              value={budgetRange}
-              onChange={(e) => setBudgetRange(e.target.value)}
-              className="w-full bg-gray-900 text-white px-3 py-2 rounded-lg border border-gray-800 focus:ring-2 focus:ring-gray-600 focus:outline-none text-sm"
-              aria-label="Filter by budget range"
-            >
-              <option value="">All Budgets</option>
-              <option value="0-1000">$0 - $1,000</option>
-              <option value="1000-2000">$1,000 - $2,000</option>
-              <option value="2000-5000">$2,000 - $5,000</option>
-              <option value="5000">$5,000+</option>
-            </select>
+            <p className="text-white text-sm font-medium">{milestone.title}</p>
+            <p className="text-gray-500 text-xs">Due {new Date(milestone.dueDate).toLocaleDateString()}</p>
           </div>
         </div>
-        <div className="mt-4 flex items-center">
-          <input
-            type="checkbox"
-            checked={showCompletedTasks}
-            onChange={() => setShowCompletedTasks(!showCompletedTasks)}
-            className="h-4 w-4 text-blue-400 bg-gray-900 border-gray-800 rounded focus:ring-blue-500"
-            aria-label="Show completed tasks"
-          />
-          <label className="ml-2 text-sm text-gray-400">Show completed tasks</label>
+        <div className="flex items-center gap-2">
+          <span className={`text-xs px-2 py-0.5 rounded-full capitalize ${msColor[milestone.status]} bg-gray-900`}>{milestone.status}</span>
+          {open ? <ChevronUp className="w-4 h-4 text-gray-500" /> : <ChevronDown className="w-4 h-4 text-gray-500" />}
         </div>
-      </div>
-
-      {/* Tabs for filtering campaigns */}
-      <div className="flex space-x-4 border-b border-gray-800">
-        {['active', 'recent', 'past'].map(tab => (
-          <button
-            key={tab}
-            onClick={() => setActiveFilter(tab)}
-            className={`pb-2 px-1 text-sm font-medium capitalize ${
-              activeFilter === tab 
-                ? 'text-white border-b-2 border-blue-400' 
-                : 'text-gray-400 hover:text-white'
-            }`}
-            aria-label={`View ${tab} campaigns`}
-          >
-            {tab} Campaigns
-          </button>
-        ))}
-      </div>
-
-      {/* Campaign List */}
-      <div className="space-y-4">
-        <AnimatePresence>
-          {filteredCampaigns.length > 0 ? (
-            filteredCampaigns.map(campaign => (
-              <CampaignCard key={campaign.id} campaign={campaign} />
-            ))
-          ) : (
-            <motion.div
-              className="bg-gray-950 border border-gray-800 rounded-xl p-6 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
-              <p className="text-gray-400 text-sm">No {activeFilter} campaigns found.</p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
-
-      {/* Content Submission Modal */}
+      </button>
       <AnimatePresence>
-        {isContentModalOpen && <ContentSubmissionModal />}
+        {open && (
+          <motion.div initial={{ height: 0 }} animate={{ height: 'auto' }} exit={{ height: 0 }} className="overflow-hidden border-t border-gray-800">
+            <div className="p-4 space-y-3">
+              {milestone.description && <p className="text-gray-400 text-xs">{milestone.description}</p>}
+              {milestone.status === 'rejected' && milestone.rejectionReason && (
+                <div className="bg-red-500/5 border border-red-500/20 rounded-lg p-3">
+                  <p className="text-red-400 text-xs font-medium mb-1">Brand feedback:</p>
+                  <p className="text-gray-300 text-xs">{milestone.rejectionReason}</p>
+                </div>
+              )}
+              {milestone.status === 'approved' && (
+                <div className="bg-green-500/5 border border-green-500/20 rounded-lg p-3 text-green-400 text-xs">Approved by brand ✓</div>
+              )}
+              {milestone.status === 'submitted' && (
+                <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-3 text-blue-400 text-xs">Waiting for brand review...</div>
+              )}
+              {(milestone.status === 'pending' || milestone.status === 'rejected') && (
+                <div className="space-y-2">
+                  <textarea value={form.submissionNote} onChange={e => setForm(p => ({ ...p, submissionNote: e.target.value }))}
+                    placeholder="Describe what you've completed..." rows={3}
+                    className="w-full bg-black border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600 resize-none" />
+                  <input value={form.submissionUrl} onChange={e => setForm(p => ({ ...p, submissionUrl: e.target.value }))}
+                    placeholder="Link to your content (optional)"
+                    className="w-full bg-black border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600" />
+                  <button onClick={handle} disabled={submitting}
+                    className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50">
+                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                    {milestone.status === 'rejected' ? 'Resubmit' : 'Submit for review'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );
-};
+}
 
-export default Campaigns;
+function ReviewModal({ campaign, onClose, onSubmit }) {
+  const [rating, setRating] = useState(0);
+  const [hover, setHover] = useState(0);
+  const [comment, setComment] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const handle = async () => {
+    if (!rating) { toast.error('Please select a rating'); return; }
+    setSubmitting(true);
+    try { await onSubmit({ campaignId: campaign._id, revieweeId: campaign.brand, rating, comment }); toast.success('Review submitted!'); onClose(); }
+    catch { toast.error('Failed'); }
+    finally { setSubmitting(false); }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+      <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}
+        className="bg-gray-950 border border-gray-800 rounded-2xl w-full max-w-md p-6">
+        <h3 className="text-white font-semibold mb-1">Rate this campaign</h3>
+        <p className="text-gray-500 text-xs mb-5">How was your experience with {campaign.brandName}?</p>
+        <div className="flex justify-center gap-1 mb-5">
+          {[1,2,3,4,5].map(s => (
+            <button key={s} onClick={() => setRating(s)} onMouseEnter={() => setHover(s)} onMouseLeave={() => setHover(0)}>
+              <Star className={`w-8 h-8 transition-colors ${s <= (hover || rating) ? 'text-amber-400 fill-amber-400' : 'text-gray-700'}`} />
+            </button>
+          ))}
+        </div>
+        <textarea value={comment} onChange={e => setComment(e.target.value)} placeholder="Share your experience (optional)..." rows={3}
+          className="w-full bg-black border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600 resize-none mb-4" />
+        <div className="flex gap-3">
+          <button onClick={onClose} className="flex-1 border border-gray-800 text-gray-400 hover:text-white py-2.5 rounded-xl text-sm transition-colors">Cancel</button>
+          <button onClick={handle} disabled={submitting}
+            className="flex-1 bg-white hover:bg-gray-100 text-black py-2.5 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50">
+            {submitting ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Submit review'}
+          </button>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+export default function Campaigns() {
+  const { user } = useAuthStore();
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [expandedId, setExpandedId] = useState(null);
+  const [milestones, setMilestones] = useState({});
+  const [loadingMs, setLoadingMs] = useState({});
+  const [reviewCampaign, setReviewCampaign] = useState(null);
+  const [myTrust, setMyTrust] = useState(null);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      try {
+        const [camps, trust] = await Promise.all([
+          getAcceptedCampaigns(),
+          user?._id ? getTrustScore(user._id).catch(() => null) : null,
+        ]);
+        setCampaigns(camps);
+        if (trust) setMyTrust(trust);
+      } catch { toast.error('Failed to load'); }
+      finally { setLoading(false); }
+    })();
+  }, [user?._id]);
+
+  const toggleExpand = useCallback(async (id) => {
+    if (expandedId === id) { setExpandedId(null); return; }
+    setExpandedId(id);
+    if (!milestones[id]) {
+      setLoadingMs(p => ({ ...p, [id]: true }));
+      try {
+        const data = await getMilestones(id);
+        setMilestones(p => ({ ...p, [id]: data.filter(m => m.creator === user?._id) }));
+      } catch { setMilestones(p => ({ ...p, [id]: [] })); }
+      finally { setLoadingMs(p => ({ ...p, [id]: false })); }
+    }
+  }, [expandedId, milestones, user]);
+
+  const handleSubmitMs = async (milestoneId, form) => {
+    await submitMilestone(milestoneId, form);
+    if (expandedId) {
+      const data = await getMilestones(expandedId);
+      setMilestones(p => ({ ...p, [expandedId]: data.filter(m => m.creator === user?._id) }));
+    }
+  };
+
+  const filtered = campaigns.filter(c => !search || c.title?.toLowerCase().includes(search.toLowerCase()) || c.brandName?.toLowerCase().includes(search.toLowerCase()));
+
+  const getProgress = (cms) => {
+    if (!cms?.length) return null;
+    const approved = cms.filter(m => m.status === 'approved').length;
+    return { approved, total: cms.length, pct: Math.round((approved / cms.length) * 100) };
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-white">My Campaigns</h1>
+          <p className="text-gray-500 text-xs mt-1">Campaigns you've been accepted into</p>
+        </div>
+        {myTrust && <TrustBadge score={myTrust.trustScore} size="lg" />}
+      </div>
+
+      <div className="relative">
+        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+        <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search campaigns..."
+          className="w-full bg-gray-950 border border-gray-800 rounded-xl pl-10 pr-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600" />
+      </div>
+
+      {loading ? (
+        <div className="flex justify-center py-20"><Loader2 className="w-8 h-8 text-gray-600 animate-spin" /></div>
+      ) : filtered.length === 0 ? (
+        <div className="bg-gray-950 border border-gray-800 rounded-xl p-16 text-center">
+          <Target className="w-10 h-10 text-gray-700 mx-auto mb-3" />
+          <p className="text-gray-400 text-sm">No active campaigns yet</p>
+          <p className="text-gray-600 text-xs mt-1">Browse campaigns, apply, and wait for brand approval</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filtered.map((c, i) => {
+            const cms = milestones[c._id];
+            const progress = getProgress(cms);
+            const isExpanded = expandedId === c._id;
+            return (
+              <motion.div key={c._id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                className="bg-gray-950 border border-gray-800 rounded-xl overflow-hidden hover:border-gray-700 transition-colors">
+                <div className="p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <h3 className="text-white font-medium text-sm">{c.title}</h3>
+                        <span className={`px-2 py-0.5 text-xs rounded-full capitalize ${statusColors[c.status] || statusColors.active}`}>{c.status}</span>
+                      </div>
+                      <p className="text-gray-500 text-xs mb-3">by {c.brandName}</p>
+                      <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                        <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />Due {new Date(c.deadline).toLocaleDateString()}</span>
+                        <span>${c.budget?.toLocaleString()}</span>
+                        <span className="bg-gray-800 px-2 py-0.5 rounded-full">{c.platform}</span>
+                      </div>
+                      {progress && (
+                        <div className="mt-3">
+                          <div className="flex justify-between mb-1">
+                            <span className="text-xs text-gray-500">Milestones</span>
+                            <span className="text-xs text-gray-400">{progress.approved}/{progress.total} done</span>
+                          </div>
+                          <div className="h-1.5 bg-gray-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-green-500 rounded-full transition-all" style={{ width: `${progress.pct}%` }} />
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 flex-shrink-0">
+                      {c.status === 'completed' && (
+                        <button onClick={() => setReviewCampaign(c)}
+                          className="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 hover:bg-amber-500/20 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+                          <Star className="w-3 h-3" /> Rate
+                        </button>
+                      )}
+                      <button onClick={() => toggleExpand(c._id)}
+                        className="flex items-center gap-1.5 border border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white px-3 py-1.5 rounded-lg text-xs transition-colors">
+                        {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                        Tasks
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <AnimatePresence>
+                  {isExpanded && (
+                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                      className="border-t border-gray-800 overflow-hidden">
+                      <div className="p-5 space-y-3 bg-black/30">
+                        <p className="text-gray-500 text-xs font-medium uppercase tracking-wider">Your deliverables</p>
+                        {loadingMs[c._id] ? (
+                          <div className="flex justify-center py-6"><Loader2 className="w-5 h-5 text-gray-600 animate-spin" /></div>
+                        ) : !cms?.length ? (
+                          <div className="text-center py-8 text-gray-600 text-sm">Brand will add your milestones soon</div>
+                        ) : cms.map(m => <MilestoneRow key={m._id} milestone={m} onSubmit={handleSubmitMs} />)}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            );
+          })}
+        </div>
+      )}
+
+      <AnimatePresence>
+        {reviewCampaign && (
+          <ReviewModal campaign={reviewCampaign} onClose={() => setReviewCampaign(null)} onSubmit={handleReview} />
+        )}
+      </AnimatePresence>
+    </div>
+  );
+  async function handleReview(data) { await submitReview(data); }
+}

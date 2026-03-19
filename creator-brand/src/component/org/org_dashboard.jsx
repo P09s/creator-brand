@@ -29,6 +29,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import NotificationPanel from '../shared/NotificationPanel';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
@@ -40,6 +41,7 @@ import Messages from './messages';
 import Payments from './payments';
 import SettingsComponent from './settings';
 import CampaignModal from './campaign/campaignModal';
+import { useCampaigns } from '../../hooks/useCampaigns';
 
 const Org_dashboard = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -49,6 +51,7 @@ const Org_dashboard = () => {
   const [showBrowseCampaign, setShowBrowseCampaign] = useState(false);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [notifOpen, setNotifOpen] = useState(false);
   const [formData, setFormData] = useState({
     brandName: '',
     campaignTitle: '',
@@ -147,214 +150,133 @@ const Org_dashboard = () => {
     setShowCampaignModal(false);
   };
 
-  const Dashboard = memo(() => (
-    <div className="space-y-8">
-      <div className="bg-gray-950 border border-gray-800 rounded-xl p-8 text-white">
-        <h1 className="text-xl font-bold mb-2">Welcome back, {profile?.name || "User"}! 👋</h1>
-        <p className="text-gray-400 text-xs">Manage your creator journey from here</p>
+  const Dashboard = memo(() => {
+    const { campaigns, loading } = useCampaigns();
+    const activeCampaigns = campaigns.filter(c => c.status === 'active' || c.status === 'draft');
+    const totalApplicants = campaigns.reduce((sum, c) => sum + (c.applicants?.length || 0), 0);
+    const totalAccepted = campaigns.reduce((sum, c) => sum + (c.accepted?.length || 0), 0);
+
+    return (
+    <div className="space-y-6">
+      {/* Welcome */}
+      <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
+        <div className="flex items-start justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-white mb-1">Welcome back, {profile?.name?.split(' ')[0]}!</h1>
+            <p className="text-gray-400 text-xs">Manage your campaigns and find the right creators</p>
+          </div>
+          <button
+            onClick={() => setShowCampaignModal(true)}
+            className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-4 py-2.5 rounded-xl text-sm font-semibold transition-colors flex-shrink-0"
+          >
+            <Plus className="w-4 h-4" />
+            New Campaign
+          </button>
+        </div>
       </div>
 
+      {/* Stats — real data */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { title: 'Total Earnings', value: '$2,450', change: '+12%', icon: Wallet, color: 'text-green-400', status: 'Growth' },
-          { title: 'Active Campaigns', value: '3', change: '+1', icon: Target, color: 'text-blue-400', status: 'Active' },
-          { title: 'Opportunities', value: '7', change: '+2 new', icon: Star, color: 'text-yellow-400', status: 'New' },
-          { title: 'Engagement Rate', value: '4.2%', change: '+0.3%', icon: TrendingUp, color: 'text-purple-400', status: 'Improved' },
-        ].map((stat, index) => (
-          <motion.div
-            key={index}
-            className="bg-gray-950 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors shadow-sm"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.3 }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <stat.icon className={`w-5 h-5 ${stat.color}`} aria-hidden="true" />
-              <span className={`text-xs ${stat.color} bg-gray-800 px-2 py-1 rounded-full`}>{stat.status}</span>
-            </div>
-            <div className="text-xl font-semibold text-white mb-1">{stat.value}</div>
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-gray-400">{stat.title}</div>
-              <div className="text-xs text-gray-300">{stat.change}</div>
-            </div>
+          { label: 'Campaigns', value: campaigns.length, sub: 'Posted', icon: Target, color: 'text-blue-400' },
+          { label: 'Active', value: activeCampaigns.length, sub: 'Running now', icon: Zap, color: 'text-green-400' },
+          { label: 'Applicants', value: totalApplicants, sub: 'Total received', icon: Users, color: 'text-purple-400' },
+          { label: 'Creators working', value: totalAccepted, sub: 'Accepted', icon: Award, color: 'text-amber-400' },
+        ].map((s, i) => (
+          <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.08 }}
+            className="bg-gray-950 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors">
+            <s.icon className={`w-4 h-4 ${s.color} mb-3`} />
+            <p className="text-2xl font-semibold text-white">{loading ? '—' : s.value}</p>
+            <p className="text-gray-400 text-xs mt-1">{s.label}</p>
+            <p className="text-gray-600 text-xs">{s.sub}</p>
           </motion.div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Target className="w-5 h-5 text-blue-400" aria-hidden="true" />
-                <h2 className="text-lg font-medium text-white">Active Campaigns</h2>
-              </div>
-              <button className="text-xs text-gray-400 hover:text-white flex items-center" onClick={() => navigate('/org_dashboard/campaigns')} aria-label="View all campaigns">
-                View All <ChevronRight className="w-3 h-3 ml-1" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-          <div className="p-5 space-y-4">
-            {activeCampaigns.map(campaign => (
-              <div key={campaign.id} className="bg-black border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="text-sm font-medium text-white">{campaign.brand}</h3>
-                      <span className={`px-2 py-1 text-xs rounded-full ${campaign.color}`}>
-                        {campaign.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400 mb-3">{campaign.title}</p>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Calendar className="w-3 h-3 mr-1" aria-hidden="true" />
-                      <span>Due {campaign.deadline}</span>
-                    </div>
-                  </div>
-                  <button className="ml-3 text-gray-400 hover:text-white" aria-label={`View details for ${campaign.brand} campaign`}>
-                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+      {/* Two column: campaigns + next steps */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
+        {/* My campaigns — real */}
         <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Star className="w-5 h-5 text-yellow-400" aria-hidden="true" />
-                <h2 className="text-lg font-medium text-white">Recommended For You</h2>
-              </div>
-              <button className="text-xs text-gray-400 hover:text-white flex items-center" aria-label="Filter opportunities">
-                <Filter className="w-3 h-3 mr-1" aria-hidden="true" /> Filter
-              </button>
+          <div className="flex items-center justify-between p-5 border-b border-gray-800">
+            <div className="flex items-center gap-2">
+              <Target className="w-4 h-4 text-blue-400" />
+              <h2 className="text-sm font-medium text-white">My Campaigns</h2>
             </div>
+            <button onClick={() => navigate('/org_dashboard/campaigns')}
+              className="text-xs text-gray-500 hover:text-white flex items-center gap-1 transition-colors">
+              View all <ChevronRight className="w-3 h-3" />
+            </button>
           </div>
-          <div className="p-5 space-y-4">
-            {newOpportunities.map(opportunity => (
-              <div key={opportunity.id} className="bg-black border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="text-sm font-medium text-white">{opportunity.brand}</h3>
-                      <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">
-                        {opportunity.category}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400 mb-3">{opportunity.title}</p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-400">Budget: {opportunity.budget}</span>
-                      <div className="flex items-center text-green-400">
-                        <Zap className="w-3 h-3 mr-1" aria-hidden="true" />
-                        <span>{opportunity.match} match</span>
-                      </div>
-                    </div>
-                  </div>
-                  <button 
-                    className="ml-3 bg-white text-black px-3 py-1.5 text-xs rounded-lg hover:bg-gray-200 transition-colors"
-                    aria-label={`Apply for ${opportunity.brand} campaign`}
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center space-x-2">
-              <Zap className="w-5 h-5 text-purple-400" aria-hidden="true" />
-              <h2 className="text-lg font-medium text-white">Quick Actions</h2>
-            </div>
-          </div>
-          <div className="p-5">
-            <div className="grid grid-cols-2 gap-3">
-              {quickActions.map((action, index) => (
-                <button 
-                  key={index}
-                  onClick={() => navigate(`/org_dashbaord${action.path}`)}
-                  className="flex flex-col items-center p-3 bg-black border border-gray-800 rounded-lg hover:border-gray-700 transition-colors group"
-                  aria-label={action.label}
-                >
-                  <action.icon className={`w-5 h-5 mb-2 ${action.color} group-hover:scale-110 transition-transform`} aria-hidden="true" />
-                  <span className="text-xs text-gray-400 text-center">{action.label}</span>
+          <div className="p-4 space-y-3">
+            {loading ? (
+              <p className="text-gray-600 text-sm text-center py-8">Loading...</p>
+            ) : campaigns.length === 0 ? (
+              <div className="text-center py-10">
+                <Target className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+                <p className="text-gray-500 text-sm">No campaigns yet</p>
+                <button onClick={() => setShowCampaignModal(true)}
+                  className="mt-3 text-xs text-white bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg transition-colors">
+                  Create your first campaign
                 </button>
-              ))}
-            </div>
+              </div>
+            ) : campaigns.slice(0, 3).map((c, i) => (
+              <motion.div key={c._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
+                className="bg-black border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-medium truncate">{c.title}</p>
+                    <p className="text-gray-500 text-xs mt-0.5">{c.platform} · ${c.budget?.toLocaleString()}</p>
+                    <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                      <span className="flex items-center gap-1"><Users className="w-3 h-3" />{c.applicants?.length || 0} applicants</span>
+                      {c.accepted?.length > 0 && <span className="text-green-400">{c.accepted.length} accepted</span>}
+                    </div>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ml-3 capitalize flex-shrink-0 ${
+                    c.status === 'active' ? 'bg-green-500/10 text-green-400' : 'bg-gray-500/10 text-gray-400'
+                  }`}>{c.status}</span>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
 
+        {/* Next steps / platform guide */}
         <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center space-x-2">
-              <DollarSign className="w-5 h-5 text-green-400" aria-hidden="true" />
-              <h2 className="text-lg font-medium text-white">Earnings Overview</h2>
-            </div>
+          <div className="flex items-center gap-2 p-5 border-b border-gray-800">
+            <Zap className="w-4 h-4 text-amber-400" />
+            <h2 className="text-sm font-medium text-white">How it works</h2>
           </div>
-          <div className="p-5">
-            <div className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400">This Month</span>
-                <span className="text-lg font-semibold text-green-400">$1,850</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-gray-400">Last Month</span>
-                <span className="text-sm text-gray-500">$1,620</span>
-              </div>
-              <div className="flex justify-between items-center pb-4 border-b border-gray-800">
-                <span className="text-sm text-gray-400">Pending</span>
-                <span className="text-sm text-yellow-400">$600</span>
-              </div>
-              
-              <button 
-                className="w-full bg-white text-black py-2.5 text-sm font-medium rounded-lg hover:bg-gray-200 transition-colors flex items-center justify-center"
-                aria-label="Withdraw funds"
-              >
-                <Wallet className="w-4 h-4 mr-2" aria-hidden="true" />
-                Withdraw Funds
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center space-x-2">
-              <Bell className="w-5 h-5 text-blue-400" aria-hidden="true" />
-              <h2 className="text-lg font-medium text-white">Recent Activity</h2>
-            </div>
-          </div>
-          <div className="p-5 space-y-4">
-            {notifications.map(notification => (
-              <div key={notification.id} className="flex items-start space-x-3">
-                <div className={`p-1.5 rounded-full ${
-                  notification.type === 'success' ? 'bg-green-500/10' :
-                  notification.type === 'warning' ? 'bg-yellow-500/10' :
-                  notification.type === 'info' ? 'bg-blue-500/10' : 'bg-gray-500/10'
-                }`}>
-                  <notification.icon className={`w-3 h-3 ${
-                    notification.type === 'success' ? 'text-green-400' :
-                    notification.type === 'warning' ? 'text-yellow-400' :
-                    notification.type === 'info' ? 'text-blue-400' : 'text-gray-400'
-                  }`} aria-hidden="true" />
+          <div className="p-4 space-y-3">
+            {[
+              { n: '1', title: 'Post a campaign', desc: 'Set your budget, platform, and what you need', done: campaigns.length > 0, path: '/org_dashboard/campaigns', action: 'Create campaign' },
+              { n: '2', title: 'Review applicants', desc: 'See creator trust scores and past work', done: totalApplicants > 0, path: '/org_dashboard/campaigns', action: 'See applicants' },
+              { n: '3', title: 'Accept & set milestones', desc: 'Define deliverables with clear deadlines', done: totalAccepted > 0, path: '/org_dashboard/campaigns', action: 'Manage' },
+              { n: '4', title: 'Approve & pay', desc: 'Release escrow when milestones are done', done: false, path: '/org_dashboard/payments', action: 'View payments' },
+            ].map((step, i) => (
+              <div key={i} className={`flex items-start gap-3 p-3 rounded-xl transition-colors ${step.done ? 'bg-green-500/5 border border-green-500/10' : 'bg-black border border-gray-800'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 mt-0.5 ${step.done ? 'bg-green-500/20 text-green-400' : 'bg-gray-800 text-gray-500'}`}>
+                  {step.done ? '✓' : step.n}
                 </div>
-                <div className="flex-1">
-                  <p className="text-xs text-gray-300 mb-1">{notification.text}</p>
-                  <p className="text-xs text-gray-500">{notification.date}</p>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium ${step.done ? 'text-green-400' : 'text-white'}`}>{step.title}</p>
+                  <p className="text-gray-500 text-xs mt-0.5">{step.desc}</p>
                 </div>
+                {!step.done && (
+                  <button onClick={() => navigate(step.path)}
+                    className="text-xs text-gray-400 hover:text-white border border-gray-800 hover:border-gray-600 px-2 py-1 rounded-lg transition-colors flex-shrink-0">
+                    {step.action}
+                  </button>
+                )}
               </div>
             ))}
           </div>
         </div>
       </div>
     </div>
-  ));
+    );
+  });
 
   return (
     <div className="flex h-screen bg-black">
@@ -397,10 +319,7 @@ const Org_dashboard = () => {
             </div>
             
             <div className="flex items-center gap-6">
-              <button className="relative p-2 text-white hover:text-gray-300 hover:bg-gray-800 rounded-lg" aria-label="View notifications">
-                <Bell className="w-4 h-4" aria-hidden="true" />
-                <span className="absolute top-0 right-0 w-2 h-2 bg-white rounded-full"></span>
-              </button>
+              <NotificationPanel isOpen={notifOpen} onToggle={() => setNotifOpen(o => !o)} />
               
               <div className="flex items-center gap-3">
                 <img

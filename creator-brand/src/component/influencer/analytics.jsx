@@ -1,5 +1,75 @@
 import React, { useState, useEffect, useRef } from 'react';
 import * as Chart from 'chart.js';
+import { Sparkles, Loader2, TrendingUp, Zap, AlertCircle } from 'lucide-react';
+import { getAnalyticsInsight } from '../../services/apiService';
+import useAuthStore from '../../store/authStore';
+
+const AIInsightPanel = () => {
+  const { user } = useAuthStore();
+  const [insight, setInsight] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const generate = async () => {
+    setLoading(true);
+    setError('');
+    try {
+      const result = await getAnalyticsInsight({
+        followers: 12400,
+        engagementRate: 4.2,
+        campaignsCompleted: 3,
+        totalEarnings: 2450,
+        topNiche: 'Technology & Lifestyle',
+      });
+      setInsight(result);
+    } catch {
+      setError('Could not load insight. Try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="bg-gray-950 border border-gray-800 rounded-xl p-5 mb-6">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <div className="p-1.5 rounded-lg bg-purple-500/10">
+            <Sparkles className="w-4 h-4 text-purple-400" />
+          </div>
+          <h3 className="text-white font-medium text-sm">AI Performance Insight</h3>
+        </div>
+        {!insight && (
+          <button onClick={generate} disabled={loading}
+            className="bg-purple-600 hover:bg-purple-500 disabled:opacity-50 text-white px-4 py-1.5 rounded-lg text-xs font-medium flex items-center gap-1.5 transition-colors">
+            {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+            {loading ? 'Analysing...' : 'Analyse my stats'}
+          </button>
+        )}
+      </div>
+      {error && <p className="text-red-400 text-xs">{error}</p>}
+      {insight && (
+        <div className="space-y-4">
+          <p className="text-gray-300 text-sm">{insight.summary}</p>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-green-500/5 border border-green-500/20 rounded-xl p-4">
+              <p className="text-green-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1"><TrendingUp className="w-3 h-3" /> Strengths</p>
+              {insight.strengths?.map((s, i) => <p key={i} className="text-gray-300 text-xs mb-1">• {s}</p>)}
+            </div>
+            <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-4">
+              <p className="text-amber-400 text-xs font-semibold uppercase tracking-wider mb-2 flex items-center gap-1"><AlertCircle className="w-3 h-3" /> Improve</p>
+              {insight.improvements?.map((s, i) => <p key={i} className="text-gray-300 text-xs mb-1">• {s}</p>)}
+            </div>
+          </div>
+          <div className="bg-purple-500/5 border border-purple-500/20 rounded-xl p-3 flex items-start gap-2">
+            <Zap className="w-3.5 h-3.5 text-purple-400 mt-0.5 flex-shrink-0" />
+            <p className="text-purple-300 text-xs">{insight.tip}</p>
+          </div>
+          <button onClick={() => setInsight(null)} className="text-gray-600 hover:text-gray-400 text-xs transition-colors">↺ Regenerate</button>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const Analytics = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('7 Days');
@@ -187,6 +257,7 @@ const Analytics = () => {
   return (
     <div className="min-h-screen bg-black text-white font-sans text-sm leading-relaxed">
       <div className="max-w-7xl mx-auto px-8 py-10">
+        <AIInsightPanel />
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
           <div>

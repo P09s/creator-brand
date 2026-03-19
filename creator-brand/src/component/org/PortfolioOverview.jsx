@@ -1,199 +1,196 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import useAuthStore from '../../store/authStore';
-import { 
-  Plus,
-  Eye,
-  Camera,
-  Edit3,
-  Award,
-  Briefcase,
-  Instagram,
-  Twitter,
-  Youtube
+import {
+  Edit3, Globe, Shield, CheckCircle, AlertCircle, Megaphone, Tag, Plus, Building2
 } from 'lucide-react';
 
-const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
-  const { user: profile } = useAuthStore(); // ✅ FIXED: Hook inside component
+const INDUSTRIES = ['Fashion & Apparel', 'Technology', 'Food & Beverage', 'Health & Fitness', 'Beauty & Skincare', 'Gaming', 'Finance', 'Travel & Hospitality', 'Education', 'Home & Lifestyle', 'Sports', 'Entertainment'];
+const CAMPAIGN_TYPES = ['Product Launch', 'Brand Awareness', 'User Generated Content', 'Event Promotion', 'Seasonal Campaign', 'Long-term Partnership'];
+
+const OrgPortfolioOverview = memo(({ setIsProfileModalOpen }) => {
+  const { user } = useAuthStore();
+  const [editingAbout, setEditingAbout] = useState(false);
+  const [about, setAbout] = useState('');
+  const [website, setWebsite] = useState('');
+  const [editingWebsite, setEditingWebsite] = useState(false);
+  const [selectedIndustry, setSelectedIndustry] = useState('');
+  const [preferredTypes, setPreferredTypes] = useState([]);
+  const [editingIndustry, setEditingIndustry] = useState(false);
+
+  const toggleType = (t) => setPreferredTypes(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]);
+
+  const completionSteps = [
+    { label: 'Write about your brand', done: about.trim().length > 0 },
+    { label: 'Add your industry', done: selectedIndustry.length > 0 },
+    { label: 'Add website', done: website.trim().length > 0 },
+    { label: 'Post first campaign', done: false },
+  ];
+  const completionPct = Math.round((completionSteps.filter(s => s.done).length / completionSteps.length) * 100);
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="bg-gray-950 border border-gray-800 rounded-xl p-8">
-        <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-white">My Portfolio</h2>
-          <button 
-            onClick={() => setIsProfileModalOpen(true)}
-            className="bg-gray-950 hover:bg-gray-900 border border-gray-800 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors text-sm font-medium"
-            aria-label="Add new portfolio work"
-          >
-            <Plus className="w-4 h-4" aria-hidden="true" />
-            Add Work
-          </button>
-        </div>
-      </div>
-      
-      {/* Profile Card */}
-      <div className="bg-gray-950 rounded-xl p-8 border border-gray-800">
-        <div className="flex items-start gap-8">
-          <div className="relative">
-            <img 
-              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s" 
-              alt="Profile picture" 
-              className="w-20 h-20 rounded-full object-cover border-2 border-gray-800"
-              onError={(e) => (e.target.src = '/fallback-image.jpg')}
-            />
-            <button 
-              className="absolute -bottom-1 -right-1 bg-gray-800 hover:bg-gray-700 text-white p-1 rounded-full"
-              aria-label="Change profile picture"
-            >
-              <Camera className="w-3 h-3" aria-hidden="true" />
-            </button>
-          </div>
-          
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <h3 className="text-lg font-semibold text-white">{profile?.name || "User"}</h3>
-              <button className="text-gray-400 hover:text-white" aria-label="Edit profile">
-                <Edit3 className="w-4 h-4" aria-hidden="true" />
-              </button>
-            </div>
-            <p className="text-gray-400 text-xs mb-3">Lifestyle & Tech Content Creator</p>
-            <div className="flex gap-4 text-xs text-gray-400">
-              <span>📍 Los Angeles, CA</span>
-              <span>🎂 25 years old</span>
-              <span>📧 alex.johnson@email.com</span>
-            </div>
-            
-            <div className="flex gap-4 mt-4">
-              <div className="flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-full">
-                <Instagram className="w-4 h-4 text-pink-400" aria-hidden="true" />
-                <span className="text-white text-xs font-medium">145K</span>
-              </div>
-              <div className="flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-full">
-                <Youtube className="w-4 h-4 text-red-400" aria-hidden="true" />
-                <span className="text-white text-xs font-medium">89K</span>
-              </div>
-              <div className="flex items-center gap-2 bg-gray-800 px-3 py-1 rounded-full">
-                <Twitter className="w-4 h-4 text-blue-400" aria-hidden="true" />
-                <span className="text-white text-xs font-medium">67K</span>
-              </div>
-            </div>
-          </div>
-          
-          <div className="text-right">
-            <div className="bg-purple-500/20 text-purple-400 px-3 py-1 rounded-full text-xs mb-2">
-              ⭐ 4.9/5 Rating
-            </div>
-            <p className="text-gray-400 text-xs">127 Completed Projects</p>
-          </div>
-        </div>
-      </div>
+    <div className="space-y-6">
 
-      {/* Skills */}
-      <div className="bg-gray-950 rounded-xl p-8 border border-gray-800">
-        <h3 className="text-base font-semibold text-white mb-4">Skills & Expertise</h3>
-        <div className="flex flex-wrap gap-2">
-          {['Fashion', 'Technology', 'Lifestyle', 'Fitness', 'Travel', 'Food', 'Beauty', 'Gaming'].map((skill) => (
-            <span key={skill} className="bg-gray-800 text-gray-200 px-3 py-1 rounded-full text-xs">
-              {skill}
-            </span>
-          ))}
+      {/* Completion banner */}
+      {completionPct < 100 && (
+        <div className="bg-blue-500/5 border border-blue-500/20 rounded-xl p-4">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-blue-400 text-sm font-medium">Complete your brand profile to attract better creators</p>
+            <span className="text-blue-400 text-xs">{completionPct}%</span>
+          </div>
+          <div className="h-1.5 bg-gray-800 rounded-full mb-3">
+            <div className="h-full bg-blue-400 rounded-full transition-all" style={{ width: `${completionPct}%` }} />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {completionSteps.filter(s => !s.done).map(s => (
+              <span key={s.label} className="flex items-center gap-1 text-xs text-gray-400 bg-gray-900 px-2 py-1 rounded-lg">
+                <AlertCircle className="w-3 h-3 text-blue-400" />
+                {s.label}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
-      {/* Work Experience */}
-      <div className="bg-gray-950 rounded-xl p-8 border border-gray-800">
-        <h3 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-          <Briefcase className="w-4 h-4 text-blue-400" aria-hidden="true" />
-          Past Work Experience
-        </h3>
-        
-        <div className="space-y-6">
-          {[
-            {
-              brand: 'Nike',
-              campaign: 'Air Max Campaign 2024',
-              date: 'March 2024',
-              platform: 'Instagram + TikTok',
-              results: '2.3M impressions, 4.8% engagement',
-              image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s'
-            },
-            {
-              brand: 'Apple',
-              campaign: 'iPhone 15 Pro Review',
-              date: 'February 2024',
-              platform: 'YouTube',
-              results: '890K views, 15K likes',
-              image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s'
-            },
-            {
-              brand: 'Starbucks',
-              campaign: 'Summer Menu Launch',
-              date: 'January 2024',
-              platform: 'Instagram Stories',
-              results: '156K story views, 3.2% CTR',
-              image: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s'
-            }
-          ].map((work, index) => (
-            <div key={index} className="bg-gray-900 rounded-lg p-6 hover:bg-gray-800 transition-colors">
-              <div className="flex items-center gap-6">
-                <img 
-                  src={work.image} 
-                  alt={`${work.brand} campaign`} 
-                  className="w-16 h-16 rounded-lg object-cover border border-gray-700"
-                  onError={(e) => (e.target.src = '/fallback-image.jpg')}
+      {/* Brand card */}
+      <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
+        <div className="flex items-start gap-5">
+          {/* Logo placeholder */}
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/30 to-purple-500/30 border-2 border-gray-700 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+            {user?.name?.[0]?.toUpperCase()}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h3 className="text-white font-semibold">{user?.name}</h3>
+              {completionPct === 100 && <CheckCircle className="w-4 h-4 text-green-400" />}
+            </div>
+            <p className="text-gray-400 text-xs mb-3">{user?.email}</p>
+
+            {/* About */}
+            {editingAbout ? (
+              <div>
+                <textarea
+                  value={about}
+                  onChange={e => setAbout(e.target.value)}
+                  placeholder="What does your brand do? Who are your customers? What kind of collaborations are you looking for?"
+                  rows={3}
+                  maxLength={300}
+                  className="w-full bg-black border border-gray-700 rounded-xl px-3 py-2 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-500 resize-none"
+                  autoFocus
                 />
-                <div className="flex-1">
-                  <div className="flex items-center justify-between mb-1">
-                    <h4 className="font-medium text-white text-sm">{work.brand}</h4>
-                    <span className="text-xs text-gray-400">{work.date}</span>
-                  </div>
-                  <p className="text-gray-400 text-xs mb-2">{work.campaign}</p>
-                  <div className="flex items-center gap-4 text-xs text-gray-300">
-                    <span className="bg-gray-800 px-2 py-1 rounded">{work.platform}</span>
-                    <span>{work.results}</span>
-                  </div>
+                <div className="flex items-center justify-between mt-2">
+                  <span className="text-gray-600 text-xs">{about.length}/300</span>
+                  <button onClick={() => setEditingAbout(false)} className="bg-white text-black text-xs px-3 py-1.5 rounded-lg font-medium hover:bg-gray-100">Save</button>
                 </div>
-                <button className="text-gray-400 hover:text-white" aria-label={`View ${work.brand} campaign details`}>
-                  <Eye className="w-4 h-4" aria-hidden="true" />
-                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setEditingAbout(true)}
+                className="flex items-start gap-1.5 text-xs text-gray-500 hover:text-gray-300 transition-colors text-left"
+              >
+                <Edit3 className="w-3 h-3 mt-0.5 flex-shrink-0" />
+                {about ? about : <span className="italic">Add a brand description — creators decide whether to apply based on this</span>}
+              </button>
+            )}
+          </div>
+
+          {/* Trust */}
+          <div className="flex-shrink-0">
+            <div className="flex items-center gap-1.5 bg-gray-900 border border-gray-800 px-3 py-2 rounded-xl">
+              <Shield className="w-4 h-4 text-gray-600" />
+              <div>
+                <p className="text-gray-500 text-xs">Brand trust</p>
+                <p className="text-gray-600 text-xs">Post campaigns first</p>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Website */}
+        <div className="mt-5 pt-4 border-t border-gray-800">
+          {editingWebsite ? (
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-gray-500 flex-shrink-0" />
+              <input
+                value={website}
+                onChange={e => setWebsite(e.target.value)}
+                placeholder="https://yourbrand.com"
+                className="flex-1 bg-black border border-gray-700 rounded-lg px-3 py-1.5 text-white text-sm focus:outline-none focus:border-gray-500"
+                autoFocus
+              />
+              <button onClick={() => setEditingWebsite(false)} className="bg-white text-black text-xs px-3 py-1.5 rounded-lg font-medium">Save</button>
+            </div>
+          ) : (
+            <button onClick={() => setEditingWebsite(true)} className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 transition-colors">
+              <Globe className="w-4 h-4" />
+              {website ? <span className="text-blue-400 underline">{website}</span> : <span className="italic">Add your website link</span>}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Industry */}
+      <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-white font-medium text-sm">Industry</h3>
+            <p className="text-gray-500 text-xs mt-1">Creators use this to find brands in their niche</p>
+          </div>
+          {selectedIndustry && (
+            <button onClick={() => setSelectedIndustry('')} className="text-gray-600 text-xs hover:text-gray-400">Clear</button>
+          )}
+        </div>
+        {editingIndustry ? (
+          <div className="flex flex-wrap gap-2">
+            {INDUSTRIES.map(ind => (
+              <button key={ind} onClick={() => { setSelectedIndustry(ind); setEditingIndustry(false); }}
+                className="px-3 py-1.5 rounded-full text-xs border border-gray-800 hover:border-gray-600 text-gray-400 hover:text-white transition-colors">
+                {ind}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <button onClick={() => setEditingIndustry(true)}
+            className={`flex items-center gap-2 text-sm ${selectedIndustry ? 'text-white bg-gray-800 px-4 py-2 rounded-full' : 'text-gray-500 italic'} transition-colors`}>
+            <Tag className="w-3.5 h-3.5" />
+            {selectedIndustry || 'Select your industry'}
+          </button>
+        )}
+      </div>
+
+      {/* Campaign types you run */}
+      <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
+        <h3 className="text-white font-medium text-sm mb-1">Campaign types</h3>
+        <p className="text-gray-500 text-xs mb-4">What kinds of campaigns do you typically run? Helps creators understand your brand.</p>
+        <div className="flex flex-wrap gap-2">
+          {CAMPAIGN_TYPES.map(t => (
+            <button key={t} onClick={() => toggleType(t)}
+              className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                preferredTypes.includes(t)
+                  ? 'bg-white text-black border-white'
+                  : 'border-gray-800 text-gray-400 hover:border-gray-600 hover:text-white'
+              }`}>
+              {t}
+            </button>
           ))}
         </div>
       </div>
 
-      {/* Awards */}
-      <div className="bg-gray-950 rounded-xl p-8 border border-gray-800">
-        <h3 className="text-base font-semibold text-white mb-4 flex items-center gap-2">
-          <Award className="w-4 h-4 text-yellow-400" aria-hidden="true" />
-          Awards & Recognition
-        </h3>
-        
-        <div className="grid md:grid-cols-2 gap-6">
-          {[
-            { title: 'Top Creator 2024', org: 'InfluencerHub Awards', date: 'Dec 2024' },
-            { title: 'Best Tech Reviewer', org: 'Digital Content Awards', date: 'Nov 2024' },
-            { title: 'Rising Star', org: 'Social Media Excellence', date: 'Oct 2024' },
-            { title: 'Brand Partnership Excellence', org: 'Creator Economy Summit', date: 'Sep 2024' }
-          ].map((award, index) => (
-            <div key={index} className="bg-gray-900 border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors">
-              <div className="flex items-center gap-3">
-                <div className="bg-gray-800 p-2 rounded-full">
-                  <Award className="w-4 h-4 text-yellow-400" aria-hidden="true" />
-                </div>
-                <div>
-                  <h4 className="font-medium text-white text-sm">{award.title}</h4>
-                  <p className="text-xs text-gray-400">{award.org}</p>
-                  <p className="text-xs text-gray-500">{award.date}</p>
-                </div>
-              </div>
-            </div>
-          ))}
+      {/* Campaign history placeholder */}
+      <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Megaphone className="w-4 h-4 text-blue-400" />
+          <h3 className="text-white font-medium text-sm">Campaign history</h3>
+        </div>
+        <div className="text-center py-12 border border-dashed border-gray-800 rounded-xl">
+          <Building2 className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+          <p className="text-gray-500 text-sm mb-1">No campaigns posted yet</p>
+          <p className="text-gray-600 text-xs">Completed campaigns will appear here with metrics and creator reviews</p>
         </div>
       </div>
+
     </div>
   );
 });
 
-export default PortfolioOverview;
+export default OrgPortfolioOverview;

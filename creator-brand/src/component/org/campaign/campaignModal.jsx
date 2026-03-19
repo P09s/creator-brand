@@ -1,40 +1,34 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import CampaignForm from './campaignForm';
-import { ArrowLeft, X } from 'lucide-react';
+import { X } from 'lucide-react';
 
-export default function CampaignModal({ isOpen, onClose }) {
-  console.log('CampaignModal render, isOpen:', isOpen);
-
+export default function CampaignModal({ isOpen, onClose, prefillData }) {
   return (
-    <AnimatePresence
-      onExitComplete={() => console.log('Exit animation completed')}
-    >
+    <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.3 } }}
+          className="fixed inset-0 z-[999] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
           onClick={onClose}
         >
           <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 50 }}
+            initial={{ scale: 0.95, opacity: 0, y: 20 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 50, transition: { duration: 0.4 } }}
-            transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-            className="bg-gray-950 border border-gray-800 p-6 sm:p-8 rounded-xl shadow-2xl w-full max-w-4xl mx-4 relative flex h-[90vh]"
-            onClick={(e) => e.stopPropagation()}
+            exit={{ scale: 0.95, opacity: 0 }}
+            transition={{ type: 'spring', stiffness: 280, damping: 24 }}
+            className="bg-gray-950 border border-gray-800 rounded-2xl shadow-2xl w-full relative flex flex-col"
+            style={{ maxWidth: '640px', maxHeight: '90vh' }}
+            onClick={e => e.stopPropagation()}
           >
             <button
-              onClick={() => {
-                console.log('Close button clicked');
-                onClose();
-              }}
-              className="absolute top-3 right-4 text-gray-400 hover:text-white p-2 transition z-[1000]"
+              onClick={onClose}
+              className="absolute top-4 right-4 text-gray-500 hover:text-white p-1.5 rounded-lg hover:bg-gray-800 transition-colors z-10"
             >
               <X className="w-5 h-5" />
             </button>
-            <CampaignForm />
+            <div className="flex-1 overflow-y-auto p-6 sm:p-8">
+              <CampaignForm prefillData={prefillData} onSuccess={onClose} />
+            </div>
           </motion.div>
         </motion.div>
       )}
