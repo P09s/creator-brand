@@ -6,6 +6,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { changePassword, updateDisplayName } from '../../services/apiService';
 import useAuthStore from '../../store/authStore';
+import Avatar from './Avatar';
 import useNotificationStore from '../../store/notificationStore';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -258,9 +259,7 @@ export default function Settings() {
       {/* Account info */}
       <div className="bg-gray-950 border border-gray-800 rounded-xl p-5">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-purple-500/40 to-blue-500/40 border-2 border-gray-700 flex items-center justify-center text-white font-bold text-lg">
-            {user?.name?.[0]?.toUpperCase()}
-          </div>
+          <Avatar src={user?.avatar} name={user?.name} size="lg" />
           <div>
             <p className="text-white font-semibold">{user?.name}</p>
             <p className="text-gray-500 text-xs">{user?.email} · {user?.userName}</p>

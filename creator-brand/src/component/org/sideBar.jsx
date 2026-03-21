@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useAuthStore from '../../store/authStore';
+import Avatar from '../shared/Avatar';
 import { 
   LayoutDashboard, 
   Target, 
@@ -139,9 +140,7 @@ const Sidebar = ({
           >
             {/* Avatar */}
             <div className="relative">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/40 to-blue-500/40 border-2 border-gray-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                {profile?.name?.[0]?.toUpperCase() || '?'}
-              </div>
+              <Avatar src={profile?.avatar} name={profile?.name} size="md" />
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></div>
             </div>
 

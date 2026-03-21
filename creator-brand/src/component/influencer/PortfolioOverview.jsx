@@ -1,7 +1,8 @@
 import React, { memo, useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
+import AvatarUpload from '../shared/AvatarUpload';
 import {
-  Edit3, Camera, Briefcase, Instagram, Youtube, Twitter,
+  Edit3, Briefcase, Instagram, Youtube, Twitter,
   CheckCircle, Plus, Link2, X, Loader2, Shield
 } from 'lucide-react';
 import { getMyProfile, updateMyProfile, addPortfolioItem, deletePortfolioItem } from '../../services/apiService';
@@ -137,14 +138,7 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
       {/* Identity card */}
       <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
         <div className="flex items-start gap-4">
-          <div className="relative flex-shrink-0">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500/40 to-blue-500/40 border-2 border-gray-700 flex items-center justify-center text-white text-2xl font-bold">
-              {user?.name?.[0]?.toUpperCase()}
-            </div>
-            <button className="absolute -bottom-1 -right-1 bg-gray-800 hover:bg-gray-700 border border-gray-700 text-white p-1 rounded-full transition-colors">
-              <Camera className="w-3 h-3" />
-            </button>
-          </div>
+          <AvatarUpload size="xl" shape="circle" />
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-0.5">

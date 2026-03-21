@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, Check, XCircle, Plus, Trash2, Loader2, Calendar, Star } from 'lucide-react';
 import { getApplicants, acceptCreator, rejectCreator, createMilestone, getMilestones } from '../../services/apiService';
 import TrustBadge from '../shared/TrustBadge';
+import Avatar from '../shared/Avatar';
 import toast from 'react-hot-toast';
 import { notifyAccepted } from '../../store/notificationStore';
 
@@ -160,9 +161,7 @@ export default function Applicants({ campaign, onClose }) {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 flex-1 min-w-0">
                         {/* Avatar */}
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-gray-700 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
-                          {a.user?.name?.[0]?.toUpperCase()}
-                        </div>
+                        <Avatar src={a.profile?.avatar} name={a.user?.name} size="md" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
                             <span className="text-white font-medium text-sm">{a.user?.name}</span>

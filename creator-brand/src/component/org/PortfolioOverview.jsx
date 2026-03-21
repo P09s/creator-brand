@@ -6,6 +6,7 @@ import {
 import { getMyProfile, updateMyProfile } from '../../services/apiService';
 import { CompletionBar } from '../shared/TrustBadge';
 import toast from 'react-hot-toast';
+import AvatarUpload from '../shared/AvatarUpload';
 
 const INDUSTRIES = ['Fashion & Apparel','Technology','Food & Beverage','Health & Fitness','Beauty & Skincare','Gaming','Finance','Travel','Education','Home & Lifestyle','Sports','Entertainment'];
 const CAMPAIGN_TYPES = ['Product Launch','Brand Awareness','User Generated Content','Event Promotion','Seasonal Campaign','Long-term Partnership'];
@@ -70,9 +71,7 @@ const OrgPortfolioOverview = memo(({ setIsProfileModalOpen }) => {
       {/* Brand card */}
       <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
         <div className="flex items-start gap-5">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/30 to-purple-500/30 border-2 border-gray-700 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
-            {user?.name?.[0]?.toUpperCase()}
-          </div>
+          <AvatarUpload size="xl" shape="rounded" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
               <h3 className="text-white font-semibold">{user?.name}</h3>

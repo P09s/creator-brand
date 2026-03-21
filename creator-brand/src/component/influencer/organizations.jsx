@@ -3,6 +3,7 @@ import { Search, Globe, Shield, MessageSquare, ChevronDown, Loader2, Building2 }
 import { motion, AnimatePresence } from 'framer-motion';
 import { getBrands } from '../../services/apiService';
 import { useNavigate } from 'react-router-dom';
+import Avatar from '../shared/Avatar';
 import toast from 'react-hot-toast';
 
 const INDUSTRIES = ['All', 'Fashion', 'Technology', 'Food', 'Fitness', 'Travel', 'Beauty', 'Gaming', 'Education'];
@@ -78,9 +79,7 @@ export default function Organizations() {
                 className="bg-gray-950 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors flex flex-col">
                 {/* Brand header */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${avatarColors[i % avatarColors.length]} border border-gray-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0`}>
-                    {getInitial(user.name)}
-                  </div>
+                  <Avatar src={profile?.avatar} name={user.name} size="lg" shape="rounded" />
                   <div className="min-w-0">
                     <p className="text-white font-medium text-sm truncate">{user.name}</p>
                     <p className="text-gray-500 text-xs">{profile?.industry || 'Brand'}</p>

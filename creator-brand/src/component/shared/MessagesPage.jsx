@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { getConversations, getMessagesWithUser, sendMessage } from '../../services/apiService';
 import useAuthStore from '../../store/authStore';
+import Avatar from './Avatar';
 import toast from 'react-hot-toast';
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -23,25 +24,7 @@ function fullTime(iso) {
   return new Date(iso).toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
 }
 
-function avatarColor(name = '') {
-  const colors = [
-    'from-blue-500/50 to-purple-500/50',
-    'from-green-500/50 to-teal-500/50',
-    'from-amber-500/50 to-orange-500/50',
-    'from-pink-500/50 to-red-500/50',
-    'from-indigo-500/50 to-blue-500/50',
-  ];
-  return colors[(name.charCodeAt(0) || 0) % colors.length];
-}
-
-function Avatar({ name, size = 'md' }) {
-  const sz = size === 'sm' ? 'w-8 h-8 text-xs' : size === 'lg' ? 'w-12 h-12 text-base' : 'w-10 h-10 text-sm';
-  return (
-    <div className={`${sz} rounded-full bg-gradient-to-br ${avatarColor(name)} border border-gray-700 flex items-center justify-center text-white font-semibold flex-shrink-0`}>
-      {name?.[0]?.toUpperCase() || <User className="w-4 h-4" />}
-    </div>
-  );
-}
+// Avatar imported from shared
 
 // ── Context banner (shows when navigated from campaign/browse) ─────────────────
 
@@ -65,7 +48,7 @@ function ConvItem({ conv, isSelected, onClick }) {
       className={`w-full flex items-center gap-3 px-4 py-3.5 hover:bg-gray-900/60 transition-colors text-left border-b border-gray-800/50 last:border-b-0 ${isSelected ? 'bg-gray-900' : ''}`}
     >
       <div className="relative flex-shrink-0">
-        <Avatar name={other?.name} size="md" />
+        <Avatar src={conv.profile?.avatar} name={other?.name} size="md" />
         {unread > 0 && (
           <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-blue-500 text-white text-xs rounded-full flex items-center justify-center font-bold">
             {unread > 9 ? '9+' : unread}
@@ -393,7 +376,7 @@ export default function MessagesPage({ dashboardBase }) {
                 <ArrowLeft className="w-5 h-5" />
               </button>
 
-              <Avatar name={selectedUser?.name} size="sm" />
+              <Avatar src={selectedUser?.avatar} name={selectedUser?.name} size="sm" />
               <div className="flex-1 min-w-0">
                 <p className="text-white text-sm font-medium truncate">{selectedUser?.name}</p>
                 <p className="text-gray-500 text-xs capitalize">

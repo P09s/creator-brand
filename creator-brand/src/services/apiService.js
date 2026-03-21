@@ -267,3 +267,10 @@ export const updateDisplayName = async (name) =>
     method: 'PUT', headers: authHeaders(),
     body: JSON.stringify({ name }),
   }));
+// ── Avatar upload ─────────────────────────────────────────────────────────────
+export const uploadAvatar = async (base64Image) =>
+  handleResponse(await fetch(`${API_URL}/profiles/me`, {
+    method: 'PUT',
+    headers: authHeaders(),
+    body: JSON.stringify({ avatar: base64Image }),
+  }));

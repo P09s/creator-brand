@@ -23,6 +23,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     unique: true
   },
+  resetToken: { type: String },
+  resetTokenExpiry: { type: Number },
 });
 
 // Pre-save hook to generate username

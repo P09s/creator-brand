@@ -3,6 +3,7 @@ import { Search, Shield, Star, Users, MessageSquare, ChevronDown, Loader2, Insta
 import { motion, AnimatePresence } from 'framer-motion';
 import { getInfluencers, getTrustScore } from '../../services/apiService';
 import { useNavigate } from 'react-router-dom';
+import Avatar from '../shared/Avatar';
 import toast from 'react-hot-toast';
 
 const NICHES = ['All', 'Fashion', 'Technology', 'Food', 'Fitness', 'Travel', 'Beauty', 'Gaming', 'Lifestyle', 'Education'];
@@ -84,9 +85,7 @@ export default function BrowseInfluencer() {
                   className="bg-gray-950 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors flex flex-col">
                   {/* Avatar + name */}
                   <div className="flex items-center gap-3 mb-4">
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${avatarColors[i % avatarColors.length]} border border-gray-700 flex items-center justify-center text-white font-bold text-lg flex-shrink-0`}>
-                      {user.name?.[0]?.toUpperCase()}
-                    </div>
+                    <Avatar src={profile?.avatar} name={user.name} size="lg" />
                     <div className="min-w-0">
                       <p className="text-white font-medium text-sm truncate">{user.name}</p>
                       <p className="text-gray-500 text-xs">{user.userName}</p>

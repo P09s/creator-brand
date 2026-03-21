@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronRight, CheckCircle, Instagram, Youtube, Twitter, Loader2, Sparkles } from 'lucide-react';
 import { updateMyProfile } from '../../services/apiService';
 import useAuthStore from '../../store/authStore';
+import Avatar from './Avatar';
 import toast from 'react-hot-toast';
 
 // ── Data ──────────────────────────────────────────────────────────────────────
@@ -77,9 +78,7 @@ function CreatorOnboarding({ user, onDone }) {
   const steps = [
     // Step 0 — welcome
     <div key="welcome" className="text-center">
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500/30 to-blue-500/30 border border-gray-700 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-6">
-        {user?.name?.[0]?.toUpperCase()}
-      </div>
+      <div className="mx-auto mb-6 flex justify-center"><Avatar src={user?.avatar} name={user?.name} size="xl" /></div>
       <h2 className="text-2xl font-bold text-white mb-2">Welcome to LinkFluence, {user?.name?.split(' ')[0]}!</h2>
       <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
         Let's set up your creator profile in 3 quick steps so brands can discover you.
@@ -186,9 +185,7 @@ function BrandOnboarding({ user, onDone }) {
   const steps = [
     // Step 0 — welcome
     <div key="welcome" className="text-center">
-      <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500/30 to-purple-500/30 border border-gray-700 flex items-center justify-center text-white text-3xl font-bold mx-auto mb-6">
-        {user?.name?.[0]?.toUpperCase()}
-      </div>
+      <div className="mx-auto mb-6 flex justify-center"><Avatar src={user?.avatar} name={user?.name} size="xl" /></div>
       <h2 className="text-2xl font-bold text-white mb-2">Welcome to LinkFluence, {user?.name?.split(' ')[0]}!</h2>
       <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
         Let's set up your brand profile so creators know who they're working with.

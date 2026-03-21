@@ -1,5 +1,6 @@
 import React, { useState, useEffect, memo } from 'react';
 import userAuthStore from '../../store/authStore';
+import Avatar from '../shared/Avatar';
 import { 
   DollarSign, 
   TrendingUp, 
@@ -333,9 +334,7 @@ const Org_dashboard = () => {
               <NotificationPanel isOpen={notifOpen} onToggle={() => setNotifOpen(o => !o)} />
               
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/40 to-blue-500/40 border-2 border-gray-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-                  {profile?.name?.[0]?.toUpperCase() || '?'}
-                </div>
+                <Avatar src={profile?.avatar} name={profile?.name} size="md" />
                 <div>
                   <p className="text-white font-medium text-sm">{profile?.name || "User"}</p>
                   <p className="text-gray-400 text-xs">{profile?.userName || "User Name"}</p>
