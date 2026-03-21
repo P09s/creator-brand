@@ -238,3 +238,32 @@ export const getUserReviews = async (userId) =>
   handleResponse(await fetch(`${API_URL}/reviews/user/${userId}`, {
     headers: authHeaders(),
   }));
+// ── Phase 3 — Profile completion + post metrics ───────────────────────────────
+
+export const submitPostMetrics = async (campaignId, data) =>
+  handleResponse(await fetch(`${API_URL}/campaigns/${campaignId}/metrics`, {
+    method: 'POST', headers: authHeaders(), body: JSON.stringify(data),
+  }));
+
+export const recordProfileView = async (userId) =>
+  handleResponse(await fetch(`${API_URL}/profiles/view/${userId}`, {
+    method: 'POST', headers: authHeaders(),
+  }));
+
+export const deletePortfolioItem = async (itemId) =>
+  handleResponse(await fetch(`${API_URL}/profiles/me/portfolio/${itemId}`, {
+    method: 'DELETE', headers: authHeaders(),
+  }));
+
+// ── Auth account actions ──────────────────────────────────────────────────────
+export const changePassword = async (currentPassword, newPassword) =>
+  handleResponse(await fetch(`${API_URL}/password`, {
+    method: 'PUT', headers: authHeaders(),
+    body: JSON.stringify({ currentPassword, newPassword }),
+  }));
+
+export const updateDisplayName = async (name) =>
+  handleResponse(await fetch(`${API_URL}/name`, {
+    method: 'PUT', headers: authHeaders(),
+    body: JSON.stringify({ name }),
+  }));

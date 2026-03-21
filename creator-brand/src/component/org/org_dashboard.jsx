@@ -33,7 +33,6 @@ import NotificationPanel from '../shared/NotificationPanel';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
-import BrowseCampaign from './BrowseCampaign';
 import Campaigns from './campaigns';
 import Browse_influencer from './browse_influencer';
 import Analytics from './analytics';
@@ -322,12 +321,9 @@ const Org_dashboard = () => {
               <NotificationPanel isOpen={notifOpen} onToggle={() => setNotifOpen(o => !o)} />
               
               <div className="flex items-center gap-3">
-                <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s"
-                  alt="Profile picture"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-gray-700"
-                  onError={(e) => (e.target.src = '/fallback-image.jpg')}
-                />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/40 to-blue-500/40 border-2 border-gray-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  {profile?.name?.[0]?.toUpperCase() || '?'}
+                </div>
                 <div>
                   <p className="text-white font-medium text-sm">{profile?.name || "User"}</p>
                   <p className="text-gray-400 text-xs">{profile?.userName || "User Name"}</p>
@@ -339,21 +335,7 @@ const Org_dashboard = () => {
 
         <main className="flex-1 overflow-auto p-8 bg-black text-white mt-20">
           <AnimatePresence mode="wait">
-            {showBrowseCampaign ? (
-              <motion.div
-                key="browse-campaign"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3, ease: 'easeInOut' }}
-              >
-                <BrowseCampaign 
-                  setActiveTab={setActiveTab} 
-                  initialSearchTerm={searchTerm} 
-                  onClose={handleBrowseCampaignClose}
-                />
-              </motion.div>
-            ) : (
+            {false ? null : (
               <motion.div
                 key="dashboard-routes"
                 initial={{ opacity: 0, y: 20 }}

@@ -28,6 +28,9 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { useCampaigns, useBrowseCampaigns } from '../../hooks/useCampaigns';
+import { applyToCampaign } from '../../services/apiService';
+import { notifyApplied } from '../../store/notificationStore';
 import NotificationPanel from '../shared/NotificationPanel';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
@@ -137,127 +140,151 @@ const InfluencerDashboard = () => {
     }
   };
 
-  const Dashboard = memo(() => (
-    <div className="space-y-8">
-      <div className="bg-gray-950 border border-gray-800 rounded-xl p-8 text-white">
-        <h1 className="text-xl font-bold mb-2">Welcome back, {profile?.name.split(' ')[0]}! 👋</h1>
-        <p className="text-gray-400 text-xs">Manage your creator journey from here</p>
-      </div>
+  const Dashboard = memo(() => {
+    const { campaigns: acceptedCampaigns, loading: loadingAccepted } = useCampaigns();
+    const { campaigns: browseCampaigns, loading: loadingBrowse } = useBrowseCampaigns();
+    const [applying, setApplying] = React.useState(null);
+    const [applied, setApplied] = React.useState(new Set());
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { title: 'Total Earnings', value: '$2,450', change: '+12%', icon: Wallet, color: 'text-green-400', status: 'Growth' },
-          { title: 'Active Campaigns', value: '3', change: '+1', icon: Target, color: 'text-blue-400', status: 'Active' },
-          { title: 'Opportunities', value: '7', change: '+2 new', icon: Star, color: 'text-yellow-400', status: 'New' },
-          { title: 'Engagement Rate', value: '4.2%', change: '+0.3%', icon: TrendingUp, color: 'text-purple-400', status: 'Improved' },
-        ].map((stat, index) => (
-          <motion.div
-            key={index}
-            className="bg-gray-950 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors shadow-sm"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1, duration: 0.3 }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <stat.icon className={`w-5 h-5 ${stat.color}`} aria-hidden="true" />
-              <span className={`text-xs ${stat.color} bg-gray-800 px-2 py-1 rounded-full`}>{stat.status}</span>
-            </div>
-            <div className="text-xl font-semibold text-white mb-1">{stat.value}</div>
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-gray-400">{stat.title}</div>
-              <div className="text-xs text-gray-300">{stat.change}</div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+    const activeCampaigns = acceptedCampaigns.filter(c => c.status === 'active' || c.status === 'draft');
+    const recommended = browseCampaigns
+      .filter(c => !c.applicants?.includes(profile?._id) && !applied.has(c._id))
+      .slice(0, 4);
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Target className="w-5 h-5 text-blue-400" aria-hidden="true" />
-                <h2 className="text-lg font-medium text-white">Active Campaigns</h2>
-              </div>
-              <button className="text-xs text-gray-400 hover:text-white flex items-center" onClick={() => navigate('/influencer_dashboard/campaigns')} aria-label="View all campaigns">
-                View All <ChevronRight className="w-3 h-3 ml-1" aria-hidden="true" />
-              </button>
-            </div>
-          </div>
-          <div className="p-5 space-y-4">
-            {activeCampaigns.map(campaign => (
-              <div key={campaign.id} className="bg-black border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors">
-                <div className="flex items-start justify-between mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="text-sm font-medium text-white">{campaign.brand}</h3>
-                      <span className={`px-2 py-1 text-xs rounded-full ${campaign.color}`}>
-                        {campaign.status}
-                      </span>
-                    </div>
-                    <p className="text-xs text-gray-400 mb-3">{campaign.title}</p>
-                    <div className="flex items-center text-xs text-gray-500">
-                      <Calendar className="w-3 h-3 mr-1" aria-hidden="true" />
-                      <span>Due {campaign.deadline}</span>
-                    </div>
-                  </div>
-                  <button className="ml-3 text-gray-400 hover:text-white" aria-label={`View details for ${campaign.brand} campaign`}>
-                    <ChevronRight className="w-4 h-4" aria-hidden="true" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+    const handleApply = async (campaign) => {
+      setApplying(campaign._id);
+      try {
+        await applyToCampaign(campaign._id);
+        setApplied(prev => new Set([...prev, campaign._id]));
+        notifyApplied(campaign.title);
+      } catch {}
+      finally { setApplying(null); }
+    };
+
+    const sColors = {
+      active: 'bg-green-500/10 text-green-400',
+      completed: 'bg-blue-500/10 text-blue-400',
+      paused: 'bg-yellow-500/10 text-yellow-400',
+      draft: 'bg-gray-500/10 text-gray-400',
+    };
+
+    return (
+      <div className="space-y-6">
+        <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
+          <h1 className="text-xl font-bold text-white mb-1">Welcome back, {profile?.name?.split(" ")[0]}! 👋</h1>
+          <p className="text-gray-400 text-xs">Manage your creator journey from here</p>
         </div>
 
-        <div className="bg-gray-950 border border-gray-800 rounded-xl">
-          <div className="p-5 border-b border-gray-800">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Star className="w-5 h-5 text-yellow-400" aria-hidden="true" />
-                <h2 className="text-lg font-medium text-white">Recommended For You</h2>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { title: "Active campaigns", value: loadingAccepted ? "—" : activeCampaigns.length, sub: "You are working on", icon: Target, color: "text-blue-400" },
+            { title: "Total accepted", value: loadingAccepted ? "—" : acceptedCampaigns.length, sub: "All time", icon: Award, color: "text-green-400" },
+            { title: "Open campaigns", value: loadingBrowse ? "—" : browseCampaigns.length, sub: "Available to apply", icon: Star, color: "text-amber-400" },
+            { title: "Earnings", value: "₹0", sub: "Via escrow — coming soon", icon: Wallet, color: "text-purple-400" },
+          ].map((stat, i) => (
+            <motion.div key={i}
+              className="bg-gray-950 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors"
+              initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.08 }}>
+              <stat.icon className={"w-4 h-4 " + stat.color + " mb-3"} />
+              <p className="text-2xl font-semibold text-white">{stat.value}</p>
+              <p className="text-gray-400 text-xs mt-1">{stat.title}</p>
+              <p className="text-gray-600 text-xs">{stat.sub}</p>
+            </motion.div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="bg-gray-950 border border-gray-800 rounded-xl">
+            <div className="flex items-center justify-between p-5 border-b border-gray-800">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-blue-400" />
+                <h2 className="text-sm font-medium text-white">My Campaigns</h2>
               </div>
-              <button className="text-xs text-gray-400 hover:text-white flex items-center" aria-label="Filter opportunities">
-                <Filter className="w-3 h-3 mr-1" aria-hidden="true" /> Filter
+              <button onClick={() => navigate("/influencer_dashboard/campaigns")}
+                className="text-xs text-gray-500 hover:text-white flex items-center gap-1 transition-colors">
+                View all <ChevronRight className="w-3 h-3" />
               </button>
             </div>
-          </div>
-          <div className="p-5 space-y-4">
-            {newOpportunities.map(opportunity => (
-              <div key={opportunity.id} className="bg-black border border-gray-800 rounded-lg p-4 hover:border-gray-700 transition-colors">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex-1">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <h3 className="text-sm font-medium text-white">{opportunity.brand}</h3>
-                      <span className="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded-full">
-                        {opportunity.category}
-                      </span>
+            <div className="p-4 space-y-3">
+              {loadingAccepted ? (
+                <p className="text-gray-600 text-sm text-center py-8">Loading...</p>
+              ) : acceptedCampaigns.length === 0 ? (
+                <div className="text-center py-10">
+                  <Target className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+                  <p className="text-gray-500 text-sm">No campaigns yet</p>
+                  <p className="text-gray-600 text-xs mt-1">Apply to campaigns to get started</p>
+                </div>
+              ) : acceptedCampaigns.slice(0, 3).map((c, i) => (
+                <motion.div key={c._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
+                  className="bg-black border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <p className="text-white text-sm font-medium truncate">{c.title}</p>
+                        <span className={"text-xs px-2 py-0.5 rounded-full capitalize flex-shrink-0 " + (sColors[c.status] || sColors.active)}>{c.status}</span>
+                      </div>
+                      <p className="text-gray-500 text-xs">by {c.brandName}</p>
+                      <p className="text-gray-600 text-xs mt-1">Due {new Date(c.deadline).toLocaleDateString()}</p>
                     </div>
-                    <p className="text-xs text-gray-400 mb-3">{opportunity.title}</p>
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-gray-400">Budget: {opportunity.budget}</span>
-                      <div className="flex items-center text-green-400">
-                        <Zap className="w-3 h-3 mr-1" aria-hidden="true" />
-                        <span>{opportunity.match} match</span>
+                    <button onClick={() => navigate("/influencer_dashboard/campaigns")} className="text-gray-600 hover:text-white flex-shrink-0">
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+
+          <div className="bg-gray-950 border border-gray-800 rounded-xl">
+            <div className="flex items-center justify-between p-5 border-b border-gray-800">
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-400" />
+                <h2 className="text-sm font-medium text-white">Open Campaigns</h2>
+              </div>
+              <button onClick={() => { setShowBrowseCampaign(true); setIsSidebarOpen(false); }}
+                className="text-xs text-gray-500 hover:text-white flex items-center gap-1 transition-colors">
+                Browse all <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="p-4 space-y-3">
+              {loadingBrowse ? (
+                <p className="text-gray-600 text-sm text-center py-8">Loading...</p>
+              ) : recommended.length === 0 ? (
+                <div className="text-center py-10">
+                  <Star className="w-8 h-8 text-gray-700 mx-auto mb-3" />
+                  <p className="text-gray-500 text-sm">No open campaigns right now</p>
+                  <p className="text-gray-600 text-xs mt-1">Check back soon — brands post daily</p>
+                </div>
+              ) : recommended.map((c, i) => (
+                <motion.div key={c._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.05 }}
+                  className="bg-black border border-gray-800 rounded-xl p-4 hover:border-gray-700 transition-colors">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <p className="text-white text-sm font-medium truncate">{c.title}</p>
+                        <span className="text-xs bg-gray-800 text-gray-400 px-2 py-0.5 rounded-full flex-shrink-0">{c.category}</span>
+                      </div>
+                      <p className="text-gray-500 text-xs">{c.brandName}</p>
+                      <div className="flex items-center gap-3 mt-1 text-xs text-gray-600">
+                        <span>${c.budget?.toLocaleString()}</span>
+                        <span>{c.platform}</span>
                       </div>
                     </div>
+                    <button onClick={() => handleApply(c)}
+                      disabled={applying === c._id || applied.has(c._id)}
+                      className={"flex-shrink-0 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors " + (applied.has(c._id) ? "bg-green-500/10 text-green-400 border border-green-500/20" : "bg-white hover:bg-gray-100 text-black disabled:opacity-50")}>
+                      {applying === c._id ? "..." : applied.has(c._id) ? "Applied ✓" : "Apply"}
+                    </button>
                   </div>
-                  <button 
-                    className="ml-3 bg-white text-black px-3 py-1.5 text-xs rounded-lg hover:bg-gray-200 transition-colors"
-                    aria-label={`Apply for ${opportunity.brand} campaign`}
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
-
-    </div>
-  ));
-
+    );
+  });
   return (
     <div className="flex h-screen bg-black">
       <Sidebar 
@@ -321,12 +348,9 @@ const InfluencerDashboard = () => {
               <NotificationPanel isOpen={notifOpen} onToggle={() => setNotifOpen(o => !o)} />
               
               <div className="flex items-center gap-3">
-                <img
-                  src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s"
-                  alt="Profile picture"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-gray-700"
-                  onError={(e) => (e.target.src = '/fallback-image.jpg')}
-                />
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/40 to-blue-500/40 border-2 border-gray-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                  {profile?.name?.[0]?.toUpperCase() || '?'}
+                </div>
                 <div>
                   <p className="text-white font-medium text-sm">{profile?.name || "user"}</p>
                   <p className="text-gray-400 text-xs">{profile?.userName || "username"}</p>

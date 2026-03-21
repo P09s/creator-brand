@@ -1,29 +1,51 @@
 const mongoose = require('mongoose');
 
 const profileSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-  bio: { type: String, default: '' },
-  avatar: { type: String, default: '' },
-  niche: { type: [String], default: [] },
+  user:     { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  bio:      { type: String, default: '' },
+  avatar:   { type: String, default: '' },
+  niche:    { type: [String], default: [] },
   platforms: { type: [String], default: [] },
-  // Influencer specific
-  followers: { type: Number, default: 0 },
-  engagementRate: { type: Number, default: 0 },
+
+  // ── Influencer specific ───────────────────────────────────────────────
+  followers:       { type: Number, default: 0 },
+  engagementRate:  { type: Number, default: 0 },
+
+  // Self-reported social stats per platform
+  socialStats: {
+    instagram: { followers: { type: Number, default: 0 }, engagementRate: { type: Number, default: 0 }, verified: { type: Boolean, default: false } },
+    youtube:   { followers: { type: Number, default: 0 }, engagementRate: { type: Number, default: 0 }, verified: { type: Boolean, default: false } },
+    twitter:   { followers: { type: Number, default: 0 }, engagementRate: { type: Number, default: 0 }, verified: { type: Boolean, default: false } },
+    tiktok:    { followers: { type: Number, default: 0 }, engagementRate: { type: Number, default: 0 }, verified: { type: Boolean, default: false } },
+  },
+
   portfolio: [{
-    brandName: String,
+    brandName:     String,
     campaignTitle: String,
-    platform: String,
-    results: String,
-    date: Date,
+    platform:      String,
+    results:       String,
+    campaignDate:  Date,
+    link:          String,
   }],
-  // Brand specific
-  website: { type: String, default: '' },
-  industry: { type: String, default: '' },
+
+  // ── Brand specific ────────────────────────────────────────────────────
+  website:          { type: String, default: '' },
+  industry:         { type: String, default: '' },
+  campaignTypes:    { type: [String], default: [] },
   campaignsLaunched: { type: Number, default: 0 },
-  // Shared
-  totalEarnings: { type: Number, default: 0 },
-  totalSpent: { type: Number, default: 0 },
-  isPro: { type: Boolean, default: false },
+
+  // ── Shared ────────────────────────────────────────────────────────────
+  totalEarnings:  { type: Number, default: 0 },
+  totalSpent:     { type: Number, default: 0 },
+  isPro:          { type: Boolean, default: false },
+  profileViews:   { type: Number, default: 0 },
+
 }, { timestamps: true });
+
+// ── Virtual: profile completion score ────────────────────────────────────
+profileSchema.virtual('completionScore').get(function() {
+  // This is recalculated on the route with userType context
+  return 0;
+});
 
 module.exports = mongoose.model('Profile', profileSchema);

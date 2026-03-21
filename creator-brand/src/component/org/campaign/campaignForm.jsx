@@ -23,6 +23,7 @@ function CampaignForm({ prefillData, onSuccess }) {
     requirements: '',
     targetAudience: '',
     brandName: '',
+    openToNewCreators: false,
   });
   const [errors, setErrors] = useState({});
 
@@ -149,6 +150,20 @@ function CampaignForm({ prefillData, onSuccess }) {
             <label className="text-gray-400 text-xs mb-1 block">Requirements / Deliverables</label>
             <textarea value={formData.requirements} onChange={e => update('requirements', e.target.value)} placeholder="What do you expect from creators? (posts, stories, videos...)" rows={4} className={`${inputClass('requirements')} resize-none`} />
           </div>
+          <div
+            onClick={() => update('openToNewCreators', !formData.openToNewCreators)}
+            className={`flex items-start gap-3 p-4 rounded-xl border cursor-pointer transition-all ${formData.openToNewCreators ? 'bg-blue-500/10 border-blue-500/30' : 'bg-black border-gray-800 hover:border-gray-600'}`}
+          >
+            <div className={`w-5 h-5 rounded flex items-center justify-center flex-shrink-0 mt-0.5 border-2 transition-colors ${formData.openToNewCreators ? 'bg-blue-500 border-blue-500' : 'border-gray-600'}`}>
+              {formData.openToNewCreators && <span className="text-white text-xs font-bold">✓</span>}
+            </div>
+            <div>
+              <p className={`text-sm font-medium ${formData.openToNewCreators ? 'text-blue-400' : 'text-white'}`}>Open to new creators</p>
+              <p className="text-gray-500 text-xs mt-0.5 leading-relaxed">
+                Creators with no completed campaigns can apply. Great for getting more applicants and helping new talent build their portfolio. Both sides take a small calculated risk — but the escrow protects everyone.
+              </p>
+            </div>
+          </div>
         </div>
       ),
     },
@@ -166,6 +181,7 @@ function CampaignForm({ prefillData, onSuccess }) {
               ['Budget', formData.budget ? `$${Number(formData.budget).toLocaleString()}` : '—'],
               ['Deadline', formData.deadline ? new Date(formData.deadline).toLocaleDateString() : '—'],
               ['Target Audience', formData.targetAudience || '—'],
+              ['Open to new creators', formData.openToNewCreators ? 'Yes' : 'No'],
             ].map(([label, val]) => (
               <div key={label} className="flex justify-between items-start text-sm">
                 <span className="text-gray-500">{label}</span>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import useAuthStore from "../store/authStore";
 import { useNavigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { motion, stagger, useAnimate } from "motion/react";
@@ -45,7 +46,16 @@ const TextGenerateEffect = ({ words, className, filter = true, duration = 0.5 })
 
 function Landing() {
   const navigate = useNavigate();
+  const { isAuthenticated, user } = useAuthStore();
   const [currentIndex, setCurrentIndex] = useState(0);
+
+  // If already authenticated, redirect away from landing immediately
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      const dest = user.userType === 'brand' ? '/org_dashboard' : '/influencer_dashboard';
+      navigate(dest, { replace: true });
+    }
+  }, [isAuthenticated, user, navigate]);
   const [showSignInModal, setShowSignInModal] = useState(false);
 
   useEffect(() => {

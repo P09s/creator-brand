@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, DollarSign, Calendar, Users, Zap, Loader2, CheckCircle } from 'lucide-react';
+import { Search, DollarSign, Calendar, Users, Zap, Loader2, CheckCircle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBrowseCampaigns } from '../../hooks/useCampaigns';
 import { applyToCampaign } from '../../services/apiService';
@@ -109,6 +109,11 @@ export default function BrowseCampaign({ initialSearchTerm = '', onClose }) {
                       <div className="flex items-center gap-2 mb-2 flex-wrap">
                         <h3 className="text-white font-medium text-sm">{c.title}</h3>
                         <span className={`px-2 py-0.5 text-xs rounded-full ${getDynamicColor(c.platform)}`}>{c.platform}</span>
+                        {c.openToNewCreators && (
+                          <span className="flex items-center gap-1 text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-0.5 rounded-full">
+                            ★ Open to new creators
+                          </span>
+                        )}
                         <span className={`px-2 py-0.5 text-xs rounded-full ${getDynamicColor(c.category)}`}>{c.category}</span>
                       </div>
                       <p className="text-gray-500 text-xs mb-1">by {c.brandName}</p>

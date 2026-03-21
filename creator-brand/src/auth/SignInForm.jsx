@@ -45,7 +45,6 @@ export default function SignInForm() {
 
       if (result.success) {
         const { user, isNewUser } = result;
-        console.log("User Profile:", user);
         
         // Wait a bit to let user see the loading toast, then transition smoothly
         setTimeout(() => {

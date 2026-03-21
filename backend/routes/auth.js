@@ -20,4 +20,41 @@ router.get('/profile', authMiddleware, async (req, res) => {
   }
 });
 
+
+// PUT change password (authenticated)
+router.put('/password', authMiddleware, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current and new password required' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+    const bcrypt = require('bcryptjs');
+    const user = await User.findById(req.user.id);
+    const valid = await bcrypt.compare(currentPassword, user.password);
+    if (!valid) {
+      return res.status(400).json({ message: 'Current password is incorrect' });
+    }
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ message: 'Password changed successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// PUT update display name
+router.put('/name', authMiddleware, async (req, res) => {
+  try {
+    const { name } = req.body;
+    if (!name?.trim()) return res.status(400).json({ message: 'Name required' });
+    await User.findByIdAndUpdate(req.user.id, { name: name.trim() });
+    res.json({ message: 'Name updated' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 module.exports = router;

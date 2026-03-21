@@ -55,7 +55,7 @@ const Sidebar = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
-  const {user: profile} = useAuthStore();
+  const { user: profile, logout } = useAuthStore();
 
   const handleSidebarToggle = () => setIsSidebarOpen(!isSidebarOpen);
   const handleNavClick = (id) => {
@@ -138,11 +138,9 @@ const Sidebar = ({
           >
             {/* Avatar */}
             <div className="relative">
-              <img
-                src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRI39jmnqGugnR-LKaHU6za8QqCi9JO541veg&s"
-                alt="user_logo"
-                className="w-10 h-10 rounded-full ring-2 ring-gray-600 object-cover"
-              />
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500/40 to-blue-500/40 border-2 border-gray-700 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                {profile?.name?.[0]?.toUpperCase() || '?'}
+              </div>
               <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></div>
             </div>
 
@@ -240,8 +238,7 @@ const Sidebar = ({
                 </button>
                 <button
                   onClick={() => {
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("profile");
+                    logout();
                     navigate("/");
                     setShowLogoutModal(false);
                   }}

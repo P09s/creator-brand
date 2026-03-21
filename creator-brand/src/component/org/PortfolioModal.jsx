@@ -1,143 +1,92 @@
-import React from 'react';
-import { Camera } from 'lucide-react';
+import React, { useState } from 'react';
+import { Camera, Loader2, X } from 'lucide-react';
+import { addPortfolioItem } from '../../services/apiService';
+import toast from 'react-hot-toast';
 
-const PortfolioModal = ({ 
-  isOpen, 
-  onClose, 
-  formData, 
-  setFormData 
-}) => {
-  // Form submission handler
-  const handleFormSubmit = (e) => {
+const PortfolioModal = ({ isOpen, onClose }) => {
+  const [formData, setFormData] = useState({
+    brandName: '', campaignTitle: '', platform: 'Instagram', campaignDate: '', results: ''
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('New Portfolio Item:', formData);
-    setFormData({ brandName: '', campaignTitle: '', platform: 'Instagram', campaignDate: '', results: '' });
-    onClose();
+    setSaving(true);
+    try {
+      await addPortfolioItem(formData);
+      toast.success('Added to portfolio!');
+      setFormData({ brandName: '', campaignTitle: '', platform: 'Instagram', campaignDate: '', results: '' });
+      onClose();
+    } catch {
+      toast.error('Failed to save — try again');
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-md flex items-center justify-center z-50 p-6">
-      <div className="bg-gray-900/80 rounded-2xl p-8 w-full max-w-2xl border border-gray-700/70 shadow-lg shadow-purple-500/10">
-        
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-white">✨ Add New Work</h3>
-          <button 
-            onClick={onClose}
-            className="text-gray-400 hover:text-pink-400 transition-colors"
-            aria-label="Close modal"
-          >
-            ✕
+    <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div className="bg-gray-950 rounded-2xl p-6 w-full max-w-lg border border-gray-800 shadow-2xl">
+        <div className="flex justify-between items-center mb-5">
+          <h3 className="text-white font-semibold">Add past collaboration</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-white p-1.5 rounded-lg hover:bg-gray-800 transition-colors">
+            <X className="w-4 h-4" />
           </button>
         </div>
-        
-        {/* Form */}
-        <form onSubmit={handleFormSubmit} className="space-y-6">
-          {/* Brand Name */}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Brand Name</label>
-            <input 
-              type="text" 
-              name="brandName"
-              value={formData.brandName}
-              onChange={handleInputChange}
-              className="w-full bg-gray-800/80 border border-gray-700 text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none text-sm"
-              placeholder="e.g., Nike, Apple, Samsung..."
-              required
-            />
+            <label className="block text-xs text-gray-500 mb-1.5">Brand name *</label>
+            <input type="text" name="brandName" value={formData.brandName} onChange={handleChange} required
+              placeholder="e.g. Nike, Myntra, boAt"
+              className="w-full bg-black border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600" />
           </div>
-          
-          {/* Campaign Title */}
+
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Campaign Title</label>
-            <input 
-              type="text" 
-              name="campaignTitle"
-              value={formData.campaignTitle}
-              onChange={handleInputChange}
-              className="w-full bg-gray-800/80 border border-gray-700 text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm"
-              placeholder="Brief description of the campaign"
-              required
-            />
+            <label className="block text-xs text-gray-500 mb-1.5">Campaign / project title *</label>
+            <input type="text" name="campaignTitle" value={formData.campaignTitle} onChange={handleChange} required
+              placeholder="e.g. Summer collection launch"
+              className="w-full bg-black border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600" />
           </div>
-          
-          {/* Platform + Date */}
-          <div className="grid grid-cols-2 gap-6">
+
+          <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Platform</label>
-              <select 
-                name="platform"
-                value={formData.platform}
-                onChange={handleInputChange}
-                className="w-full bg-gray-800/80 border border-gray-700 text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none text-sm"
-              >
-                <option>Instagram</option>
-                <option>TikTok</option>
-                <option>YouTube</option>
-                <option>Twitter</option>
-                <option>Multiple Platforms</option>
+              <label className="block text-xs text-gray-500 mb-1.5">Platform</label>
+              <select name="platform" value={formData.platform} onChange={handleChange}
+                className="w-full bg-black border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-gray-600">
+                {['Instagram', 'YouTube', 'TikTok', 'Twitter', 'Multiple'].map(p => <option key={p}>{p}</option>)}
               </select>
             </div>
-            
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">Campaign Date</label>
-              <input 
-                type="date" 
-                name="campaignDate"
-                value={formData.campaignDate}
-                onChange={handleInputChange}
-                className="w-full bg-gray-800/80 border border-gray-700 text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-yellow-500 focus:outline-none text-sm"
-                required
-              />
+              <label className="block text-xs text-gray-500 mb-1.5">Date *</label>
+              <input type="date" name="campaignDate" value={formData.campaignDate} onChange={handleChange} required
+                className="w-full bg-black border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-gray-600" />
             </div>
           </div>
-          
-          {/* Results */}
+
           <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Results Achieved</label>
-            <input 
-              type="text" 
-              name="results"
-              value={formData.results}
-              onChange={handleInputChange}
-              className="w-full bg-gray-800/80 border border-gray-700 text-white px-3 py-2 rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none text-sm"
-              placeholder="e.g., 2.3M impressions, 4.8% engagement rate"
-            />
+            <label className="block text-xs text-gray-500 mb-1.5">Results (optional)</label>
+            <input type="text" name="results" value={formData.results} onChange={handleChange}
+              placeholder="e.g. 2.3M impressions, 4.8% engagement"
+              className="w-full bg-black border border-gray-800 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600" />
           </div>
-          
-          {/* Media Upload */}
-          <div>
-            <label className="block text-sm font-medium text-gray-300 mb-2">Campaign Image/Media</label>
-            <div className="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-purple-500/70 transition-colors cursor-pointer">
-              <Camera className="w-10 h-10 text-gray-400 mx-auto mb-2" aria-hidden="true" />
-              <p className="text-gray-300 text-xs">Click to upload or drag and drop</p>
-              <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF up to 10MB</p>
-            </div>
-          </div>
-          
-          {/* Buttons */}
-          <div className="flex gap-4 pt-4">
-            <button 
-              type="button" 
-              onClick={onClose}
-              className="flex-1 bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white py-2 px-4 rounded-lg transition-colors text-sm"
-              aria-label="Cancel adding new work"
-            >
+
+          <div className="flex gap-3 pt-2">
+            <button type="button" onClick={onClose}
+              className="flex-1 border border-gray-800 text-gray-400 hover:text-white py-2.5 rounded-xl text-sm transition-colors">
               Cancel
             </button>
-            <button 
-              type="submit"
-              className="flex-1 bg-gradient-to-r from-purple-500 via-pink-500 to-orange-500 hover:opacity-90 text-white font-medium py-2 px-4 rounded-lg transition-all text-sm shadow-md"
-              aria-label="Add to portfolio"
-            >
-              + Add to Portfolio
+            <button type="submit" disabled={saving}
+              className="flex-1 bg-white hover:bg-gray-100 disabled:opacity-50 text-black font-semibold py-2.5 rounded-xl text-sm transition-colors flex items-center justify-center gap-2">
+              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+              {saving ? 'Saving...' : 'Add to portfolio'}
             </button>
           </div>
         </form>

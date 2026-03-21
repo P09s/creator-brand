@@ -3,11 +3,8 @@ import SignInForm from './SignInForm';
 import { ArrowLeft } from 'lucide-react';
 
 export default function SignInModal({ isOpen, onClose }) {
-  console.log('SignInModal render, isOpen:', isOpen);
-
   return (
     <AnimatePresence
-      onExitComplete={() => console.log('Exit animation completed')}
     >
       {isOpen && (
         <motion.div
@@ -26,10 +23,7 @@ export default function SignInModal({ isOpen, onClose }) {
             onClick={(e) => e.stopPropagation()}
           >
             <button
-              onClick={() => {
-                console.log('Close button clicked');
-                onClose();
-              }}
+              onClick={onClose}
               className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 bg-white text-black rounded-full p-1 sm:p-2 hover:bg-gray-200 transition z-[1000]"
             >
               <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />

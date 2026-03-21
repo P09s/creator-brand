@@ -2,9 +2,46 @@ const express = require('express');
 const router = express.Router();
 const Profile = require('../models/Profile');
 const User = require('../models/User');
+const Campaign = require('../models/Campaign');
+const Review = require('../models/Review');
 const authMiddleware = require('../middlewares/authMiddleware');
 
-// GET own profile (creates one if doesn't exist)
+// ── Completion score helper ───────────────────────────────────────────────────
+function calcCompletionScore(profile, user, completedCampaigns) {
+  const isInfluencer = user.userType === 'influencer';
+  let score = 0;
+  const steps = [];
+
+  if (isInfluencer) {
+    const hasBio = profile.bio?.trim().length > 10;
+    const hasNiche = profile.niche?.length > 0;
+    const hasFollowers = profile.followers > 0 ||
+      Object.values(profile.socialStats || {}).some(p => p.followers > 0);
+    const hasPortfolio = profile.portfolio?.length > 0;
+    const hasCampaigns = completedCampaigns > 0;
+
+    steps.push({ key: 'bio', label: 'Add a bio', done: hasBio, points: 20 });
+    steps.push({ key: 'niche', label: 'Select your niche', done: hasNiche, points: 20 });
+    steps.push({ key: 'followers', label: 'Add follower counts', done: hasFollowers, points: 20 });
+    steps.push({ key: 'portfolio', label: 'Add past work', done: hasPortfolio, points: 20 });
+    steps.push({ key: 'campaign', label: 'Complete first campaign', done: hasCampaigns, points: 20 });
+  } else {
+    const hasBio = profile.bio?.trim().length > 10;
+    const hasIndustry = profile.industry?.trim().length > 0;
+    const hasWebsite = profile.website?.trim().length > 0;
+    const hasCampaign = completedCampaigns > 0;
+
+    steps.push({ key: 'bio', label: 'Write brand description', done: hasBio, points: 25 });
+    steps.push({ key: 'industry', label: 'Set your industry', done: hasIndustry, points: 25 });
+    steps.push({ key: 'website', label: 'Add website', done: hasWebsite, points: 25 });
+    steps.push({ key: 'campaign', label: 'Post first campaign', done: hasCampaign, points: 25 });
+  }
+
+  score = steps.filter(s => s.done).reduce((sum, s) => sum + s.points, 0);
+  return { score, steps };
+}
+
+// ── GET own profile with completion score ─────────────────────────────────────
 router.get('/me', authMiddleware, async (req, res) => {
   try {
     let profile = await Profile.findOne({ user: req.user.id });
@@ -12,46 +49,19 @@ router.get('/me', authMiddleware, async (req, res) => {
       profile = new Profile({ user: req.user.id });
       await profile.save();
     }
-    res.json(profile);
+    const user = await User.findById(req.user.id);
+    const completedCampaigns = user.userType === 'influencer'
+      ? await Campaign.countDocuments({ accepted: req.user.id, status: 'completed' })
+      : await Campaign.countDocuments({ brand: req.user.id, status: 'completed' });
+
+    const { score, steps } = calcCompletionScore(profile, user, completedCampaigns);
+    res.json({ ...profile.toObject(), completionScore: score, completionSteps: steps });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// GET all influencers (for brands to browse)
-router.get('/influencers', authMiddleware, async (req, res) => {
-  try {
-    const { niche, platform, search } = req.query;
-    const influencerUsers = await User.find({ userType: 'influencer' }).select('-password');
-    const profiles = await Promise.all(
-      influencerUsers.map(async (u) => {
-        const profile = await Profile.findOne({ user: u._id });
-        return { user: u, profile: profile || {} };
-      })
-    );
-    res.json(profiles);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// GET all brands (for influencers to browse)
-router.get('/brands', authMiddleware, async (req, res) => {
-  try {
-    const brandUsers = await User.find({ userType: 'brand' }).select('-password');
-    const profiles = await Promise.all(
-      brandUsers.map(async (u) => {
-        const profile = await Profile.findOne({ user: u._id });
-        return { user: u, profile: profile || {} };
-      })
-    );
-    res.json(profiles);
-  } catch (err) {
-    res.status(500).json({ message: 'Server error' });
-  }
-});
-
-// PUT update own profile
+// ── PUT update own profile ────────────────────────────────────────────────────
 router.put('/me', authMiddleware, async (req, res) => {
   try {
     const profile = await Profile.findOneAndUpdate(
@@ -59,13 +69,18 @@ router.put('/me', authMiddleware, async (req, res) => {
       { $set: req.body },
       { new: true, upsert: true }
     );
-    res.json(profile);
+    const user = await User.findById(req.user.id);
+    const completedCampaigns = user.userType === 'influencer'
+      ? await Campaign.countDocuments({ accepted: req.user.id, status: 'completed' })
+      : await Campaign.countDocuments({ brand: req.user.id, status: 'completed' });
+    const { score, steps } = calcCompletionScore(profile, user, completedCampaigns);
+    res.json({ ...profile.toObject(), completionScore: score, completionSteps: steps });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
 });
 
-// POST add portfolio item (influencers)
+// ── POST add portfolio item ───────────────────────────────────────────────────
 router.post('/me/portfolio', authMiddleware, async (req, res) => {
   try {
     const profile = await Profile.findOneAndUpdate(
@@ -74,6 +89,85 @@ router.post('/me/portfolio', authMiddleware, async (req, res) => {
       { new: true, upsert: true }
     );
     res.json(profile);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// ── DELETE portfolio item ─────────────────────────────────────────────────────
+router.delete('/me/portfolio/:itemId', authMiddleware, async (req, res) => {
+  try {
+    const profile = await Profile.findOneAndUpdate(
+      { user: req.user.id },
+      { $pull: { portfolio: { _id: req.params.itemId } } },
+      { new: true }
+    );
+    res.json(profile);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// ── POST record a profile view (called when brand views a creator) ────────────
+router.post('/view/:userId', authMiddleware, async (req, res) => {
+  try {
+    if (req.params.userId === req.user.id) return res.json({ ok: true }); // no self-views
+    await Profile.findOneAndUpdate(
+      { user: req.params.userId },
+      { $inc: { profileViews: 1 } },
+      { upsert: true }
+    );
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// ── GET all influencers with trust + completion ───────────────────────────────
+router.get('/influencers', authMiddleware, async (req, res) => {
+  try {
+    const { niche } = req.query;
+    const users = await User.find({ userType: 'influencer' }).select('-password');
+    const profiles = await Promise.all(
+      users.map(async (u) => {
+        const profile = await Profile.findOne({ user: u._id });
+        const completedCampaigns = await Campaign.countDocuments({ accepted: u._id, status: 'completed' });
+        const reviews = await Review.find({ reviewee: u._id });
+        const avgRating = reviews.length
+          ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
+        const trustScore = Math.min(100, Math.round((avgRating / 5) * 60 + Math.min(completedCampaigns, 5) * 8));
+        const { score: completionScore } = profile
+          ? calcCompletionScore(profile, u, completedCampaigns) : { score: 0 };
+        return { user: u, profile: profile || {}, trustScore, completionScore, completedCampaigns };
+      })
+    );
+    const filtered = niche
+      ? profiles.filter(p => p.profile?.niche?.includes(niche))
+      : profiles;
+    res.json(filtered);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// ── GET all brands ────────────────────────────────────────────────────────────
+router.get('/brands', authMiddleware, async (req, res) => {
+  try {
+    const users = await User.find({ userType: 'brand' }).select('-password');
+    const profiles = await Promise.all(
+      users.map(async (u) => {
+        const profile = await Profile.findOne({ user: u._id });
+        const completedCampaigns = await Campaign.countDocuments({ brand: u._id, status: 'completed' });
+        const reviews = await Review.find({ reviewee: u._id });
+        const avgRating = reviews.length
+          ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : 0;
+        const trustScore = Math.min(100, Math.round((avgRating / 5) * 60 + Math.min(completedCampaigns, 5) * 8));
+        const { score: completionScore } = profile
+          ? calcCompletionScore(profile, u, completedCampaigns) : { score: 0 };
+        return { user: u, profile: profile || {}, trustScore, completionScore };
+      })
+    );
+    res.json(profiles);
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

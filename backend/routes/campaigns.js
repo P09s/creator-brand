@@ -125,6 +125,7 @@ router.post('/', authMiddleware, async (req, res) => {
       budget: Number(budget), deadline: new Date(deadline),
       requirements, targetAudience,
       brand: req.user.id, brandName: brandName || req.user.name,
+      openToNewCreators: req.body.openToNewCreators === true || req.body.openToNewCreators === 'true',
     });
     await campaign.save();
     res.status(201).json(campaign);
@@ -169,6 +170,36 @@ router.delete('/:id', authMiddleware, async (req, res) => {
     const campaign = await Campaign.findOneAndDelete({ _id: req.params.id, brand: req.user.id });
     if (!campaign) return res.status(404).json({ message: 'Not found or unauthorized' });
     res.json({ message: 'Campaign deleted' });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// POST creator submits post-campaign metrics
+router.post('/:id/metrics', authMiddleware, async (req, res) => {
+  try {
+    const campaign = await Campaign.findById(req.params.id);
+    if (!campaign) return res.status(404).json({ message: 'Campaign not found' });
+    if (!campaign.accepted.map(id => id.toString()).includes(req.user.id)) {
+      return res.status(403).json({ message: 'You are not an accepted creator on this campaign' });
+    }
+    // Remove existing metrics from this creator then push new
+    campaign.postMetrics = campaign.postMetrics.filter(
+      m => m.creator.toString() !== req.user.id
+    );
+    campaign.postMetrics.push({
+      creator: req.user.id,
+      reach:       Number(req.body.reach || 0),
+      impressions: Number(req.body.impressions || 0),
+      likes:       Number(req.body.likes || 0),
+      comments:    Number(req.body.comments || 0),
+      saves:       Number(req.body.saves || 0),
+      shares:      Number(req.body.shares || 0),
+      screenshotUrl: req.body.screenshotUrl || '',
+    });
+    await campaign.save();
+    res.json({ message: 'Metrics saved', campaign });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }
