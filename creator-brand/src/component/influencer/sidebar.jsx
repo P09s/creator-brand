@@ -22,6 +22,7 @@ const sidebarVariants = {
 const NavItem = ({ item, activeTab, isSidebarOpen, handleNavClick, index }) => (
   <button
     onClick={() => handleNavClick(item.id)}
+    data-tour={item.tour}
     className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
       activeTab === item.id
         ? 'bg-gray-900 text-white border border-gray-600'
@@ -68,13 +69,13 @@ const Sidebar = ({
   };
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'campaigns', label: 'Campaigns', icon: Target },
-    { id: 'organizations', label: 'Organizations', icon: Users },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'messages', label: 'Messages', icon: MessageCircle },
-    { id: 'payments', label: 'Payments', icon: CreditCard },
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, tour: 'sidebar-dashboard' },
+    { id: 'campaigns', label: 'Campaigns', icon: Target, tour: 'sidebar-campaigns' },
+    { id: 'organizations', label: 'Organizations', icon: Users, tour: 'sidebar-browse' },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3, tour: 'sidebar-analytics' },
+    { id: 'messages', label: 'Messages', icon: MessageCircle, tour: 'sidebar-messages' },
+    { id: 'payments', label: 'Payments', icon: CreditCard, tour: 'sidebar-payments' },
+    { id: 'settings', label: 'Settings', icon: Settings, tour: 'sidebar-settings' }
   ];
 
   return (
@@ -186,7 +187,8 @@ const Sidebar = ({
                 className="absolute bottom-full mb-2 left-4 right-4 space-y-1 bg-gray-950 border border-gray-800 rounded-lg p-2 shadow-lg"
               >
                 <button
-                  className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-gray-900 hover:border-gray-600 rounded-lg border border-transparent transition-colors"
+                  data-tour="sidebar-portfolio"
+                className="flex items-center w-full px-3 py-2 text-sm text-white hover:bg-gray-900 hover:border-gray-600 rounded-lg border border-transparent transition-colors"
                   onClick={() => {
                     navigate('/influencer_dashboard/portfolio');
                     setActiveTab('portfolio');

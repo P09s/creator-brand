@@ -32,6 +32,8 @@ import { useCampaigns, useAcceptedCampaigns, useBrowseCampaigns } from '../../ho
 import { applyToCampaign } from '../../services/apiService';
 import { notifyApplied } from '../../store/notificationStore';
 import NotificationPanel from '../shared/NotificationPanel';
+import Onboarding from '../shared/Onboarding';
+import ProductTour from '../shared/ProductTour';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
@@ -52,6 +54,16 @@ const InfluencerDashboard = () => {
   const [showBrowseCampaign, setShowBrowseCampaign] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [notifOpen, setNotifOpen] = useState(false);
+  // Read isNewUser directly from Zustand persisted state
+  const { isNewUser, logout: authLogout } = useAuthStore();
+  const [showOnboarding, setShowOnboarding] = useState(isNewUser === true);
+  const [showTour, setShowTour] = useState(false);
+  const handleOnboardingDone = (startTour = false) => {
+    setShowOnboarding(false);
+    // Clear isNewUser in the store so tour never re-fires
+    useAuthStore.setState({ isNewUser: false });
+    if (startTour) setTimeout(() => setShowTour(true), 500);
+  };
   const [formData, setFormData] = useState({
     brandName: '',
     campaignTitle: '',
@@ -175,7 +187,7 @@ const InfluencerDashboard = () => {
           <p className="text-gray-400 text-xs">Manage your creator journey from here</p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div data-tour="dashboard-stats" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { title: "Active campaigns", value: loadingAccepted ? "—" : activeCampaigns.length, sub: "You are working on", icon: Target, color: "text-blue-400" },
             { title: "Total accepted", value: loadingAccepted ? "—" : acceptedCampaigns.length, sub: "All time", icon: Award, color: "text-green-400" },
@@ -512,6 +524,8 @@ const InfluencerDashboard = () => {
         formData={formData}
         setFormData={setFormData}
       />
+      {showOnboarding && <Onboarding onDone={handleOnboardingDone} />}
+      {showTour && <ProductTour userType="influencer" onDone={() => setShowTour(false)} />}
     </div>
   );
 };

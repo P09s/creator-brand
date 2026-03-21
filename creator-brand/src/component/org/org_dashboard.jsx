@@ -31,6 +31,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import NotificationPanel from '../shared/NotificationPanel';
 import Onboarding from '../shared/Onboarding';
+import ProductTour from '../shared/ProductTour';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
@@ -52,18 +53,15 @@ const Org_dashboard = () => {
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [notifOpen, setNotifOpen] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    try {
-      const store = JSON.parse(localStorage.getItem('auth-storage') || '{}');
-      return store?.state?.isNewUser === true;
-    } catch { return false; }
-  });
-  const handleOnboardingDone = () => {
+  // Read isNewUser directly from Zustand persisted state
+  const { isNewUser } = userAuthStore();
+  const [showOnboarding, setShowOnboarding] = useState(isNewUser === true);
+  const [showTour, setShowTour] = useState(false);
+  const handleOnboardingDone = (startTour = false) => {
     setShowOnboarding(false);
-    try {
-      const store = JSON.parse(localStorage.getItem('auth-storage') || '{}');
-      if (store?.state) { store.state.isNewUser = false; localStorage.setItem('auth-storage', JSON.stringify(store)); }
-    } catch {}
+    // Clear isNewUser in the store so tour never re-fires
+    userAuthStore.setState({ isNewUser: false });
+    if (startTour) setTimeout(() => setShowTour(true), 500);
   };
   const [formData, setFormData] = useState({
     brandName: '',
@@ -189,7 +187,7 @@ const Org_dashboard = () => {
       </div>
 
       {/* Stats — real data */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div data-tour="dashboard-stats" className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
           { label: 'Campaigns', value: campaigns.length, sub: 'Posted', icon: Target, color: 'text-blue-400' },
           { label: 'Active', value: activeCampaigns.length, sub: 'Running now', icon: Zap, color: 'text-green-400' },
@@ -494,6 +492,7 @@ const Org_dashboard = () => {
         )}
       </AnimatePresence>
       {showOnboarding && <Onboarding onDone={handleOnboardingDone} />}
+      {showTour && <ProductTour userType="brand" onDone={() => setShowTour(false)} />}
     </div>
   );
 };

@@ -22,6 +22,7 @@ const sidebarVariants = {
 const NavItem = ({ item, activeTab, isSidebarOpen, handleNavClick, index }) => (
   <button
     onClick={() => handleNavClick(item.id)}
+    data-tour={item.tour}
     className={`w-full flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200 group ${
       activeTab === item.id
         ? 'bg-gray-900 text-white border border-gray-600'
@@ -67,13 +68,13 @@ const Sidebar = ({
   };
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { id: 'campaigns', label: 'Campaigns', icon: Target },
-    { id: 'browse_influencer', label: 'Browse Influencer', icon: Users },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-    { id: 'messages', label: 'Messages', icon: MessageCircle },
-    { id: 'payments', label: 'Payments', icon: CreditCard },
-    { id: 'settings', label: 'Settings', icon: Settings }
+    { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, tour: 'sidebar-dashboard' },
+    { id: 'campaigns', label: 'Campaigns', icon: Target, tour: 'sidebar-campaigns' },
+    { id: 'browse_influencer', label: 'Browse Influencer', icon: Users, tour: 'sidebar-browse' },
+    { id: 'analytics', label: 'Analytics', icon: BarChart3, tour: 'sidebar-analytics' },
+    { id: 'messages', label: 'Messages', icon: MessageCircle, tour: 'sidebar-messages' },
+    { id: 'payments', label: 'Payments', icon: CreditCard, tour: 'sidebar-payments' },
+    { id: 'settings', label: 'Settings', icon: Settings, tour: 'sidebar-settings' }
   ];
 
   return (

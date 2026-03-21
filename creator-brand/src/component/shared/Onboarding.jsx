@@ -65,10 +65,10 @@ function CreatorOnboarding({ user, onDone }) {
         followers: Math.max(...PLATFORMS.map(({ key }) => Number(followers[key]) || 0)),
       });
       toast.success("Profile set up — let's find you campaigns! 🚀");
-      onDone();
+      onDone(true); // true = show product tour after this
     } catch {
       toast.error('Could not save profile. You can update it in your portfolio.');
-      onDone();
+      onDone(true);
     } finally {
       setSaving(false);
     }
@@ -174,10 +174,10 @@ function BrandOnboarding({ user, onDone }) {
     try {
       await updateMyProfile({ industry, bio, website });
       toast.success("Brand profile set up — post your first campaign! 🚀");
-      onDone();
+      onDone(true); // true = show product tour after this
     } catch {
       toast.error('Could not save profile. You can update it in your portfolio.');
-      onDone();
+      onDone(true);
     } finally {
       setSaving(false);
     }
