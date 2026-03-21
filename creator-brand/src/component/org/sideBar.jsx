@@ -100,7 +100,7 @@ const Sidebar = ({
                   transition={{ duration: 0.2 }}
                 >
                   <h1 className="text-xl text-white font-bold font-satoshi tracking-tight">LinkFluence</h1>
-                  <p className="text-xs text-gray-400 font-medium">Organizattion</p>
+                  <p className="text-xs text-gray-400 font-medium">Organization</p>
                 </motion.div>
               )}
             </AnimatePresence>

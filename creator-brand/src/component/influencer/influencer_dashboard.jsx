@@ -28,7 +28,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { useCampaigns, useBrowseCampaigns } from '../../hooks/useCampaigns';
+import { useCampaigns, useAcceptedCampaigns, useBrowseCampaigns } from '../../hooks/useCampaigns';
 import { applyToCampaign } from '../../services/apiService';
 import { notifyApplied } from '../../store/notificationStore';
 import NotificationPanel from '../shared/NotificationPanel';
@@ -141,7 +141,7 @@ const InfluencerDashboard = () => {
   };
 
   const Dashboard = memo(() => {
-    const { campaigns: acceptedCampaigns, loading: loadingAccepted } = useCampaigns();
+    const { campaigns: acceptedCampaigns, loading: loadingAccepted } = useAcceptedCampaigns();
     const { campaigns: browseCampaigns, loading: loadingBrowse } = useBrowseCampaigns();
     const [applying, setApplying] = React.useState(null);
     const [applied, setApplied] = React.useState(new Set());

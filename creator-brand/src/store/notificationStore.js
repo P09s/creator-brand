@@ -1,65 +1,89 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
-// Notification types and their display config
-export const NOTIF_TYPES = {
-  CAMPAIGN_APPLIED:       { icon: '⚡', color: 'text-blue-400',   label: 'Application sent' },
-  CAMPAIGN_ACCEPTED:      { icon: '✓',  color: 'text-green-400',  label: 'Accepted!' },
-  CAMPAIGN_REJECTED:      { icon: '✕',  color: 'text-red-400',    label: 'Not selected' },
-  MILESTONE_SUBMITTED:    { icon: '📝', color: 'text-amber-400',  label: 'Submission received' },
-  MILESTONE_APPROVED:     { icon: '✓',  color: 'text-green-400',  label: 'Milestone approved' },
-  MILESTONE_REJECTED:     { icon: '✕',  color: 'text-red-400',    label: 'Revision requested' },
-  NEW_MESSAGE:            { icon: '💬', color: 'text-purple-400', label: 'New message' },
-  NEW_APPLICANT:          { icon: '👤', color: 'text-blue-400',   label: 'New applicant' },
-  CAMPAIGN_CREATED:       { icon: '🚀', color: 'text-white',      label: 'Campaign live' },
-  REVIEW_RECEIVED:        { icon: '⭐', color: 'text-amber-400',  label: 'New review' },
+// ── Storage key per user — prevents bleed between accounts ───────────────────
+const getStorageKey = () => {
+  try {
+    const auth = JSON.parse(localStorage.getItem('auth-storage') || '{}');
+    const userId = auth?.state?.user?._id;
+    return userId ? `linkfluence-notif-${userId}` : 'linkfluence-notif-guest';
+  } catch {
+    return 'linkfluence-notif-guest';
+  }
 };
 
-const useNotificationStore = create(
-  persist(
-    (set, get) => ({
-      notifications: [],
+const loadNotifications = () => {
+  try {
+    const raw = localStorage.getItem(getStorageKey());
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+};
 
-      // Add a notification
-      push: ({ type, title, body, link = null, campaignId = null, userId = null }) => {
-        const notif = {
-          id: Date.now() + Math.random(),
-          type,
-          title,
-          body,
-          link,
-          campaignId,
-          userId,
-          read: false,
-          createdAt: new Date().toISOString(),
-        };
-        set(s => ({ notifications: [notif, ...s.notifications].slice(0, 50) }));
-      },
+const saveNotifications = (notifications) => {
+  try {
+    localStorage.setItem(getStorageKey(), JSON.stringify(notifications.slice(0, 50)));
+  } catch {}
+};
 
-      // Mark one as read
-      markRead: (id) => set(s => ({
-        notifications: s.notifications.map(n => n.id === id ? { ...n, read: true } : n),
-      })),
+// ── Notification types ────────────────────────────────────────────────────────
+export const NOTIF_TYPES = {
+  CAMPAIGN_APPLIED:    { icon: '⚡', color: 'text-blue-400',   label: 'Application sent'       },
+  CAMPAIGN_ACCEPTED:   { icon: '✓',  color: 'text-green-400',  label: 'Accepted!'               },
+  CAMPAIGN_REJECTED:   { icon: '✕',  color: 'text-red-400',    label: 'Not selected'            },
+  MILESTONE_SUBMITTED: { icon: '📝', color: 'text-amber-400',  label: 'Submission received'     },
+  MILESTONE_APPROVED:  { icon: '✓',  color: 'text-green-400',  label: 'Milestone approved'      },
+  MILESTONE_REJECTED:  { icon: '✕',  color: 'text-red-400',    label: 'Revision requested'      },
+  NEW_MESSAGE:         { icon: '💬', color: 'text-purple-400', label: 'New message'             },
+  NEW_APPLICANT:       { icon: '👤', color: 'text-blue-400',   label: 'New applicant'           },
+  CAMPAIGN_CREATED:    { icon: '🚀', color: 'text-white',      label: 'Campaign live'           },
+  REVIEW_RECEIVED:     { icon: '⭐', color: 'text-amber-400',  label: 'New review'              },
+};
 
-      // Mark all as read
-      markAllRead: () => set(s => ({
-        notifications: s.notifications.map(n => ({ ...n, read: true })),
-      })),
+const useNotificationStore = create((set, get) => ({
+  notifications: loadNotifications(),
 
-      // Clear all
-      clear: () => set({ notifications: [] }),
+  push: ({ type, title, body, link = null }) => {
+    const notif = {
+      id: Date.now() + Math.random(),
+      type,
+      title,
+      body,
+      link,
+      read: false,
+      createdAt: new Date().toISOString(),
+    };
+    const updated = [notif, ...get().notifications].slice(0, 50);
+    saveNotifications(updated);
+    set({ notifications: updated });
+  },
 
-      // Computed
-      unreadCount: () => get().notifications.filter(n => !n.read).length,
-    }),
-    {
-      name: 'linkfluence-notifications',
-      partialize: (s) => ({ notifications: s.notifications }),
-    }
-  )
-);
+  markRead: (id) => {
+    const updated = get().notifications.map(n => n.id === id ? { ...n, read: true } : n);
+    saveNotifications(updated);
+    set({ notifications: updated });
+  },
 
-// ── Helper functions called from anywhere in the app ──────────────────────────
+  markAllRead: () => {
+    const updated = get().notifications.map(n => ({ ...n, read: true }));
+    saveNotifications(updated);
+    set({ notifications: updated });
+  },
+
+  clear: () => {
+    saveNotifications([]);
+    set({ notifications: [] });
+  },
+
+  // Re-load from localStorage on user change (called after login)
+  reloadForUser: () => {
+    set({ notifications: loadNotifications() });
+  },
+
+  unreadCount: () => get().notifications.filter(n => !n.read).length,
+}));
+
+// ── Helper functions ──────────────────────────────────────────────────────────
 
 export function notifyApplied(campaignTitle) {
   useNotificationStore.getState().push({
@@ -110,7 +134,7 @@ export function notifyMilestoneApproved(milestoneTitle) {
   useNotificationStore.getState().push({
     type: 'MILESTONE_APPROVED',
     title: 'Milestone approved!',
-    body: `"${milestoneTitle}" was approved by the brand`,
+    body: `"${milestoneTitle}" was approved`,
     link: '/influencer_dashboard/campaigns',
   });
 }

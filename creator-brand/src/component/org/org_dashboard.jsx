@@ -30,6 +30,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import NotificationPanel from '../shared/NotificationPanel';
+import Onboarding from '../shared/Onboarding';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
 import PortfolioModal from './PortfolioModal';
@@ -51,6 +52,19 @@ const Org_dashboard = () => {
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [notifOpen, setNotifOpen] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try {
+      const store = JSON.parse(localStorage.getItem('auth-storage') || '{}');
+      return store?.state?.isNewUser === true;
+    } catch { return false; }
+  });
+  const handleOnboardingDone = () => {
+    setShowOnboarding(false);
+    try {
+      const store = JSON.parse(localStorage.getItem('auth-storage') || '{}');
+      if (store?.state) { store.state.isNewUser = false; localStorage.setItem('auth-storage', JSON.stringify(store)); }
+    } catch {}
+  };
   const [formData, setFormData] = useState({
     brandName: '',
     campaignTitle: '',
@@ -479,6 +493,7 @@ const Org_dashboard = () => {
           />
         )}
       </AnimatePresence>
+      {showOnboarding && <Onboarding onDone={handleOnboardingDone} />}
     </div>
   );
 };

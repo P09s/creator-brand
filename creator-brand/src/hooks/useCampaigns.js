@@ -1,13 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getCampaigns, getMyCampaigns, applyToCampaign, createCampaign, deleteCampaign } from '../services/apiService';
+import {
+  getCampaigns, getMyCampaigns, getAcceptedCampaigns,
+  applyToCampaign, createCampaign, deleteCampaign
+} from '../services/apiService';
 import useAuthStore from '../store/authStore';
 
+// ── Brand: my campaigns / Influencer: all browsable campaigns ─────────────────
 export function useCampaigns() {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { user } = useAuthStore();
-
   const isBrand = user?.userType === 'brand';
 
   const fetchCampaigns = useCallback(async (filters = {}) => {
@@ -42,7 +45,6 @@ export function useCampaigns() {
   const create = async (data) => {
     try {
       const newCampaign = await createCampaign(data);
-      // Add immediately to state so it shows up without a page refresh
       setCampaigns(prev => [newCampaign, ...prev]);
       return { success: true, campaign: newCampaign };
     } catch (err) {
@@ -66,6 +68,30 @@ export function useCampaigns() {
   return { campaigns, loading, error, apply, create, remove, hasApplied, refetch: fetchCampaigns };
 }
 
+// ── Influencer: campaigns they have been ACCEPTED into ────────────────────────
+// This is what the influencer dashboard and campaigns page should use.
+export function useAcceptedCampaigns() {
+  const [campaigns, setCampaigns] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetch = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await getAcceptedCampaigns();
+      setCampaigns(data);
+    } catch {
+      setCampaigns([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetch(); }, [fetch]);
+
+  return { campaigns, loading, refetch: fetch };
+}
+
+// ── Browse: all open campaigns (for influencer browse page) ───────────────────
 export function useBrowseCampaigns() {
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);

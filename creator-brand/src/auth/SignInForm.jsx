@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Mail, Lock, UserPlus } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import useAuthStore from '../store/authStore';
+import useNotificationStore from '../store/notificationStore';
 import { 
   showWelcomeToast, 
   showLoadingToast, 
@@ -45,6 +46,8 @@ export default function SignInForm() {
 
       if (result.success) {
         const { user, isNewUser } = result;
+        // Reload notifications for this specific user (clears other users' notifs from view)
+        useNotificationStore.getState().reloadForUser();
         
         // Wait a bit to let user see the loading toast, then transition smoothly
         setTimeout(() => {
