@@ -2,7 +2,7 @@ import React, { memo, useState, useEffect } from 'react';
 import useAuthStore from '../../store/authStore';
 import AvatarUpload from '../shared/AvatarUpload';
 import {
-  Edit3, Briefcase, Instagram, Youtube, Twitter,
+  Edit3, Briefcase, Instagram, Youtube, Twitter, Globe,
   CheckCircle, Plus, Link2, X, Loader2, Shield
 } from 'lucide-react';
 import { getMyProfile, updateMyProfile, addPortfolioItem, deletePortfolioItem } from '../../services/apiService';
@@ -35,6 +35,8 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
   const [niches, setNiches] = useState([]);
   const [followers, setFollowers] = useState({ instagram: '', youtube: '', twitter: '' });
   const [editingFollowers, setEditingFollowers] = useState(false);
+  const [socialLinks, setSocialLinks] = useState({ instagram: '', youtube: '', twitter: '', tiktok: '', website: '' });
+  const [editingSocialLinks, setEditingSocialLinks] = useState(false);
   const [showAddWork, setShowAddWork] = useState(false);
   const [workForm, setWorkForm] = useState({ brandName: '', campaignTitle: '', platform: 'Instagram', results: '', link: '' });
   const [deletingItem, setDeletingItem] = useState(null);
@@ -50,6 +52,14 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
         instagram: ss.instagram?.followers || '',
         youtube:   ss.youtube?.followers || '',
         twitter:   ss.twitter?.followers || '',
+      });
+      const sl = p.socialLinks || {};
+      setSocialLinks({
+        instagram: sl.instagram || '',
+        youtube:   sl.youtube   || '',
+        twitter:   sl.twitter   || '',
+        tiktok:    sl.tiktok    || '',
+        website:   sl.website   || '',
       });
     }).catch(() => {}).finally(() => setLoading(false));
   }, []);
@@ -68,6 +78,12 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
     await save({ bio });
     setEditingBio(false);
     toast.success('Bio saved');
+  };
+
+  const handleSaveSocialLinks = async () => {
+    await save({ socialLinks });
+    setEditingSocialLinks(false);
+    toast.success('Social links saved');
   };
 
   const handleSaveFollowers = async () => {
@@ -237,6 +253,59 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* Social links */}
+      <div className="bg-gray-950 border border-gray-800 rounded-xl p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-white font-medium text-sm">Social profiles</h3>
+            <p className="text-gray-500 text-xs mt-0.5">Brands tap these to check your content before accepting</p>
+          </div>
+          <button onClick={() => setEditingSocialLinks(f => !f)}
+            className="text-xs text-gray-500 hover:text-gray-300 flex items-center gap-1 transition-colors border border-gray-800 hover:border-gray-600 px-2.5 py-1 rounded-lg">
+            <Edit3 className="w-3 h-3" /> {editingSocialLinks ? 'Cancel' : 'Edit'}
+          </button>
+        </div>
+        {editingSocialLinks ? (
+          <div className="space-y-3">
+            {[
+              { key: 'instagram', label: 'Instagram username', placeholder: '@yourhandle', icon: Instagram, color: 'text-pink-400' },
+              { key: 'youtube',   label: 'YouTube channel',    placeholder: '@yourchannel',  icon: Youtube,   color: 'text-red-400'  },
+              { key: 'twitter',   label: 'Twitter / X handle', placeholder: '@yourhandle',  icon: Twitter,   color: 'text-blue-400' },
+              { key: 'tiktok',    label: 'TikTok username',    placeholder: '@yourhandle',  icon: null,      color: 'text-gray-400' },
+              { key: 'website',   label: 'Portfolio website',  placeholder: 'https://...',  icon: Globe,     color: 'text-green-400'},
+            ].map(({ key, label, placeholder, icon: Icon, color }) => (
+              <div key={key} className="flex items-center gap-3">
+                {Icon ? <Icon className={`w-4 h-4 ${color} flex-shrink-0`} /> : <span className="w-4 text-center text-xs text-gray-500 flex-shrink-0">TT</span>}
+                <input
+                  value={socialLinks[key]}
+                  onChange={e => setSocialLinks(p => ({ ...p, [key]: e.target.value }))}
+                  placeholder={placeholder}
+                  className="flex-1 bg-black border border-gray-800 rounded-xl px-3 py-2 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600"
+                />
+              </div>
+            ))}
+            <button onClick={handleSaveSocialLinks}
+              className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-4 py-2 rounded-xl text-sm font-semibold transition-colors">
+              Save links
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-wrap gap-3">
+            {Object.entries(socialLinks).filter(([,v]) => v).length === 0 ? (
+              <p className="text-gray-600 text-xs italic">No social profiles added yet — brands can't find you externally</p>
+            ) : (
+              Object.entries(socialLinks).filter(([,v]) => v).map(([key, val]) => (
+                <a key={key} href={key === 'website' ? val : key === 'instagram' ? `https://instagram.com/${val.replace('@','')}` : key === 'youtube' ? `https://youtube.com/@${val.replace('@','')}` : key === 'tiktok' ? `https://tiktok.com/@${val.replace('@','')}` : `https://twitter.com/${val.replace('@','')}`}
+                  target="_blank" rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 text-xs bg-gray-900 border border-gray-800 hover:border-gray-600 text-gray-300 px-3 py-1.5 rounded-lg transition-colors capitalize">
+                  {key === 'website' ? '🌐' : key === 'instagram' ? '📸' : key === 'youtube' ? '▶️' : key === 'tiktok' ? '🎵' : '🐦'} {key}
+                </a>
+              ))
+            )}
+          </div>
+        )}
       </div>
 
       {/* Past collaborations */}

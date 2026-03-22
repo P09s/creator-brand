@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, DollarSign, Calendar, Users, Zap, Loader2, CheckCircle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBrowseCampaigns } from '../../hooks/useCampaigns';
-import { applyToCampaign } from '../../services/apiService';
+import { applyToCampaign, withdrawApplication } from '../../services/apiService';
 import useAuthStore from '../../store/authStore';
 import AIContentSuggestions from './AIContentSuggestions';
 import toast from 'react-hot-toast';
@@ -20,6 +20,7 @@ export default function BrowseCampaign({ initialSearchTerm = '', onClose }) {
   const [platformFilter, setPlatformFilter] = useState('');
   const [applying, setApplying] = useState(null);
   const [applied, setApplied] = useState(new Set());
+  const [withdrawing, setWithdrawing] = useState(null);
   const [selected, setSelected] = useState(null);
 
   const handleSearch = (e) => {
@@ -40,6 +41,20 @@ export default function BrowseCampaign({ initialSearchTerm = '', onClose }) {
       toast.error('Already applied or error occurred');
     } finally {
       setApplying(null);
+    }
+  };
+
+  const handleWithdraw = async (campaignId, e) => {
+    e.stopPropagation();
+    setWithdrawing(campaignId);
+    try {
+      await withdrawApplication(campaignId);
+      setApplied(prev => { const n = new Set(prev); n.delete(campaignId); return n; });
+      toast.success('Application withdrawn');
+    } catch (err) {
+      toast.error(err.message || 'Cannot withdraw — you may have been accepted');
+    } finally {
+      setWithdrawing(null);
     }
   };
 
@@ -121,13 +136,23 @@ export default function BrowseCampaign({ initialSearchTerm = '', onClose }) {
                       <div className="flex flex-wrap gap-4 text-xs text-gray-500">
                         <span className="flex items-center gap-1"><DollarSign className="w-3 h-3" />${c.budget?.toLocaleString()}</span>
                         <span className="flex items-center gap-1"><Calendar className="w-3 h-3" />{new Date(c.deadline).toLocaleDateString()}</span>
-                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{c.applicants?.length || 0} applicants</span>
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{c.applicants?.length > 10 ? "10+ applied" : c.applicants?.length > 0 ? `${c.applicants.length} applied` : "Be first to apply"}</span>
                       </div>
                     </div>
                     <div className="flex-shrink-0">
                       {isApplied ? (
-                        <div className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 text-green-400 px-4 py-2 rounded-xl text-xs font-medium">
-                          <CheckCircle className="w-3.5 h-3.5" /> Applied
+                        <div className="flex flex-col gap-1.5">
+                          <div className="flex items-center gap-1.5 bg-green-500/10 border border-green-500/20 text-green-400 px-3 py-2 rounded-xl text-xs font-medium">
+                            <CheckCircle className="w-3.5 h-3.5" /> Applied
+                          </div>
+                          <button
+                            onClick={e => handleWithdraw(c._id, e)}
+                            disabled={withdrawing === c._id}
+                            className="flex items-center justify-center gap-1 text-gray-600 hover:text-red-400 text-xs transition-colors px-1 py-0.5"
+                          >
+                            {withdrawing === c._id ? <Loader2 className="w-3 h-3 animate-spin" /> : null}
+                            Withdraw
+                          </button>
                         </div>
                       ) : (
                         <button

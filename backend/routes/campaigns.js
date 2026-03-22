@@ -8,6 +8,13 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 // GET all active campaigns (influencers browsing)
 router.get('/', authMiddleware, async (req, res) => {
+  // Auto-expire: mark any active campaigns past their deadline as completed
+  try {
+    await Campaign.updateMany(
+      { status: 'active', deadline: { $lt: new Date() } },
+      { $set: { status: 'completed' } }
+    );
+  } catch {} // non-blocking
   try {
     const { platform, category, search } = req.query;
     let query = { status: 'active' };
@@ -27,6 +34,12 @@ router.get('/', authMiddleware, async (req, res) => {
 
 // GET campaigns created by the brand
 router.get('/mine', authMiddleware, async (req, res) => {
+  try {
+    await Campaign.updateMany(
+      { brand: req.user.id, status: 'active', deadline: { $lt: new Date() } },
+      { $set: { status: 'completed' } }
+    );
+  } catch {}
   try {
     const campaigns = await Campaign.find({ brand: req.user.id }).sort({ createdAt: -1 });
     res.json(campaigns);
@@ -200,6 +213,32 @@ router.post('/:id/metrics', authMiddleware, async (req, res) => {
     });
     await campaign.save();
     res.json({ message: 'Metrics saved', campaign });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+// DELETE /:id/apply — creator withdraws their application
+router.delete('/:id/apply', authMiddleware, async (req, res) => {
+  try {
+    const campaign = await Campaign.findById(req.params.id);
+    if (!campaign) return res.status(404).json({ message: 'Campaign not found' });
+
+    const userId = req.user.id;
+    const wasApplicant = campaign.applicants.map(id => id.toString()).includes(userId);
+    const wasAccepted  = campaign.accepted.map(id => id.toString()).includes(userId);
+
+    if (!wasApplicant && !wasAccepted) {
+      return res.status(400).json({ message: 'You have not applied to this campaign' });
+    }
+    if (wasAccepted) {
+      return res.status(400).json({ message: 'You have already been accepted — contact the brand to withdraw' });
+    }
+
+    campaign.applicants = campaign.applicants.filter(id => id.toString() !== userId);
+    await campaign.save();
+    res.json({ message: 'Application withdrawn' });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
   }

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Shield, Star, Users, MessageSquare, ChevronDown, Loader2, Instagram, Youtube, Twitter } from 'lucide-react';
+import { Search, Shield, Star, Users, MessageSquare, ChevronDown, Loader2, Instagram, Youtube, Twitter, Globe } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getInfluencers, getTrustScore } from '../../services/apiService';
 import { useNavigate } from 'react-router-dom';

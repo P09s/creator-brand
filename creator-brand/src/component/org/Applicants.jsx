@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Users, Check, XCircle, Plus, Trash2, Loader2, Calendar, Star } from 'lucide-react';
+import {
+  X, Users, Check, XCircle, Plus, Trash2, Loader2, Calendar,
+  Star, ArrowUpDown, Instagram, Youtube, Globe
+} from 'lucide-react';
 import { getApplicants, acceptCreator, rejectCreator, createMilestone, getMilestones } from '../../services/apiService';
 import TrustBadge from '../shared/TrustBadge';
 import Avatar from '../shared/Avatar';
@@ -8,18 +11,20 @@ import toast from 'react-hot-toast';
 import { notifyAccepted } from '../../store/notificationStore';
 
 export default function Applicants({ campaign, onClose }) {
-  const [applicants, setApplicants] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [acting, setActing] = useState(null);
-  const [view, setView] = useState('list'); // 'list' | 'milestones'
+  const [applicants,    setApplicants]    = useState([]);
+  const [loading,       setLoading]       = useState(true);
+  const [acting,        setActing]        = useState(null);
+  const [view,          setView]          = useState('list'); // 'list' | 'milestones'
   const [selectedCreator, setSelectedCreator] = useState(null);
-  const [milestones, setMilestones] = useState([]);
-  const [newMilestone, setNewMilestone] = useState({ title: '', description: '', dueDate: '' });
+  const [milestones,    setMilestones]    = useState([]);
+  const [newMilestone,  setNewMilestone]  = useState({ title: '', description: '', dueDate: '' });
   const [savingMilestone, setSavingMilestone] = useState(false);
 
-  useEffect(() => {
-    fetchApplicants();
-  }, []);
+  // Filter + sort state
+  const [filter, setFilter] = useState('all');    // 'all' | 'pending' | 'accepted'
+  const [sortBy, setSortBy] = useState('applied'); // 'applied' | 'trust' | 'followers' | 'name'
+
+  useEffect(() => { fetchApplicants(); }, []);
 
   const fetchApplicants = async () => {
     setLoading(true);
@@ -40,8 +45,6 @@ export default function Applicants({ campaign, onClose }) {
       setApplicants(prev => prev.map(a =>
         a.user._id === creatorId ? { ...a, isAccepted: true } : a
       ));
-      // In real app, this notification goes to the creator's device
-      // For now it fires locally so the brand gets confirmation
       notifyAccepted(campaign.title, campaign.brandName || 'Brand');
       toast.success('Creator accepted!');
     } catch (err) {
@@ -100,6 +103,20 @@ export default function Applicants({ campaign, onClose }) {
     }
   };
 
+  // ── Derived: filtered + sorted list ────────────────────────────────────────
+  const displayedApplicants = [...applicants]
+    .filter(a => {
+      if (filter === 'pending')  return !a.isAccepted;
+      if (filter === 'accepted') return  a.isAccepted;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'trust')     return (b.trustScore || 0) - (a.trustScore || 0);
+      if (sortBy === 'followers') return (b.profile?.followers || 0) - (a.profile?.followers || 0);
+      if (sortBy === 'name')      return (a.user?.name || '').localeCompare(b.user?.name || '');
+      return 0; // 'applied' keeps original order
+    });
+
   const statusColor = {
     pending:   'bg-gray-500/10 text-gray-400 border-gray-500/20',
     submitted: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
@@ -127,7 +144,9 @@ export default function Applicants({ campaign, onClose }) {
                 {view === 'list' ? `Applicants — ${campaign.title}` : `Milestones for ${selectedCreator?.user?.name}`}
               </h2>
               <p className="text-gray-500 text-xs">
-                {view === 'list' ? `${applicants.length} people applied` : `${milestones.length} milestone${milestones.length !== 1 ? 's' : ''} set`}
+                {view === 'list'
+                  ? `${displayedApplicants.length}${filter !== 'all' ? ` of ${applicants.length}` : ''} applicant${applicants.length !== 1 ? 's' : ''}`
+                  : `${milestones.length} milestone${milestones.length !== 1 ? 's' : ''} set`}
               </p>
             </div>
           </div>
@@ -141,7 +160,43 @@ export default function Applicants({ campaign, onClose }) {
 
             {/* APPLICANTS LIST */}
             {view === 'list' && (
-              <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-3">
+              <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
+
+                {/* Filter + Sort bar — always visible when there are applicants */}
+                {!loading && applicants.length > 0 && (
+                  <div className="flex items-center gap-3 flex-wrap pb-2 border-b border-gray-800">
+                    {/* Filter pills */}
+                    <div className="flex items-center gap-1 bg-black border border-gray-800 rounded-xl p-1 flex-shrink-0">
+                      {[['all','All'], ['pending','Pending'], ['accepted','Accepted']].map(([val, label]) => (
+                        <button key={val} onClick={() => setFilter(val)}
+                          className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors ${
+                            filter === val ? 'bg-gray-700 text-white' : 'text-gray-500 hover:text-gray-300'
+                          }`}>
+                          {label}
+                          {val === 'all'      && ` (${applicants.length})`}
+                          {val === 'pending'  && ` (${applicants.filter(a => !a.isAccepted).length})`}
+                          {val === 'accepted' && ` (${applicants.filter(a =>  a.isAccepted).length})`}
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Sort */}
+                    <div className="flex items-center gap-2 ml-auto">
+                      <ArrowUpDown className="w-3.5 h-3.5 text-gray-600 flex-shrink-0" />
+                      <select
+                        value={sortBy}
+                        onChange={e => setSortBy(e.target.value)}
+                        className="bg-black border border-gray-800 rounded-lg px-2.5 py-1.5 text-xs text-gray-300 focus:outline-none focus:border-gray-600 cursor-pointer"
+                      >
+                        <option value="applied">Order applied</option>
+                        <option value="trust">Trust score ↓</option>
+                        <option value="followers">Followers ↓</option>
+                        <option value="name">Name A–Z</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+
                 {loading ? (
                   <div className="flex justify-center py-16"><Loader2 className="w-8 h-8 text-gray-600 animate-spin" /></div>
                 ) : applicants.length === 0 ? (
@@ -150,17 +205,18 @@ export default function Applicants({ campaign, onClose }) {
                     <p className="text-gray-500 text-sm">No applicants yet</p>
                     <p className="text-gray-600 text-xs mt-1">Share your campaign to attract creators</p>
                   </div>
-                ) : applicants.map((a, i) => (
-                  <motion.div
-                    key={a.user._id}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                ) : displayedApplicants.length === 0 ? (
+                  <div className="text-center py-10">
+                    <p className="text-gray-500 text-sm">No {filter} applicants</p>
+                  </div>
+                ) : displayedApplicants.map((a, i) => (
+                  <motion.div key={a.user._id}
+                    initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.04 }}
                     className={`bg-black border rounded-xl p-5 transition-colors ${a.isAccepted ? 'border-green-500/30' : 'border-gray-800 hover:border-gray-700'}`}
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-3 flex-1 min-w-0">
-                        {/* Avatar */}
                         <Avatar src={a.profile?.avatar} name={a.user?.name} size="md" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -171,12 +227,14 @@ export default function Applicants({ campaign, onClose }) {
                               <span className="text-xs bg-green-500/10 text-green-400 border border-green-500/20 px-2 py-0.5 rounded-full">Accepted</span>
                             )}
                           </div>
+
+                          {/* Stats row */}
                           <div className="flex flex-wrap gap-3 text-xs text-gray-500 mb-2">
                             {a.profile?.niche?.length > 0 && (
                               <span>{a.profile.niche.slice(0, 2).join(' · ')}</span>
                             )}
                             {a.profile?.followers > 0 && (
-                              <span>{(a.profile.followers / 1000).toFixed(1)}K followers</span>
+                              <span>{a.profile.followers >= 1000 ? `${(a.profile.followers/1000).toFixed(1)}K` : a.profile.followers} followers</span>
                             )}
                             {a.reviewCount > 0 && (
                               <span className="flex items-center gap-1">
@@ -185,8 +243,47 @@ export default function Applicants({ campaign, onClose }) {
                               </span>
                             )}
                           </div>
+
                           {a.profile?.bio && (
-                            <p className="text-gray-400 text-xs line-clamp-2">{a.profile.bio}</p>
+                            <p className="text-gray-400 text-xs line-clamp-2 mb-2">{a.profile.bio}</p>
+                          )}
+
+                          {/* Social links — tap through to actual profiles */}
+                          {a.profile?.socialLinks && (
+                            <div className="flex items-center gap-3 flex-wrap">
+                              {a.profile.socialLinks.instagram && (
+                                <a href={`https://instagram.com/${a.profile.socialLinks.instagram.replace('@','')}`}
+                                  target="_blank" rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()}
+                                  className="flex items-center gap-1 text-xs text-pink-400 hover:text-pink-300 transition-colors">
+                                  <Instagram className="w-3 h-3" /> @{a.profile.socialLinks.instagram.replace('@','')}
+                                </a>
+                              )}
+                              {a.profile.socialLinks.youtube && (
+                                <a href={`https://youtube.com/@${a.profile.socialLinks.youtube.replace('@','')}`}
+                                  target="_blank" rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()}
+                                  className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors">
+                                  <Youtube className="w-3 h-3" /> {a.profile.socialLinks.youtube.replace('@','')}
+                                </a>
+                              )}
+                              {a.profile.socialLinks.tiktok && (
+                                <a href={`https://tiktok.com/@${a.profile.socialLinks.tiktok.replace('@','')}`}
+                                  target="_blank" rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()}
+                                  className="text-xs text-gray-400 hover:text-gray-300 transition-colors">
+                                  TikTok @{a.profile.socialLinks.tiktok.replace('@','')}
+                                </a>
+                              )}
+                              {a.profile.socialLinks.website && (
+                                <a href={a.profile.socialLinks.website}
+                                  target="_blank" rel="noopener noreferrer"
+                                  onClick={e => e.stopPropagation()}
+                                  className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                                  <Globe className="w-3 h-3" /> Portfolio
+                                </a>
+                              )}
+                            </div>
                           )}
                         </div>
                       </div>
@@ -195,30 +292,21 @@ export default function Applicants({ campaign, onClose }) {
                       <div className="flex flex-col gap-2 flex-shrink-0">
                         {!a.isAccepted ? (
                           <>
-                            <button
-                              onClick={() => handleAccept(a.user._id)}
-                              disabled={acting === a.user._id + '_accept'}
-                              className="flex items-center gap-1.5 bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 text-green-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
-                            >
+                            <button onClick={() => handleAccept(a.user._id)} disabled={acting === a.user._id + '_accept'}
+                              className="flex items-center gap-1.5 bg-green-500/10 hover:bg-green-500/20 border border-green-500/30 text-green-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50">
                               {acting === a.user._id + '_accept' ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />}
                               Accept
                             </button>
-                            <button
-                              onClick={() => handleReject(a.user._id)}
-                              disabled={acting === a.user._id + '_reject'}
-                              className="flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50"
-                            >
+                            <button onClick={() => handleReject(a.user._id)} disabled={acting === a.user._id + '_reject'}
+                              className="flex items-center gap-1.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors disabled:opacity-50">
                               {acting === a.user._id + '_reject' ? <Loader2 className="w-3 h-3 animate-spin" /> : <XCircle className="w-3 h-3" />}
                               Reject
                             </button>
                           </>
                         ) : (
-                          <button
-                            onClick={() => openMilestones(a)}
-                            className="flex items-center gap-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors"
-                          >
-                            <Calendar className="w-3 h-3" />
-                            Set milestones
+                          <button onClick={() => openMilestones(a)}
+                            className="flex items-center gap-1.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/30 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors">
+                            <Calendar className="w-3 h-3" /> Set milestones
                           </button>
                         )}
                       </div>
@@ -235,67 +323,50 @@ export default function Applicants({ campaign, onClose }) {
                   Set clear deliverables for {selectedCreator?.user?.name}. They'll see these as tasks to complete — no more WhatsApp confusion.
                 </div>
 
-                {/* Existing milestones */}
                 {milestones.length > 0 && (
                   <div className="space-y-2">
                     {milestones.map((m, i) => (
                       <div key={m._id} className="bg-black border border-gray-800 rounded-xl p-4">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-start gap-3">
-                            <span className="w-6 h-6 rounded-full bg-gray-800 text-gray-400 text-xs flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
-                            <div>
-                              <p className="text-white text-sm font-medium">{m.title}</p>
-                              {m.description && <p className="text-gray-500 text-xs mt-0.5">{m.description}</p>}
-                              <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
-                                <span>Due {new Date(m.dueDate).toLocaleDateString()}</span>
-                                <span className={`px-2 py-0.5 rounded-full border capitalize ${statusColor[m.status]}`}>{m.status}</span>
-                              </div>
+                        <div className="flex items-start gap-3">
+                          <span className="w-6 h-6 rounded-full bg-gray-800 text-gray-400 text-xs flex items-center justify-center flex-shrink-0 mt-0.5">{i + 1}</span>
+                          <div className="flex-1">
+                            <p className="text-white text-sm font-medium">{m.title}</p>
+                            {m.description && <p className="text-gray-500 text-xs mt-0.5">{m.description}</p>}
+                            <div className="flex items-center gap-3 mt-2 text-xs text-gray-500">
+                              <span>Due {new Date(m.dueDate).toLocaleDateString()}</span>
+                              <span className={`px-2 py-0.5 rounded-full border capitalize ${statusColor[m.status]}`}>{m.status}</span>
                             </div>
-                          </div>
-                        </div>
-                        {m.submissionNote && (
-                          <div className="mt-3 bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
-                            <p className="text-blue-400 text-xs font-medium mb-1">Creator's submission:</p>
-                            <p className="text-gray-300 text-xs">{m.submissionNote}</p>
-                            {m.submissionUrl && (
-                              <a href={m.submissionUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs underline mt-1 block">View link</a>
+                            {m.submissionNote && (
+                              <div className="mt-3 bg-blue-500/5 border border-blue-500/20 rounded-lg p-3">
+                                <p className="text-blue-400 text-xs font-medium mb-1">Creator's submission:</p>
+                                <p className="text-gray-300 text-xs">{m.submissionNote}</p>
+                                {m.submissionUrl && (
+                                  <a href={m.submissionUrl} target="_blank" rel="noopener noreferrer" className="text-blue-400 text-xs underline mt-1 block">View link</a>
+                                )}
+                              </div>
                             )}
                           </div>
-                        )}
+                        </div>
                       </div>
                     ))}
                   </div>
                 )}
 
-                {/* Add new milestone */}
                 <div className="bg-black border border-gray-800 rounded-xl p-5">
                   <p className="text-gray-400 text-xs font-medium mb-4 uppercase tracking-wider">Add milestone</p>
                   <div className="space-y-3">
-                    <input
-                      value={newMilestone.title}
-                      onChange={e => setNewMilestone(p => ({ ...p, title: e.target.value }))}
+                    <input value={newMilestone.title} onChange={e => setNewMilestone(p => ({ ...p, title: e.target.value }))}
                       placeholder="e.g. Submit draft Reel for review"
-                      className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600"
-                    />
-                    <input
-                      value={newMilestone.description}
-                      onChange={e => setNewMilestone(p => ({ ...p, description: e.target.value }))}
+                      className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600" />
+                    <input value={newMilestone.description} onChange={e => setNewMilestone(p => ({ ...p, description: e.target.value }))}
                       placeholder="Details or requirements (optional)"
-                      className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600"
-                    />
+                      className="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm placeholder:text-gray-600 focus:outline-none focus:border-gray-600" />
                     <div className="flex gap-3">
-                      <input
-                        type="date"
-                        value={newMilestone.dueDate}
-                        onChange={e => setNewMilestone(p => ({ ...p, dueDate: e.target.value }))}
+                      <input type="date" value={newMilestone.dueDate} onChange={e => setNewMilestone(p => ({ ...p, dueDate: e.target.value }))}
                         min={new Date().toISOString().split('T')[0]}
-                        className="flex-1 bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gray-600"
-                      />
-                      <button
-                        onClick={handleAddMilestone}
-                        disabled={savingMilestone}
-                        className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-5 py-3 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50"
-                      >
+                        className="flex-1 bg-gray-950 border border-gray-800 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-gray-600" />
+                      <button onClick={handleAddMilestone} disabled={savingMilestone}
+                        className="flex items-center gap-2 bg-white hover:bg-gray-100 text-black px-5 py-3 rounded-xl text-sm font-semibold transition-colors disabled:opacity-50">
                         {savingMilestone ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                         Add
                       </button>

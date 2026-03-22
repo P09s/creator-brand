@@ -274,3 +274,30 @@ export const uploadAvatar = async (base64Image) =>
     headers: authHeaders(),
     body: JSON.stringify({ avatar: base64Image }),
   }));
+// ── P1 features ───────────────────────────────────────────────────────────────
+export const withdrawApplication = async (campaignId) =>
+  handleResponse(await fetch(`${API_URL}/campaigns/${campaignId}/apply`, {
+    method: 'DELETE', headers: authHeaders(),
+  }));
+
+export const duplicateCampaign = async (campaignId) => {
+  // Fetch the campaign then create a copy
+  const original = await handleResponse(await fetch(`${API_URL}/campaigns/${campaignId}`, {
+    headers: authHeaders(),
+  }));
+  const copy = {
+    title: `${original.title} (Copy)`,
+    description: original.description,
+    platform: original.platform,
+    category: original.category,
+    budget: original.budget,
+    deadline: original.deadline,
+    requirements: original.requirements,
+    targetAudience: original.targetAudience,
+    brandName: original.brandName,
+    openToNewCreators: original.openToNewCreators,
+  };
+  return handleResponse(await fetch(`${API_URL}/campaigns`, {
+    method: 'POST', headers: authHeaders(), body: JSON.stringify(copy),
+  }));
+};

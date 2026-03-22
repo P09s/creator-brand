@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Calendar, Target, DollarSign, Users, Plus, Trash2, Loader2, Sparkles, Search } from 'lucide-react';
+import { Calendar, Target, DollarSign, Users, Plus, Trash2, Loader2, Sparkles, Search, Copy, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useCampaigns } from '../../hooks/useCampaigns';
+import { duplicateCampaign } from '../../services/apiService';
 import AIBriefGenerator from './AIBriefGenerator';
 import CampaignModal from './campaign/campaignModal';
 import Applicants from './Applicants';
@@ -22,6 +23,7 @@ export default function OrgCampaigns() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [prefillData, setPrefillData] = useState(null);
   const [deleting, setDeleting] = useState(null);
+  const [duplicating, setDuplicating] = useState(null);
   const [applicantsCampaign, setApplicantsCampaign] = useState(null);
 
   const filtered = campaigns.filter(c => {
@@ -106,6 +108,11 @@ export default function OrgCampaigns() {
                     <div className="flex items-center gap-2 mb-2 flex-wrap">
                       <h3 className="text-white font-medium text-sm">{c.title}</h3>
                       <span className={`px-2 py-0.5 text-xs rounded-full capitalize ${statusColors[c.status] || statusColors.draft}`}>{c.status}</span>
+                      {new Date(c.deadline) < new Date() && c.status !== 'completed' && (
+                        <span className="flex items-center gap-1 text-xs bg-red-500/10 text-red-400 border border-red-500/20 px-2 py-0.5 rounded-full">
+                          <Clock className="w-3 h-3" /> Expired
+                        </span>
+                      )}
                     </div>
                     <p className="text-gray-400 text-xs mb-3 line-clamp-2">{c.description}</p>
                     <div className="flex flex-wrap items-center gap-4 text-xs text-gray-500">
@@ -129,10 +136,16 @@ export default function OrgCampaigns() {
                       </div>
                     )}
                   </div>
-                  <button onClick={() => handleDelete(c._id)} disabled={deleting === c._id}
-                    className="p-2 text-gray-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors flex-shrink-0">
-                    {deleting === c._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                  </button>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => handleDuplicate(c._id)} disabled={duplicating === c._id}
+                      className="p-2 text-gray-600 hover:text-blue-400 hover:bg-blue-400/10 rounded-lg transition-colors" title="Duplicate campaign">
+                      {duplicating === c._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
+                    </button>
+                    <button onClick={() => handleDelete(c._id)} disabled={deleting === c._id}
+                      className="p-2 text-gray-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors" title="Delete campaign">
+                      {deleting === c._id ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}

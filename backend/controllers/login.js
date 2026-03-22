@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Profile = require('../models/Profile');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -10,7 +11,19 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.json({ token, user: { name: user.name, email: user.email, userType: user.userType } });
+    // Also fetch profile so client gets avatar on login
+    const profile = await Profile.findOne({ user: user._id }).select('avatar socialLinks');
+    res.json({
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        userType: user.userType,
+        userName: user.userName,
+        avatar: profile?.avatar || '',
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -27,7 +40,17 @@ exports.register = async (req, res) => {
     const user = new User({ name, email, password: hashedPassword, userType });
     await user.save();
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    res.status(201).json({ token, user: { name, email, userType } });
+    res.status(201).json({
+      token,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        userType: user.userType,
+        userName: user.userName,
+        avatar: '',
+      }
+    });
   } catch (error) {
     console.error('Register error:', error);
     res.status(500).json({ message: 'Server error' });

@@ -29,6 +29,15 @@ const profileSchema = new mongoose.Schema({
   }],
 
   // ── Brand specific ────────────────────────────────────────────────────
+  // Social profile links
+  socialLinks: {
+    instagram: { type: String, default: '' },
+    youtube:   { type: String, default: '' },
+    tiktok:    { type: String, default: '' },
+    twitter:   { type: String, default: '' },
+    website:   { type: String, default: '' },
+  },
+
   website:          { type: String, default: '' },
   industry:         { type: String, default: '' },
   campaignTypes:    { type: [String], default: [] },
