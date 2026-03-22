@@ -368,7 +368,7 @@ export default function Settings() {
         </div>
       </Section>
 
-      <p className="text-gray-700 text-xs text-center">LinkFluence · Built by CyberPunks</p>
+      <p className="text-gray-700 text-xs text-center">Liflu · Built by CyberPunks</p>
     </div>
   );
 }

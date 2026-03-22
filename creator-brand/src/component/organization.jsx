@@ -65,7 +65,7 @@ export default function OrganizationLanding() {
       {/* Features Section */}
       <section className="mt-28 max-w-6xl mx-auto text-center">
         <h2 className="text-4xl font-bold font-satoshi mb-8">
-          Why Brands Choose LinkFluence
+          Why Brands Choose Liflu
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left px-4 md:px-0">
           {features.map((feature, i) => (

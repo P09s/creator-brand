@@ -9,7 +9,7 @@ import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 const CREATOR_STEPS = [
   {
     id: 'welcome',
-    title: 'Welcome to LinkFluence! 👋',
+    title: 'Welcome to Liflu! 👋',
     description: 'You\'re now part of the platform that connects real creators with real brands — no fake followers, no getting ghosted. Let\'s show you around in 30 seconds.',
     target: null, // No spotlight — full screen welcome card
     position: 'center',
@@ -54,7 +54,7 @@ const CREATOR_STEPS = [
 const BRAND_STEPS = [
   {
     id: 'welcome',
-    title: 'Welcome to LinkFluence! 👋',
+    title: 'Welcome to Liflu! 👋',
     description: 'The platform that connects brands with verified creators — with escrow payments, milestone tracking, and trust scores built in. Let\'s take a quick look around.',
     target: null,
     position: 'center',

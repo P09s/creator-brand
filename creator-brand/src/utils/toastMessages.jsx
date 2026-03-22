@@ -54,7 +54,7 @@ const toastStyles = {
 
 export const showWelcomeToast = (user, isNewUser = false) => {
   const message = isNewUser 
-    ? `Welcome to LinkFluence, ${user.name}! 🎉`
+    ? `Welcome to Liflu, ${user.name}! 🎉`
     : `Welcome back, ${user.name}! 👋`;
   
   const emoji = isNewUser ? '🚀' : '✨';

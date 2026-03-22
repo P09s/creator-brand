@@ -79,7 +79,7 @@ function CreatorOnboarding({ user, onDone }) {
     // Step 0 — welcome
     <div key="welcome" className="text-center">
       <div className="mx-auto mb-6 flex justify-center"><Avatar src={user?.avatar} name={user?.name} size="xl" /></div>
-      <h2 className="text-2xl font-bold text-white mb-2">Welcome to LinkFluence, {user?.name?.split(' ')[0]}!</h2>
+      <h2 className="text-2xl font-bold text-white mb-2">Welcome to Liflu, {user?.name?.split(' ')[0]}!</h2>
       <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
         Let's set up your creator profile in 3 quick steps so brands can discover you.
       </p>
@@ -186,7 +186,7 @@ function BrandOnboarding({ user, onDone }) {
     // Step 0 — welcome
     <div key="welcome" className="text-center">
       <div className="mx-auto mb-6 flex justify-center"><Avatar src={user?.avatar} name={user?.name} size="xl" /></div>
-      <h2 className="text-2xl font-bold text-white mb-2">Welcome to LinkFluence, {user?.name?.split(' ')[0]}!</h2>
+      <h2 className="text-2xl font-bold text-white mb-2">Welcome to Liflu, {user?.name?.split(' ')[0]}!</h2>
       <p className="text-gray-400 text-sm leading-relaxed mb-8 max-w-xs mx-auto">
         Let's set up your brand profile so creators know who they're working with.
       </p>

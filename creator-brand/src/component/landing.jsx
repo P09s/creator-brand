@@ -138,7 +138,7 @@ function Landing() {
 
         {/* Hero Heading with Animation */}
         <TextGenerateEffect
-          words="Welcome to LinkFluence, the platform that connects brands with influencers for seamless collaborations."
+          words="Welcome to Liflu, the platform that connects brands with influencers for seamless collaborations."
           className="text-3xl sm:text-4xl md:text-5xl leading-tight max-w-4xl w-full"
         />
 

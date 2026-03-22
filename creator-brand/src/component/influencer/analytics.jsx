@@ -141,7 +141,7 @@ function SocialReachSection({ stats, onSave }) {
           <div>
             <p className="text-amber-300 text-xs leading-relaxed">
               Stats are self-reported and shown with a "Self-reported" label to brands.
-              To get a <span className="font-semibold">Verified</span> badge, email a screenshot of your analytics dashboard to <span className="text-white">verify@linkfluence.in</span> — we review within 24 hours.
+              To get a <span className="font-semibold">Verified</span> badge, email a screenshot of your analytics dashboard to <span className="text-white">verify@liflu.in</span> — we review within 24 hours.
             </p>
           </div>
         </div>

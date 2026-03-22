@@ -5,9 +5,9 @@ const getStorageKey = () => {
   try {
     const auth = JSON.parse(localStorage.getItem('auth-storage') || '{}');
     const userId = auth?.state?.user?._id;
-    return userId ? `linkfluence-notif-${userId}` : 'linkfluence-notif-guest';
+    return userId ? `liflu-notif-${userId}` : 'liflu-notif-guest';
   } catch {
-    return 'linkfluence-notif-guest';
+    return 'liflu-notif-guest';
   }
 };
 

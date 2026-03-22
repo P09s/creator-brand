@@ -102,7 +102,7 @@ const Sidebar = ({
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <h1 className="text-xl text-white font-bold font-satoshi tracking-tight">LinkFluence</h1>
+                  <h1 className="text-xl text-white font-bold font-satoshi tracking-tight">Liflu</h1>
                   <p className="text-xs text-gray-400 font-medium">
                     Influencer
                   </p>

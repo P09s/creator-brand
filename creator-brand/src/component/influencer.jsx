@@ -33,7 +33,7 @@ export default function Influencer() {
             Grow Your Influence. Get Paid to Collaborate.
           </h1>
           <p className="text-gray-400 text-lg font-satoshi">
-            Connect with trusted brands and monetize your reach. LinkFluence helps you focus on what you love—creating.
+            Connect with trusted brands and monetize your reach. Liflu helps you focus on what you love—creating.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <div className="flex gap-4">
@@ -66,7 +66,7 @@ export default function Influencer() {
       {/* Perks Section */}
       <section className="mt-28 max-w-6xl mx-auto text-center">
         <h2 className="text-4xl font-bold font-satoshi mb-8">
-          Why Creators Love LinkFluence
+          Why Creators Love Liflu
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-left px-4 md:px-0">
           {perks.map((perk, i) => (

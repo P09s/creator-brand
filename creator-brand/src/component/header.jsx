@@ -68,7 +68,7 @@ function Header({ setHeaderHeight }) {
               onClick={() => navigate('/', { replace: true })}
             >
               <img className="size-12" src="src/assets/img/logo.png" alt="logo" />
-              <span className="text-white font-bold font-satoshi text-xl">LinkFluence</span>
+              <span className="text-white font-bold font-satoshi text-xl">Liflu</span>
             </div>
 
             {/* Desktop Navigation */}
