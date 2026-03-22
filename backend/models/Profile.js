@@ -13,11 +13,33 @@ const profileSchema = new mongoose.Schema({
 
   // Self-reported social stats per platform
   socialStats: {
-    instagram: { followers: { type: Number, default: 0 }, engagementRate: { type: Number, default: 0 }, verified: { type: Boolean, default: false } },
-    youtube:   { followers: { type: Number, default: 0 }, engagementRate: { type: Number, default: 0 }, verified: { type: Boolean, default: false } },
-    twitter:   { followers: { type: Number, default: 0 }, engagementRate: { type: Number, default: 0 }, verified: { type: Boolean, default: false } },
-    tiktok:    { followers: { type: Number, default: 0 }, engagementRate: { type: Number, default: 0 }, verified: { type: Boolean, default: false } },
+    instagram: {
+      handle:        { type: String,  default: '' },
+      followers:     { type: Number,  default: 0  },
+      engagementRate:{ type: Number,  default: 0  },
+      verified:      { type: Boolean, default: false },
+    },
+    youtube: {
+      handle:         { type: String,  default: '' },
+      subscribers:    { type: Number,  default: 0  },
+      avgViews:       { type: Number,  default: 0  }, // avg views per video
+      verified:       { type: Boolean, default: false },
+    },
+    tiktok: {
+      handle:        { type: String,  default: '' },
+      followers:     { type: Number,  default: 0  },
+      avgViews:      { type: Number,  default: 0  },
+      verified:      { type: Boolean, default: false },
+    },
+    twitter: {
+      handle:        { type: String,  default: '' },
+      followers:     { type: Number,  default: 0  },
+      verified:      { type: Boolean, default: false },
+    },
   },
+
+  // Content format the creator specialises in
+  contentType: { type: String, default: '' }, // 'short-form' | 'long-form' | 'mixed' | 'stories-live'
 
   portfolio: [{
     brandName:     String,

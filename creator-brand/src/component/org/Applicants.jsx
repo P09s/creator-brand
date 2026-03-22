@@ -162,8 +162,8 @@ export default function Applicants({ campaign, onClose }) {
             {view === 'list' && (
               <motion.div key="list" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="space-y-4">
 
-                {/* Filter + Sort bar — always visible when there are applicants */}
-                {!loading && applicants.length > 0 && (
+                {/* Filter + Sort bar */}
+                {!loading && (
                   <div className="flex items-center gap-3 flex-wrap pb-2 border-b border-gray-800">
                     {/* Filter pills */}
                     <div className="flex items-center gap-1 bg-black border border-gray-800 rounded-xl p-1 flex-shrink-0">

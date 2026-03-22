@@ -3,6 +3,7 @@ const router = express.Router();
 const { login, register } = require('../controllers/login');
 const authMiddleware = require('../middlewares/authMiddleware');
 const User = require('../models/User');
+const Profile = require('../models/Profile');
 
 router.post('/login', login);
 router.post('/register', register);
@@ -10,13 +11,20 @@ router.post('/register', register);
 // Protected profile route
 router.get('/profile', authMiddleware, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("-password"); // exclude password
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json(user);
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    // Merge avatar from Profile so client always has it on refresh
+    const profile = await Profile.findOne({ user: req.user.id }).select('avatar');
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      userType: user.userType,
+      userName: user.userName,
+      avatar: profile?.avatar || '',
+    });
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: 'Server error' });
   }
 });
 
@@ -65,6 +73,7 @@ router.post('/forgot-password', async (req, res) => {
     const { email } = req.body;
     if (!email) return res.status(400).json({ message: 'Email required' });
     const User = require('../models/User');
+const Profile = require('../models/Profile');
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     // Always return success to prevent email enumeration
     if (!user) return res.json({ message: 'If that email exists, a reset link has been sent.' });
@@ -98,6 +107,7 @@ router.post('/reset-password', async (req, res) => {
     if (newPassword.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters' });
 
     const User = require('../models/User');
+const Profile = require('../models/Profile');
     const bcrypt = require('bcryptjs');
     const user = await User.findOne({
       resetToken: token,

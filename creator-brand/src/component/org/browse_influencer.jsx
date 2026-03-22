@@ -130,6 +130,44 @@ export default function BrowseInfluencer() {
                     </p>
                   )}
 
+                  {/* Social links — tap through to actual profiles */}
+                  {profile?.socialLinks && Object.values(profile.socialLinks).some(v => v) && (
+                    <div className="flex items-center gap-3 mb-3 flex-wrap">
+                      {profile.socialLinks.instagram && (
+                        <a href={`https://instagram.com/${profile.socialLinks.instagram.replace('@','')}`}
+                          target="_blank" rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="flex items-center gap-1 text-xs text-pink-400 hover:text-pink-300 transition-colors">
+                          <Instagram className="w-3 h-3" /> {profile.socialLinks.instagram.replace('@','')}
+                        </a>
+                      )}
+                      {profile.socialLinks.youtube && (
+                        <a href={`https://youtube.com/@${profile.socialLinks.youtube.replace('@','')}`}
+                          target="_blank" rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="flex items-center gap-1 text-xs text-red-400 hover:text-red-300 transition-colors">
+                          <Youtube className="w-3 h-3" /> {profile.socialLinks.youtube.replace('@','')}
+                        </a>
+                      )}
+                      {profile.socialLinks.tiktok && (
+                        <a href={`https://tiktok.com/@${profile.socialLinks.tiktok.replace('@','')}`}
+                          target="_blank" rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="text-xs text-gray-400 hover:text-gray-300 transition-colors">
+                          TikTok @{profile.socialLinks.tiktok.replace('@','')}
+                        </a>
+                      )}
+                      {profile.socialLinks.website && (
+                        <a href={profile.socialLinks.website}
+                          target="_blank" rel="noopener noreferrer"
+                          onClick={e => e.stopPropagation()}
+                          className="flex items-center gap-1 text-xs text-blue-400 hover:text-blue-300 transition-colors">
+                          <Globe className="w-3 h-3" /> Portfolio
+                        </a>
+                      )}
+                    </div>
+                  )}
+
                   <button
                     onClick={() => navigate(`/org_dashboard/messages?with=${user._id}`)}
                     className="w-full flex items-center justify-center gap-2 border border-gray-800 hover:border-gray-600 text-gray-300 hover:text-white py-2.5 rounded-xl text-xs font-medium transition-colors"
