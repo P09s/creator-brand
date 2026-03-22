@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Message = require('../models/Message');
 const User = require('../models/User');
+const Profile = require('../models/Profile');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 // GET all conversations for current user (grouped by other user)
@@ -27,8 +28,9 @@ router.get('/conversations', authMiddleware, async (req, res) => {
     // Populate user details
     const conversations = await Promise.all(
       Object.entries(conversationMap).map(async ([otherId, data]) => {
-        const user = await User.findById(otherId).select('name userName userType');
-        return { user, lastMessage: data.lastMessage, unread: data.unread };
+        const user    = await User.findById(otherId).select('name userName userType');
+        const profile = await Profile.findOne({ user: otherId }).select('avatar');
+        return { user, profile, lastMessage: data.lastMessage, unread: data.unread };
       })
     );
 

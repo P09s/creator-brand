@@ -34,6 +34,7 @@ import { applyToCampaign } from '../../services/apiService';
 import { notifyApplied } from '../../store/notificationStore';
 import NotificationPanel from '../shared/NotificationPanel';
 import Onboarding from '../shared/Onboarding';
+import { HelpButton } from '../shared/HelpPanel';
 import ProductTour from '../shared/ProductTour';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
@@ -358,6 +359,7 @@ const InfluencerDashboard = () => {
             </div>
             
             <div className="flex items-center gap-6">
+              <HelpButton userType="influencer" />
               <NotificationPanel isOpen={notifOpen} onToggle={() => setNotifOpen(o => !o)} />
               
               <div className="flex items-center gap-3">

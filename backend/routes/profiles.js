@@ -7,37 +7,44 @@ const Review = require('../models/Review');
 const authMiddleware = require('../middlewares/authMiddleware');
 
 // ── Completion score helper ───────────────────────────────────────────────────
-function calcCompletionScore(profile, user, completedCampaigns) {
+function calcCompletionScore(profile, user, completedCampaigns, totalCampaigns) {
   const isInfluencer = user.userType === 'influencer';
-  let score = 0;
   const steps = [];
 
   if (isInfluencer) {
-    const hasBio = profile.bio?.trim().length > 10;
-    const hasNiche = profile.niche?.length > 0;
-    const hasFollowers = profile.followers > 0 ||
-      Object.values(profile.socialStats || {}).some(p => p.followers > 0);
+    const hasBio      = profile.bio?.trim().length > 10;
+    const hasNiche    = profile.niche?.length > 0;
+    // Check followers OR subscribers (YouTube) in socialStats
+    const ss = profile.socialStats || {};
+    const hasSocialHandle = !!(
+      ss.instagram?.handle || ss.youtube?.handle ||
+      ss.tiktok?.handle    || ss.twitter?.handle ||
+      ss.instagram?.followers > 0 || ss.youtube?.subscribers > 0 ||
+      ss.tiktok?.followers > 0   || profile.followers > 0
+    );
     const hasPortfolio = profile.portfolio?.length > 0;
-    const hasCampaigns = completedCampaigns > 0;
+    // Achievable: just need to APPLY and get accepted once, not COMPLETE
+    const hasActiveCampaign = completedCampaigns > 0 || totalCampaigns > 0;
 
-    steps.push({ key: 'bio', label: 'Add a bio', done: hasBio, points: 20 });
-    steps.push({ key: 'niche', label: 'Select your niche', done: hasNiche, points: 20 });
-    steps.push({ key: 'followers', label: 'Add follower counts', done: hasFollowers, points: 20 });
-    steps.push({ key: 'portfolio', label: 'Add past work', done: hasPortfolio, points: 20 });
-    steps.push({ key: 'campaign', label: 'Complete first campaign', done: hasCampaigns, points: 20 });
+    steps.push({ key: 'bio',      label: 'Add a bio',               done: hasBio,            points: 25 });
+    steps.push({ key: 'niche',    label: 'Select your niche',        done: hasNiche,          points: 25 });
+    steps.push({ key: 'social',   label: 'Add a social handle',      done: hasSocialHandle,   points: 25 });
+    steps.push({ key: 'portfolio',label: 'Add past work',            done: hasPortfolio,      points: 25 });
+    // "Complete first campaign" is now a BONUS shown on TrustBadge, not blocking profile score
   } else {
-    const hasBio = profile.bio?.trim().length > 10;
+    const hasBio      = profile.bio?.trim().length > 10;
     const hasIndustry = profile.industry?.trim().length > 0;
-    const hasWebsite = profile.website?.trim().length > 0;
-    const hasCampaign = completedCampaigns > 0;
+    const hasWebsite  = profile.website?.trim().length > 0;
+    // For brands: count ANY campaign posted (active OR completed), not just completed
+    const hasPostedCampaign = totalCampaigns > 0;
 
-    steps.push({ key: 'bio', label: 'Write brand description', done: hasBio, points: 25 });
-    steps.push({ key: 'industry', label: 'Set your industry', done: hasIndustry, points: 25 });
-    steps.push({ key: 'website', label: 'Add website', done: hasWebsite, points: 25 });
-    steps.push({ key: 'campaign', label: 'Post first campaign', done: hasCampaign, points: 25 });
+    steps.push({ key: 'bio',      label: 'Write brand description', done: hasBio,            points: 25 });
+    steps.push({ key: 'industry', label: 'Set your industry',       done: hasIndustry,       points: 25 });
+    steps.push({ key: 'website',  label: 'Add website',             done: hasWebsite,        points: 25 });
+    steps.push({ key: 'campaign', label: 'Post first campaign',     done: hasPostedCampaign, points: 25 });
   }
 
-  score = steps.filter(s => s.done).reduce((sum, s) => sum + s.points, 0);
+  const score = steps.filter(s => s.done).reduce((sum, s) => sum + s.points, 0);
   return { score, steps };
 }
 
@@ -53,8 +60,11 @@ router.get('/me', authMiddleware, async (req, res) => {
     const completedCampaigns = user.userType === 'influencer'
       ? await Campaign.countDocuments({ accepted: req.user.id, status: 'completed' })
       : await Campaign.countDocuments({ brand: req.user.id, status: 'completed' });
+    const totalCampaigns = user.userType === 'influencer'
+      ? await Campaign.countDocuments({ accepted: req.user.id })
+      : await Campaign.countDocuments({ brand: req.user.id });
 
-    const { score, steps } = calcCompletionScore(profile, user, completedCampaigns);
+    const { score, steps } = calcCompletionScore(profile, user, completedCampaigns, totalCampaigns);
     res.json({ ...profile.toObject(), completionScore: score, completionSteps: steps });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });
@@ -64,16 +74,35 @@ router.get('/me', authMiddleware, async (req, res) => {
 // ── PUT update own profile ────────────────────────────────────────────────────
 router.put('/me', authMiddleware, async (req, res) => {
   try {
+    // Flatten nested objects to dot notation so partial updates don't wipe siblings
+    // e.g. { socialStats: { youtube: {..} } } => { 'socialStats.youtube': {..} }
+    function flatten(obj, prefix = '') {
+      return Object.keys(obj).reduce((acc, key) => {
+        const full = prefix ? `${prefix}.${key}` : key;
+        const val  = obj[key];
+        if (val && typeof val === 'object' && !Array.isArray(val) && !(val instanceof Date)) {
+          Object.assign(acc, flatten(val, full));
+        } else {
+          acc[full] = val;
+        }
+        return acc;
+      }, {});
+    }
+    const flatBody = flatten(req.body);
+
     const profile = await Profile.findOneAndUpdate(
       { user: req.user.id },
-      { $set: req.body },
+      { $set: flatBody },
       { new: true, upsert: true }
     );
     const user = await User.findById(req.user.id);
     const completedCampaigns = user.userType === 'influencer'
       ? await Campaign.countDocuments({ accepted: req.user.id, status: 'completed' })
       : await Campaign.countDocuments({ brand: req.user.id, status: 'completed' });
-    const { score, steps } = calcCompletionScore(profile, user, completedCampaigns);
+    const totalCampaigns = user.userType === 'influencer'
+      ? await Campaign.countDocuments({ accepted: req.user.id })
+      : await Campaign.countDocuments({ brand: req.user.id });
+    const { score, steps } = calcCompletionScore(profile, user, completedCampaigns, totalCampaigns);
     res.json({ ...profile.toObject(), completionScore: score, completionSteps: steps });
   } catch (err) {
     res.status(500).json({ message: 'Server error' });

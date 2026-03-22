@@ -32,6 +32,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import NotificationPanel from '../shared/NotificationPanel';
 import Onboarding from '../shared/Onboarding';
+import { HelpButton } from '../shared/HelpPanel';
 import ProductTour from '../shared/ProductTour';
 import Sidebar from './sidebar';
 import PortfolioOverview from './PortfolioOverview';
@@ -331,6 +332,7 @@ const Org_dashboard = () => {
             </div>
             
             <div className="flex items-center gap-6">
+              <HelpButton userType="brand" />
               <NotificationPanel isOpen={notifOpen} onToggle={() => setNotifOpen(o => !o)} />
               
               <div className="flex items-center gap-3">

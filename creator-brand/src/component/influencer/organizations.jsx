@@ -4,12 +4,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getBrands } from '../../services/apiService';
 import { useNavigate } from 'react-router-dom';
 import Avatar from '../shared/Avatar';
+import ProfileModal from '../shared/ProfileModal';
 import toast from 'react-hot-toast';
 
 const INDUSTRIES = ['All', 'Fashion', 'Technology', 'Food', 'Fitness', 'Travel', 'Beauty', 'Gaming', 'Education'];
 
 export default function Organizations() {
   const [brands, setBrands] = useState([]);
+  const [selectedProfile, setSelectedProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [industry, setIndustry] = useState('All');
@@ -76,7 +78,8 @@ export default function Organizations() {
           <AnimatePresence>
             {filtered.map(({ user, profile }, i) => (
               <motion.div key={user._id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-                className="bg-gray-950 border border-gray-800 rounded-xl p-5 hover:border-gray-700 transition-colors flex flex-col">
+                onClick={() => setSelectedProfile({ user, profile })}
+                className="bg-gray-950 border border-gray-800 rounded-xl p-5 hover:border-gray-600 transition-all cursor-pointer flex flex-col">
                 {/* Brand header */}
                 <div className="flex items-center gap-3 mb-4">
                   <Avatar src={profile?.avatar} name={user.name} size="lg" shape="rounded" />
@@ -117,6 +120,14 @@ export default function Organizations() {
             ))}
           </AnimatePresence>
         </div>
+      )}
+      {selectedProfile && (
+        <ProfileModal
+          user={selectedProfile.user}
+          profile={selectedProfile.profile}
+          dashboardBase="/influencer_dashboard"
+          onClose={() => setSelectedProfile(null)}
+        />
       )}
     </div>
   );
