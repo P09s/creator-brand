@@ -65,6 +65,13 @@ const profileSchema = new mongoose.Schema({
   campaignTypes:    { type: [String], default: [] },
   campaignsLaunched: { type: Number, default: 0 },
 
+  // ── Brand extended fields ─────────────────────────────────────────────
+  budgetRange:      { type: String, default: '' }, // '1k-5k' | '5k-25k' | '25k-1l' | '1l+'
+  preferredCreatorSize: { type: String, default: '' }, // 'nano' | 'micro' | 'macro' | 'any'
+  companySize:      { type: String, default: '' }, // 'solo' | 'startup' | 'smb' | 'enterprise'
+  linkedinUrl:      { type: String, default: '' },
+  instagramHandle:  { type: String, default: '' },
+
   // ── Shared ────────────────────────────────────────────────────────────
   totalEarnings:  { type: Number, default: 0 },
   totalSpent:     { type: Number, default: 0 },

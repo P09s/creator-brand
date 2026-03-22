@@ -32,15 +32,14 @@ function calcCompletionScore(profile, user, completedCampaigns, totalCampaigns) 
     steps.push({ key: 'portfolio',label: 'Add past work',            done: hasPortfolio,      points: 25 });
     // "Complete first campaign" is now a BONUS shown on TrustBadge, not blocking profile score
   } else {
-    const hasBio      = profile.bio?.trim().length > 10;
-    const hasIndustry = profile.industry?.trim().length > 0;
-    const hasWebsite  = profile.website?.trim().length > 0;
-    // For brands: count ANY campaign posted (active OR completed), not just completed
+    const hasBio        = profile.bio?.trim().length > 10;
+    const hasIndustry   = profile.industry?.trim().length > 0;
+    const hasBudget     = profile.budgetRange?.trim().length > 0;
     const hasPostedCampaign = totalCampaigns > 0;
 
     steps.push({ key: 'bio',      label: 'Write brand description', done: hasBio,            points: 25 });
     steps.push({ key: 'industry', label: 'Set your industry',       done: hasIndustry,       points: 25 });
-    steps.push({ key: 'website',  label: 'Add website',             done: hasWebsite,        points: 25 });
+    steps.push({ key: 'budget',   label: 'Set budget range',        done: hasBudget,         points: 25 });
     steps.push({ key: 'campaign', label: 'Post first campaign',     done: hasPostedCampaign, points: 25 });
   }
 
