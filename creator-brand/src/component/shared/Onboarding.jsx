@@ -57,7 +57,11 @@ function CreatorOnboarding({ user, onDone }) {
     try {
       const ss = {};
       PLATFORMS.forEach(({ key }) => {
-        if (followers[key]) ss[key] = { followers: Number(followers[key]), verified: false };
+        if (followers[key]) {
+          // YouTube uses subscribers, other platforms use followers
+          const countKey = key === 'youtube' ? 'subscribers' : 'followers';
+          ss[key] = { [countKey]: Number(followers[key]), verified: false };
+        }
       });
       await updateMyProfile({
         niche: niches,

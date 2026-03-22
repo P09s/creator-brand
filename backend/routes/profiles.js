@@ -93,7 +93,7 @@ router.put('/me', authMiddleware, async (req, res) => {
     const profile = await Profile.findOneAndUpdate(
       { user: req.user.id },
       { $set: flatBody },
-      { new: true, upsert: true }
+      { new: true, upsert: true, strict: false }
     );
     const user = await User.findById(req.user.id);
     const completedCampaigns = user.userType === 'influencer'

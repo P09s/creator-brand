@@ -50,7 +50,7 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
       const ss = p.socialStats || {};
       setFollowers({
         instagram: ss.instagram?.followers || '',
-        youtube:   ss.youtube?.followers || '',
+        youtube:   ss.youtube?.subscribers || ss.youtube?.followers || '',
         twitter:   ss.twitter?.followers || '',
       });
       const sl = p.socialLinks || {};
@@ -90,7 +90,7 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
     await save({
       socialStats: {
         instagram: { followers: Number(followers.instagram) || 0 },
-        youtube:   { followers: Number(followers.youtube) || 0 },
+        youtube:   { subscribers: Number(followers.youtube) || 0 },  // YouTube uses subscribers
         twitter:   { followers: Number(followers.twitter) || 0 },
       },
       followers: Math.max(
@@ -296,13 +296,30 @@ const PortfolioOverview = memo(({ setIsProfileModalOpen }) => {
             {Object.entries(socialLinks).filter(([,v]) => v).length === 0 ? (
               <p className="text-gray-600 text-xs italic">No social profiles added yet — brands can't find you externally</p>
             ) : (
-              Object.entries(socialLinks).filter(([,v]) => v).map(([key, val]) => (
-                <a key={key} href={key === 'website' ? val : key === 'instagram' ? `https://instagram.com/${val.replace('@','')}` : key === 'youtube' ? `https://youtube.com/@${val.replace('@','')}` : key === 'tiktok' ? `https://tiktok.com/@${val.replace('@','')}` : `https://twitter.com/${val.replace('@','')}`}
-                  target="_blank" rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 text-xs bg-gray-900 border border-gray-800 hover:border-gray-600 text-gray-300 px-3 py-1.5 rounded-lg transition-colors capitalize">
-                  {key === 'website' ? '🌐' : key === 'instagram' ? '📸' : key === 'youtube' ? '▶️' : key === 'tiktok' ? '🎵' : '🐦'} {key}
-                </a>
-              ))
+              Object.entries(socialLinks).filter(([,v]) => v).map(([key, val]) => {
+                const href = key === 'website' ? val
+                  : key === 'instagram' ? `https://instagram.com/${val.replace('@','')}`
+                  : key === 'youtube'   ? `https://youtube.com/@${val.replace('@','')}`
+                  : key === 'tiktok'    ? `https://tiktok.com/@${val.replace('@','')}`
+                  : `https://twitter.com/${val.replace('@','')}`;
+
+                const iconProps = { className: 'w-3.5 h-3.5 flex-shrink-0' };
+                const Icon = key === 'instagram' ? <Instagram {...iconProps} className="w-3.5 h-3.5 text-pink-400" />
+                           : key === 'youtube'   ? <Youtube   {...iconProps} className="w-3.5 h-3.5 text-red-400" />
+                           : key === 'twitter'   ? <Twitter   {...iconProps} className="w-3.5 h-3.5 text-blue-400" />
+                           : key === 'tiktok'    ? <span className="text-xs font-bold text-gray-300 leading-none">TT</span>
+                           : <Globe className="w-3.5 h-3.5 text-green-400" />;
+
+                const label = key === 'website' ? 'Portfolio' : key.charAt(0).toUpperCase() + key.slice(1);
+
+                return (
+                  <a key={key} href={href} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-xs bg-gray-900 border border-gray-800 hover:border-gray-600 text-gray-300 hover:text-white px-3 py-1.5 rounded-lg transition-colors">
+                    {Icon}
+                    {label}
+                  </a>
+                );
+              })
             )}
           </div>
         )}
